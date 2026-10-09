@@ -46,13 +46,15 @@ So I'm building the app I want to use. Progrex is my playground to design a real
 
 | Layer | Choice |
 |---|---|
-| App | Expo SDK 57, React Native 0.86, TypeScript (strict), Expo Router |
+| Language | TypeScript 6 (strict) across the app and the shared training logic |
+| App | Expo SDK 57, React Native 0.86, Expo Router |
 | Local data | SQLite (`expo-sqlite`, async API) + Drizzle ORM, custom migrator and live queries |
 | Domain logic | Pure TypeScript in `packages/shared` — progression engine, plan generator, metrics |
 | Validation | Zod schemas shared across the app |
-| UI | Custom design system (tokens, Inter, monochrome), Reanimated, SVG charts |
+| UI | Custom design system (tokens, Inter, monochrome), Reanimated, `react-native-svg` charts |
 | i18n | English and European Portuguese (i18next) |
 | Tests | Vitest — 71 tests, including 960 generated plans checked against domain rules |
+| Tooling | npm workspaces (monorepo), ESLint, Prettier |
 | Planned | Cloudflare Workers + D1 for sync between devices |
 
 ## Project structure
@@ -72,7 +74,7 @@ docs/                 Design decisions and concepts
 
 ## Getting started
 
-Requires Node.js 22+.
+Requires Node.js 20.19+, 22.13+ or 24.3+.
 
 ```bash
 npm install
