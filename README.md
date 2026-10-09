@@ -19,7 +19,7 @@ Progrex sits right where my two passions meet: **fitness** and **programming**.
 
 Anyone who trains knows the problem: the moment you change gyms, travel, or end up training at home for a few days, your plan stops making sense and your progress charts flatline. Most apps track progress *per exercise*, so a week of push-ups in a hotel room counts for nothing towards your bench press.
 
-So I'm building the app I want to use. Progrex is my playground to design a real product end to end — training science on one side, software architecture on the other — and to keep learning both along the way.
+So I'm building the app I want to use. Progrex is my playground to design a real product end to end, training science on one side, software architecture on the other, and to keep learning both along the way.
 
 ## What makes it different
 
