@@ -20,6 +20,7 @@ import { ProgressBar } from '@/ui/ProgressBar';
 import { SegmentedControl } from '@/ui/SegmentedControl';
 import { Text } from '@/ui/Text';
 import { radius, space, touch } from '@/ui/theme';
+import { useSingleFlight } from '@/ui/useSingleFlight';
 import { useTheme } from '@/ui/useTheme';
 
 import {
@@ -117,10 +118,10 @@ export function NextSession({ state, next, location }: NextSessionProps) {
     router.push(`/workout/${id}`);
   }
 
-  async function startFree() {
+  const startFree = useSingleFlight(async () => {
     const id = await startWorkout(location.id);
     router.push(`/workout/${id}`);
-  }
+  });
 
   function togglePainArea(area: BodyArea) {
     setPain((current) => {

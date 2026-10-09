@@ -92,7 +92,11 @@ export default function WorkoutScreen() {
   return (
     <>
       <Stack.Screen options={{ title }} />
-      <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.scroll}>
+      <ScrollView
+        style={{ backgroundColor: theme.background }}
+        contentContainerStyle={styles.scroll}
+        // iPhone: scroll the typed field above the keyboard.
+        automaticallyAdjustKeyboardInsets>
         <View style={styles.column}>
           <View style={styles.topBar}>
             <Text color="textMuted" style={styles.place}>

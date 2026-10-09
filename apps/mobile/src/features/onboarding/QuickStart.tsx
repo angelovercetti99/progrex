@@ -12,6 +12,7 @@ import { Card } from '@/ui/Card';
 import { LogoMark } from '@/ui/Logo';
 import { Text } from '@/ui/Text';
 import { radius, space, touch } from '@/ui/theme';
+import { useSingleFlight } from '@/ui/useSingleFlight';
 import { useTheme } from '@/ui/useTheme';
 
 /**
@@ -25,20 +26,20 @@ export function QuickStart({ hasPlace }: { hasPlace: boolean }) {
   const [step, setStep] = useState<0 | 1 | 2>(hasPlace ? 1 : 0);
   const [goal, setGoal] = useState<Goal>('hypertrophy');
 
-  async function choosePlace(preset: LocationPreset) {
+  const choosePlace = useSingleFlight(async (preset: LocationPreset) => {
     const name = t(`locations.preset${preset[0].toUpperCase()}${preset.slice(1)}` as 'locations.presetGym');
     await createLocation(name, LOCATION_PRESETS[preset]);
     setStep(1);
-  }
+  });
 
   function chooseGoal(value: Goal) {
     setGoal(value);
     setStep(2);
   }
 
-  async function chooseDays(days: number) {
+  const chooseDays = useSingleFlight(async (days: number) => {
     await createMesocycle({ goal, daysPerWeek: days, sessionMinutes: 60, experience: 'intermediate' });
-  }
+  });
 
   return (
     <View style={styles.container}>

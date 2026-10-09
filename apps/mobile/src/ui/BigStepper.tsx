@@ -29,12 +29,17 @@ export function BigStepper({ label, value, onChange, step = 1, min = 0, max = 99
   // Big jumps (0 → 60 kg) are faster typed than tapped: tap the number to type it.
   const [draft, setDraft] = useState<string | null>(null);
 
-  function commit() {
-    if (draft === null) return;
-    const parsed = Number(draft.replace(',', '.'));
-    if (Number.isFinite(parsed)) {
+  // Applied while typing: the iPhone number pad has no "done" key, and tapping
+  // "Complete set" right away must already use the typed value.
+  function type(text: string) {
+    setDraft(text);
+    const parsed = Number(text.replace(',', '.'));
+    if (text.trim() !== '' && Number.isFinite(parsed)) {
       onChange(Math.min(max, Math.max(min, Math.round(parsed * 100) / 100)));
     }
+  }
+
+  function commit() {
     setDraft(null);
   }
 
@@ -76,7 +81,7 @@ export function BigStepper({ label, value, onChange, step = 1, min = 0, max = 99
               keyboardType="decimal-pad"
               returnKeyType="done"
               value={draft}
-              onChangeText={setDraft}
+              onChangeText={type}
               onSubmitEditing={commit}
               onBlur={commit}
               style={[

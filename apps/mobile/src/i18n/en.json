@@ -425,5 +425,12 @@
     "days": "How many days a week?",
     "later": "60-minute workouts. You can fine-tune everything later in the Plan tab.",
     "skip": "Train without a plan"
+  },
+  "startup": {
+    "otherTabTitle": "Progrex is already open in another tab",
+    "otherTabBody": "In the browser, your data can only be open in one place at a time. Close the other tab and try again.",
+    "errorTitle": "Couldn't open your data",
+    "errorBody": "Your workouts are still saved. Try again; if it keeps happening, restart the app.",
+    "retry": "Try again"
   }
 }

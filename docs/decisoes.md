@@ -765,3 +765,31 @@ disponível, prefere exercícios com carga**: é a alavanca que dá progresso du
 
 **Princípio:** cada toque que a app consegue poupar, poupa. Valores por defeito sensatos,
 afinar depois e nunca antes.
+
+---
+
+## 43. Caça aos erros (QA)
+
+Revimos a app à procura de erros: verificações automáticas, compilação para iPhone e
+Android, testes de "uso mau" no browser (toques duplos, apagar coisas em uso, ecrãs de 320 px,
+modo escuro, dois separadores) e leitura do código.
+
+**Encontrados e corrigidos:**
+
+| # | Erro | Correção |
+|---|---|---|
+| 1 | Dois toques em "Ginásio" criavam dois espaços | `useSingleFlight`: ignora toques enquanto a ação decorre |
+| 2 | Dois toques em "Concluir série" gravavam duas séries | o mesmo, aplicado a todos os botões (`Button`) |
+| 3 | Apagar os dados de exemplo apagava um treino real feito num espaço de exemplo | esses espaços ficam |
+| 4 | Recriar os dados de exemplo podia rebentar (ID repetido) | inserção tolerante |
+| 5 | iPhone: o teclado numérico não tem "OK" e o peso escrito podia não contar | o valor aplica-se enquanto escreves |
+| 6 | iPhone: o teclado tapava o campo | o ecrã ajusta-se ao teclado |
+| 7 | "Percebi" invisível (mesma cor que a caixa) | botão com fundo destacado |
+| 8 | Dois separadores na web: erro técnico em inglês | mensagem clara + "Tentar outra vez" (recarrega na web) |
+| 9 | A lógica "qual é a próxima sessão / juntar sessões" não tinha testes | separada numa função pura (`planPosition`) com 6 testes |
+
+**Verificado sem problemas:** traduções PT/EN completas, compilação iOS e Android,
+`expo-doctor`, apagar o único espaço com um plano ativo, 320 px em claro e escuro sem cortes.
+
+**Ainda por verificar (precisa do telemóvel):** vibração, teclado numérico, tabs nativas,
+desempenho do SQLite nativo e o comportamento real do teclado no iPhone.

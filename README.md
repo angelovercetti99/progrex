@@ -72,7 +72,7 @@ It's also my playground to design a real product end to end, training science on
 | Validation | Zod schemas shared across the app |
 | UI | Custom design system (tokens, Inter, monochrome), Reanimated, `react-native-svg` charts |
 | i18n | English and European Portuguese (i18next) |
-| Tests | Vitest: 86 tests, including 960 generated plans checked against domain rules |
+| Tests | Vitest: 92 tests, including 960 generated plans checked against domain rules |
 | Tooling | npm workspaces (monorepo), ESLint, Prettier |
 | Planned | Cloudflare Workers + D1 for sync between devices |
 

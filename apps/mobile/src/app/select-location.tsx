@@ -16,6 +16,7 @@ import { ListRow } from '@/ui/ListRow';
 import { SegmentedControl } from '@/ui/SegmentedControl';
 import { Text } from '@/ui/Text';
 import { maxContentWidth, space } from '@/ui/theme';
+import { useSingleFlight } from '@/ui/useSingleFlight';
 import { useTheme } from '@/ui/useTheme';
 
 type Duration = 'always' | 'today' | 'days3' | 'week';
@@ -36,7 +37,7 @@ export default function SelectLocationScreen() {
   const current = useLiveQuery(getCurrentLocation, ['locations', 'preferences'], []);
   const [duration, setDuration] = useState<Duration>('always');
 
-  async function choose(id: string) {
+  const choose = useSingleFlight(async (id: string) => {
     if (duration === 'always') {
       await setTravel(null);
       await setCurrentLocationId(id);
@@ -44,7 +45,7 @@ export default function SelectLocationScreen() {
       await setTravel({ locationId: id, until: addDays(todayLocalDate(), DAYS[duration] - 1) });
     }
     router.back();
-  }
+  });
 
   return (
     <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.scroll}>

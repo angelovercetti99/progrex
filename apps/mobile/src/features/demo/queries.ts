@@ -6,7 +6,7 @@ import {
   type LocationEquipment,
   type Target,
 } from '@progrex/shared';
-import { and, isNotNull, isNull, like } from 'drizzle-orm';
+import { and, isNotNull, isNull, like, not, notInArray } from 'drizzle-orm';
 
 import { db } from '@/db/client';
 import { notifyChanged } from '@/db/live';
@@ -104,14 +104,18 @@ export async function createDemoData(): Promise<void> {
   const firstMonday = addDays(weekStart(today), -7 * (WEEKS.length - 1));
   const catalog = new Map(CATALOG.map((exercise) => [exercise.key, exercise]));
 
-  await db.insert(locations).values(
-    (Object.keys(PLACES) as Place[]).map((place) => ({
-      id: `${PREFIX}${place}`,
-      name: PLACES[place].name,
-      equipment: PLACES[place].equipment,
-      ...stamps,
-    }))
-  );
+  // A sample place kept from an earlier round (real workouts used it) may still exist.
+  await db
+    .insert(locations)
+    .values(
+      (Object.keys(PLACES) as Place[]).map((place) => ({
+        id: `${PREFIX}${place}`,
+        name: PLACES[place].name,
+        equipment: PLACES[place].equipment,
+        ...stamps,
+      }))
+    )
+    .onConflictDoNothing();
 
   // Double progression per exercise: +1 rep per session, then +weight back to 8 reps.
   const state = new Map<string, { weight: number | null; reps: number }>();
@@ -207,7 +211,25 @@ export async function deleteDemoData(): Promise<void> {
   await db.delete(sets).where(like(sets.id, `${PREFIX}%`));
   await db.delete(workoutExercises).where(like(workoutExercises.id, `${PREFIX}%`));
   await db.delete(workouts).where(like(workouts.id, `${PREFIX}%`));
-  await db.delete(locations).where(like(locations.id, `${PREFIX}%`));
+  // A sample place where you logged real workouts stays (else those workouts lose their place).
+  const used = await db
+    .selectDistinct({ id: workouts.locationId })
+    .from(workouts)
+    .where(and(not(like(workouts.id, `${PREFIX}%`)), like(workouts.locationId, `${PREFIX}%`)));
+  const keep = used.map((row) => row.id);
+  if (keep.length) {
+    await db
+      .update(locations)
+      .set({ dirty: true })
+      .where(like(locations.id, `${PREFIX}%`));
+  }
+  await db
+    .delete(locations)
+    .where(
+      keep.length
+        ? and(like(locations.id, `${PREFIX}%`), notInArray(locations.id, keep))
+        : like(locations.id, `${PREFIX}%`)
+    );
   if ((await getTravel())?.locationId.startsWith(PREFIX)) {
     await setTravel(null);
   }

@@ -1,10 +1,9 @@
 import {
   adaptSession,
   addDays,
-  daysLeftInPlanWeek,
   generateMesocycle,
-  groupSessions,
   mergeSessions,
+  planPosition,
   selectVariant,
   sessionScore,
   shouldDeloadEarly,
@@ -80,27 +79,9 @@ export async function getPlanState(): Promise<PlanState | undefined> {
     for (const session of row.covered ?? [row.session]) done.add(sessionKey({ week: row.week, session }));
   }
 
-  // Sessions are done in order: week by week, A, B, C…
-  let next: SessionRef | null = null;
-  outer: for (let week = 0; week < mesocycle.plan.weeks.length; week++) {
-    for (let session = 0; session < mesocycle.plan.sessions.length; session++) {
-      if (!done.has(sessionKey({ week, session }))) {
-        next = { week, session };
-        break outer;
-      }
-    }
-  }
-
-  // A busy week never leaves you behind: if more sessions are left than days, merge them.
+  // Next session + merging in a busy week: a pure, tested function (packages/shared/src/adapt).
   const today = todayLocalDate();
-  let group: number[] = next ? [next.session] : [];
-  if (next) {
-    const remaining = mesocycle.plan.sessions
-      .map((_, index) => index)
-      .filter((index) => !done.has(sessionKey({ week: next.week, session: index })));
-    const daysLeft = daysLeftInPlanWeek(mesocycle.startDate, next.week, today);
-    group = groupSessions(remaining, daysLeft)[0] ?? group;
-  }
+  const { next, group } = planPosition(mesocycle.plan, done, mesocycle.startDate, today);
 
   const last = await db
     .select({ date: workouts.date })

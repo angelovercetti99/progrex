@@ -5,7 +5,15 @@ import { radius, space, touch } from './theme';
 import { useTheme } from './useTheme';
 
 /** Small pill button for quick choices (e.g. presets). */
-export function Chip({ label, onPress }: { label: string; onPress: () => void }) {
+export function Chip({
+  label,
+  onPress,
+  raised = false,
+}: {
+  label: string;
+  onPress: () => void;
+  raised?: boolean;
+}) {
   const theme = useTheme();
   return (
     <Pressable
@@ -13,7 +21,7 @@ export function Chip({ label, onPress }: { label: string; onPress: () => void })
       onPress={onPress}
       style={({ pressed }) => [
         styles.chip,
-        { backgroundColor: theme.surfaceMuted },
+        { backgroundColor: raised ? theme.raised : theme.surfaceMuted },
         pressed && styles.pressed,
       ]}>
       <Text variant="label">{label}</Text>

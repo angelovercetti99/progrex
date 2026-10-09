@@ -14,6 +14,7 @@ import { SegmentedControl } from '@/ui/SegmentedControl';
 import { Text } from '@/ui/Text';
 import { TextField } from '@/ui/TextField';
 import { maxContentWidth, space } from '@/ui/theme';
+import { useSingleFlight } from '@/ui/useSingleFlight';
 import { useTheme } from '@/ui/useTheme';
 
 /** "Supino" matches "supino" and "Agachamento búlgaro" matches "bulgaro". */
@@ -58,14 +59,14 @@ export default function AddExerciseScreen() {
     return exercise.equipment.map((type) => t(`equipment.${type}`)).join(' + ');
   }
 
-  async function add(exercise: Exercise) {
+  const add = useSingleFlight(async (exercise: Exercise) => {
     if (replacing) {
       await swapExercise(replacing.id, exercise.id);
     } else {
       await addExerciseToWorkout(workoutId, exercise.id);
     }
     router.back();
-  }
+  });
 
   return (
     <>

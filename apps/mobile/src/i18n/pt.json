@@ -425,5 +425,12 @@
     "days": "Quantos dias por semana?",
     "later": "Treinos de 60 min. Podes afinar tudo depois no separador Plano.",
     "skip": "Treinar sem plano"
+  },
+  "startup": {
+    "otherTabTitle": "A Progrex já está aberta noutro separador",
+    "otherTabBody": "No browser, os teus dados só podem estar abertos num sítio de cada vez. Fecha o outro separador e tenta outra vez.",
+    "errorTitle": "Não foi possível abrir os teus dados",
+    "errorBody": "Os teus treinos continuam guardados. Tenta outra vez; se persistir, reinicia a app.",
+    "retry": "Tentar outra vez"
   }
 }

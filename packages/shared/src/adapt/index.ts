@@ -174,3 +174,33 @@ export function shouldDeloadEarly(stalledByExercise: number[]): boolean {
   const stuck = stalledByExercise.filter((stalled) => stalled >= PLATEAU_SESSIONS).length;
   return stuck / stalledByExercise.length >= 0.5;
 }
+
+// ---------- Where you are in the plan ----------
+
+export type PlanPosition = {
+  /** The next session to do (week + session index), or null when the block is complete. */
+  next: { week: number; session: number } | null;
+  /** The session(s) the next workout covers (several in a busy week). */
+  group: number[];
+};
+
+/**
+ * The next workout of a plan. Sessions are done in order; a week with more
+ * sessions left than days left merges them, so you never fall behind.
+ * `done` holds "week-session" keys.
+ */
+export function planPosition(
+  plan: Pick<Mesocycle, 'weeks' | 'sessions'>,
+  done: ReadonlySet<string>,
+  startDate: string,
+  today: string
+): PlanPosition {
+  const key = (week: number, session: number) => `${week}-${session}`;
+  for (let week = 0; week < plan.weeks.length; week++) {
+    const remaining = plan.sessions.map((_, index) => index).filter((index) => !done.has(key(week, index)));
+    if (remaining.length === 0) continue;
+    const daysLeft = daysLeftInPlanWeek(startDate, week, today);
+    return { next: { week, session: remaining[0] }, group: groupSessions(remaining, daysLeft)[0] };
+  }
+  return { next: null, group: [] };
+}

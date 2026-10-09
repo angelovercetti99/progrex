@@ -64,7 +64,7 @@ export function EffortPicker({ rir, targetRir, onChange }: EffortPickerProps) {
             {t('effort.introBody')}
           </Text>
           <View style={styles.introAction}>
-            <Chip label={t('effort.gotIt')} onPress={dismiss} />
+            <Chip raised label={t('effort.gotIt')} onPress={dismiss} />
           </View>
         </Animated.View>
       )}

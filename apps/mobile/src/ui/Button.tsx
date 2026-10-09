@@ -3,11 +3,12 @@ import { Platform, Pressable, StyleSheet } from 'react-native';
 
 import { Text } from './Text';
 import { radius, space, touch } from './theme';
+import { useSingleFlight } from './useSingleFlight';
 import { useTheme } from './useTheme';
 
 type ButtonProps = {
   label: string;
-  onPress: () => void;
+  onPress: () => unknown;
   /** `primary` = the ONE main action of the screen. Everything else is `secondary`. */
   variant?: 'primary' | 'secondary';
   disabled?: boolean;
@@ -15,13 +16,14 @@ type ButtonProps = {
 
 export function Button({ label, onPress, variant = 'primary', disabled = false }: ButtonProps) {
   const theme = useTheme();
+  const run = useSingleFlight(onPress);
   const isPrimary = variant === 'primary';
 
   function handlePress() {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    onPress();
+    run();
   }
 
   return (

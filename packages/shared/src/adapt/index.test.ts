@@ -9,6 +9,7 @@ import {
   groupSessions,
   mergeSessions,
   PAIN_PATTERNS,
+  planPosition,
   shouldDeloadEarly,
 } from './index';
 
@@ -123,5 +124,47 @@ describe('stagnation', () => {
     expect(shouldDeloadEarly([3, 4, 0, 3])).toBe(true);
     expect(shouldDeloadEarly([3, 0, 0, 1])).toBe(false);
     expect(shouldDeloadEarly([3, 3])).toBe(false); // too little evidence
+  });
+});
+
+describe('planPosition', () => {
+  const plan3 = generateMesocycle({
+    goal: 'hypertrophy',
+    daysPerWeek: 3,
+    sessionMinutes: 60,
+    experience: 'intermediate',
+  });
+  const start = '2026-10-05'; // a Monday
+
+  it('starts at week 1, session A, one session per workout', () => {
+    expect(planPosition(plan3, new Set(), start, '2026-10-05')).toEqual({
+      next: { week: 0, session: 0 },
+      group: [0],
+    });
+  });
+
+  it('continues in order', () => {
+    expect(planPosition(plan3, new Set(['0-0']), start, '2026-10-07').next).toEqual({ week: 0, session: 1 });
+  });
+
+  it('merges when more sessions are left than days (Saturday, 3 left)', () => {
+    expect(planPosition(plan3, new Set(), start, '2026-10-10').group).toEqual([0, 1]);
+  });
+
+  it('merges everything left when the week is already over', () => {
+    expect(planPosition(plan3, new Set(['0-0']), start, '2026-10-13').group).toEqual([1, 2]);
+  });
+
+  it('counts merged sessions as done and moves to the next week', () => {
+    const done = new Set(['0-0', '0-1', '0-2']);
+    expect(planPosition(plan3, done, start, '2026-10-13')).toEqual({
+      next: { week: 1, session: 0 },
+      group: [0],
+    });
+  });
+
+  it('is complete when every session of every week is done', () => {
+    const done = new Set(plan3.weeks.flatMap((_, w) => plan3.sessions.map((__, s) => `${w}-${s}`)));
+    expect(planPosition(plan3, done, start, '2026-12-01')).toEqual({ next: null, group: [] });
   });
 });
