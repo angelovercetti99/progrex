@@ -1,0 +1,19 @@
+{
+  "name": "progrex",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run start --workspace @progrex/mobile",
+    "web": "npm run web --workspace @progrex/mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "format": "prettier --write \"apps/mobile/src/**/*.{ts,tsx}\" \"packages/shared/src/**/*.ts\"",
+    "preview": "npm run export:web --workspace @progrex/mobile && node scripts/serve-web.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.9"
+  }
+}

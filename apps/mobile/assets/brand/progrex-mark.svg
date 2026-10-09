@@ -1,0 +1,9 @@
+<!-- Progrex mark: a "P" whose stem is an upward arrow (progress). 1024 grid.
+     Source for every icon/splash PNG in assets/images. White on black for the app icon. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#000000"/>
+  <g transform="translate(512 512) scale(0.78) translate(-470 -480)">
+    <path d="M 292 792 V 330 H 214 L 354 168 L 494 330 H 416 V 792 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="24" stroke-linejoin="round"/>
+    <path d="M 416 382 H 560 A 118 118 0 0 1 560 618 H 416" fill="none" stroke="#FFFFFF" stroke-width="112" stroke-linejoin="round"/>
+  </g>
+</svg>

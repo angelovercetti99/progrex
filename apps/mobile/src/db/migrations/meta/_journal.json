@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1791551578241,
+      "tag": "0000_steep_kree",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791553107823,
+      "tag": "0001_even_jack_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791553804434,
+      "tag": "0002_smart_phantom_reporter",
+      "breakpoints": true
+    }
+  ]
+}

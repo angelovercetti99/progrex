@@ -1,0 +1,16 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+.DS_Store
+
+# Expo native folders (geradas com prebuild)
+/apps/mobile/ios
+/apps/mobile/android
+
+# Segredos
+.env
+.env.*
+.dev.vars
+*.pem

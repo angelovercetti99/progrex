@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progrex — proposta de diferenciação</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#F5F5F7; --card:#FFF; --text:#1D1D1F; --muted:#6E6E73; --line:#D9D9DE; --soft:#EBEBEF; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#E8E8ED; color:var(--text); font-family:Inter, system-ui, sans-serif; padding:40px 24px 80px; }
+  .page { max-width:1280px; margin:0 auto; }
+  h1 { font-size:36px; letter-spacing:-0.035em; margin:0 0 8px; }
+  .lead { color:var(--muted); font-size:18px; line-height:1.5; max-width:820px; margin:0 0 12px; }
+  .pill { display:inline-block; background:#1D1D1F; color:#fff; border-radius:999px; padding:6px 14px; font-size:14px; font-weight:600; margin:0 6px 32px 0; }
+  .phones { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; }
+  .phone { width:390px; background:var(--bg); border-radius:44px; padding:22px 18px 28px; box-shadow:0 30px 60px -30px rgba(0,0,0,.35); border:10px solid #111; }
+  .cap { text-align:center; color:var(--muted); font-size:14px; margin-top:12px; max-width:390px; line-height:1.45; }
+  .status { display:flex; justify-content:space-between; font-size:14px; font-weight:600; padding:0 10px 14px; }
+  .title { font-size:34px; font-weight:700; letter-spacing:-0.035em; margin:6px 4px 16px; }
+  .card { background:var(--card); border-radius:18px; padding:18px; margin-bottom:12px; }
+  .label { font-size:13px; color:var(--muted); font-weight:500; }
+  .big { font-size:52px; font-weight:600; letter-spacing:-0.045em; line-height:1; margin:6px 0 4px; font-variant-numeric:tabular-nums; }
+  .sub { font-size:14px; color:var(--muted); }
+  .h { font-size:17px; font-weight:600; letter-spacing:-0.02em; margin:0 0 2px; }
+  .row { display:flex; align-items:center; gap:10px; }
+  .bar { height:8px; background:var(--soft); border-radius:99px; position:relative; flex:1; }
+  .bar > i { position:absolute; left:0; top:0; bottom:0; background:#1D1D1F; border-radius:99px; }
+  .bar > b { position:absolute; top:-4px; bottom:-4px; width:2px; background:#1D1D1F; opacity:.35; }
+  .num { font-variant-numeric:tabular-nums; font-size:14px; font-weight:600; width:52px; text-align:right; }
+  .mini { font-size:12px; color:var(--muted); }
+  .chips { display:flex; gap:6px; margin-top:8px; }
+  .chip { flex:1; text-align:center; font-size:11px; font-weight:600; color:var(--muted); background:var(--soft); border-radius:6px; padding:3px 0; }
+  .chip.h { background:#1D1D1F; color:#fff; }
+  .list .item { display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--soft); }
+  .list .item:first-child { border-top:none; }
+  .delta { font-weight:600; font-variant-numeric:tabular-nums; width:56px; text-align:right; }
+  .seg { display:flex; height:10px; border-radius:99px; overflow:hidden; gap:2px; margin:10px 0; }
+  .legend { display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; font-size:13px; }
+  .dot { width:9px; height:9px; border-radius:3px; display:inline-block; margin-right:6px; }
+  .banner { background:#1D1D1F; color:#fff; border-radius:18px; padding:16px 18px; margin-bottom:12px; }
+  .banner .sub { color:#B0B0B6; }
+  .swap { display:flex; align-items:center; gap:8px; font-size:14px; padding:9px 0; border-top:1px solid var(--soft); }
+  .swap s { color:var(--muted); text-decoration:none; flex:1; }
+  .swap span { flex:1.2; font-weight:500; }
+  .btn { background:#1D1D1F; color:#fff; border-radius:999px; text-align:center; padding:16px; font-weight:600; font-size:17px; margin-top:6px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .metric { background:var(--card); border-radius:16px; padding:14px; }
+  .metric .v { font-size:30px; font-weight:600; letter-spacing:-0.03em; font-variant-numeric:tabular-nums; }
+  .why { background:var(--card); border-radius:22px; padding:28px; margin:44px auto 0; max-width:1000px; }
+  .why h2 { margin:0 0 14px; letter-spacing:-0.03em; }
+  .why table { width:100%; border-collapse:collapse; font-size:15px; }
+  .why td, .why th { text-align:left; padding:10px 8px; border-top:1px solid var(--soft); vertical-align:top; }
+  .why th { color:var(--muted); font-weight:500; border-top:none; }
+  .yes { font-weight:700; } .no { color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Progrex: o progresso que não se parte</h1>
+  <p class="lead">As outras apps medem o progresso <b>por máquina</b> (o 1RM do supino). Quando mudas de ginásio, viajas ou treinas em casa, o gráfico pára. A Progrex mede o progresso <b>por movimento</b>: flexões no hotel e supino no ginásio contam para a mesma linha, "Empurrar".</p>
+  <span class="pill">Índice Progrex</span><span class="pill">Estímulo equivalente</span><span class="pill">Modo viagem</span><span class="pill">Como progrediste</span>
+
+  <div class="phones">
+    <!-- 1. Progress -->
+    <div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>●●●</span></div>
+        <div class="title">Progresso</div>
+        <div class="card">
+          <div class="label">Índice Progrex · 8 semanas</div>
+          <div class="big">+12,4%</div>
+          <div class="sub">A tua força, em todos os sítios onde treinaste</div>
+          <svg id="spark" width="100%" height="90" style="margin-top:10px"></svg>
+          <div class="chips" id="weeks"></div>
+          <div class="mini" style="margin-top:6px">G ginásio · C casa · <b style="color:#1D1D1F">H hotel</b>: o índice continuou a subir</div>
+        </div>
+        <div class="card">
+          <div class="row" style="justify-content:space-between"><div class="h">Estímulo desta semana</div><div class="num" style="width:auto">96%</div></div>
+          <div class="sub" style="margin-bottom:12px">Séries duras vs. a tua média · no hotel</div>
+          <div id="stim"></div>
+        </div>
+        <div class="card list" id="patterns"><div class="h" style="margin-bottom:4px">Por movimento</div></div>
+        <div class="card">
+          <div class="h">Como progrediste</div>
+          <div class="sub">O que te fez evoluir nestas 8 semanas</div>
+          <div class="seg" id="seg"></div>
+          <div class="legend" id="legend"></div>
+        </div>
+      </div>
+      <div class="cap"><b>Separador Progresso.</b> Uma métrica principal (o Índice), o estímulo da semana face à tua média, a evolução por movimento e as alavancas que funcionaram contigo.</div>
+    </div>
+
+    <!-- 2. Travel mode -->
+    <div>
+      <div class="phone">
+        <div class="status"><span>7:02</span><span>●●●</span></div>
+        <div class="title">Treino</div>
+        <div class="banner">
+          <div style="font-weight:600;font-size:17px">Modo viagem · Hotel Lisboa</div>
+          <div class="sub" style="margin-top:4px">Até domingo. O plano adaptou-se ao quarto: mesmo estímulo, outros exercícios.</div>
+        </div>
+        <div class="card">
+          <div class="label">Semana 3 · Treino A · Superior</div>
+          <div class="row" style="margin:8px 0 6px;justify-content:space-between">
+            <div class="h">Estímulo equivalente</div><div class="num" style="width:auto">≈ 95%</div>
+          </div>
+          <div class="bar"><i style="width:95%"></i><b style="left:100%"></b></div>
+          <div class="mini" style="margin-top:6px">Face ao mesmo treino no ginásio</div>
+        </div>
+        <div class="card">
+          <div class="h" style="margin-bottom:6px">O que mudou hoje</div>
+          <div class="swap"><s>Supino com halteres</s>→<span>Flexões c/ pés elevados</span></div>
+          <div class="swap"><s>Remada com barra</s>→<span>Remada debaixo da mesa</span></div>
+          <div class="swap"><s>Press militar</s>→<span>Flexões pike</span></div>
+          <div class="swap"><s>Elevações</s>→<span>Remada c/ toalha na porta</span></div>
+          <div class="mini" style="margin-top:8px">A dificuldade compensa a falta de peso: séries mais perto do limite e mais reps.</div>
+        </div>
+        <div class="btn">Começar treino A</div>
+      </div>
+      <div class="cap"><b>Modo viagem.</b> Dizes onde vais estar e até quando, e a app adapta o plano antes de chegares, mostrando o que trocou e quanto do estímulo mantém.</div>
+    </div>
+
+    <!-- 3. Workout summary -->
+    <div>
+      <div class="phone">
+        <div class="status"><span>7:48</span><span>●●●</span></div>
+        <div style="text-align:center;margin:18px 0 6px">
+          <svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#1D1D1F"/><path d="M19 33 l9 9 l17 -19" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="title" style="text-align:center;margin-bottom:4px">Treino A feito</div>
+        <div class="sub" style="text-align:center;margin-bottom:18px">Hotel Lisboa · 41 min</div>
+        <div class="grid">
+          <div class="metric"><div class="label">Séries duras</div><div class="v">14</div></div>
+          <div class="metric"><div class="label">Estímulo</div><div class="v">97%</div></div>
+          <div class="metric"><div class="label">Índice Progrex</div><div class="v">+0,8%</div></div>
+          <div class="metric"><div class="label">Melhores marcas</div><div class="v">3</div></div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="h">Primeiro treino fora, sem perder ritmo</div>
+          <div class="sub" style="margin-top:4px;line-height:1.45">"Empurrar" subiu 3% com flexões em vez de supino. Na próxima, a app sugere pés mais elevados.</div>
+        </div>
+        <div class="card list">
+          <div class="item"><span style="flex:1">Flexões c/ pés elevados</span><span class="mini">14 · 13 · 12</span><span class="delta">+2 reps</span></div>
+          <div class="item"><span style="flex:1">Remada debaixo da mesa</span><span class="mini">12 · 12 · 11</span><span class="delta">1.ª vez</span></div>
+          <div class="item"><span style="flex:1">Flexões pike</span><span class="mini">10 · 9 · 9</span><span class="delta">+1 rep</span></div>
+        </div>
+      </div>
+      <div class="cap"><b>Resumo do treino.</b> Fecha cada treino com o que importa: o estímulo, o efeito no Índice e uma frase sobre o que fazer a seguir.</div>
+    </div>
+  </div>
+
+  <div class="why">
+    <h2>Porque é que isto nos distingue</h2>
+    <table>
+      <tr><th></th><th>Hevy / Strong</th><th>Fitbod</th><th>Alpha Progression</th><th>Progrex</th></tr>
+      <tr><td>Adapta ao equipamento</td><td class="no">Não</td><td class="yes">Sim</td><td class="no">Parcial</td><td class="yes">Sim</td></tr>
+      <tr><td>Progresso que continua quando mudas de sítio</td><td class="no">Não (por exercício)</td><td class="no">Não (por exercício)</td><td class="no">Não</td><td class="yes">Sim: Índice por movimento</td></tr>
+      <tr><td>Diz quanto estímulo manténs fora do ginásio</td><td class="no">Não</td><td class="no">Não</td><td class="no">Não</td><td class="yes">Sim: estímulo equivalente</td></tr>
+      <tr><td>Prepara a viagem antes de partires</td><td class="no">Não</td><td class="no">Manual (trocar perfil)</td><td class="no">Não</td><td class="yes">Sim: modo viagem</td></tr>
+      <tr><td>Explica o porquê de cada alvo</td><td class="no">Não</td><td class="no">Pouco</td><td class="no">Parcial</td><td class="yes">Sim: uma frase por exercício</td></tr>
+      <tr><td>Progresso útil sem pesos (casa/hotel)</td><td class="no">Não (1RM)</td><td class="no">Fraco</td><td class="no">Fraco</td><td class="yes">Sim: reps, tempo, densidade, variante</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  const ink = '#1D1D1F', muted = '#B9B9C0';
+  // 1. Index sparkline (8 weeks), hotel week highlighted
+  const idx = [0, 1.6, 3.1, 4.0, 5.2, 7.9, 10.1, 12.4];
+  const where = ['G','G','G','H','C','G','G','G'];
+  const svg = document.getElementById('spark');
+  const W = 318, H = 90, pad = 8, max = 14;
+  const x = (i) => pad + i * (W - 2 * pad) / (idx.length - 1);
+  const y = (v) => H - pad - (v / max) * (H - 2 * pad);
+  let d = idx.map((v, i) => `${i ? 'L' : 'M'} ${x(i)} ${y(v)}`).join(' ');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = `<path d="${d} L ${x(7)} ${H} L ${x(0)} ${H} Z" fill="${ink}" opacity="0.06"/>
+    <path d="${d}" fill="none" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${idx.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="${where[i] === 'H' ? 5 : 3}" fill="${where[i] === 'H' ? ink : '#fff'}" stroke="${ink}" stroke-width="2"/>`).join('')}`;
+  document.getElementById('weeks').innerHTML = where.map((w) => `<div class="chip ${w === 'H' ? 'h' : ''}">${w}</div>`).join('');
+
+  // 2. Stimulus bars: hard sets vs average (tick = 100%)
+  const stim = [['Empurrar', 11, 12], ['Puxar', 10, 11], ['Pernas', 13, 13], ['Core', 4, 5]];
+  document.getElementById('stim').innerHTML = stim.map(([n, v, avg]) => `
+    <div class="row" style="margin:9px 0"><span style="width:76px;font-size:14px">${n}</span>
+      <div class="bar"><i style="width:${(v / 16) * 100}%"></i><b style="left:${(avg / 16) * 100}%"></b></div>
+      <span class="num">${v}/${avg}</span></div>`).join('') + '<div class="mini">Barra: séries duras esta semana · traço: a tua média</div>';
+
+  // 3. Per pattern with mini sparklines
+  const pats = [['Empurrar horizontal', 'Supino · Flexões', [0,2,3,5,6,8,9]], ['Puxar', 'Remada · Elevações', [0,1,4,6,8,11,14]], ['Agachar', 'Goblet · Búlgaro', [0,1,1,2,4,5,6]], ['Dobradiça de anca', 'RDL · Unilateral', [0,2,3,5,7,9,11]]];
+  document.getElementById('patterns').innerHTML += pats.map(([n, v, s]) => {
+    const w = 64, h = 26, m = Math.max(...s) || 1;
+    const p = s.map((val, i) => `${i ? 'L' : 'M'} ${(i * w) / (s.length - 1)} ${h - 2 - (val / m) * (h - 4)}`).join(' ');
+    return `<div class="item"><div style="flex:1"><div style="font-size:15px;font-weight:500">${n}</div><div class="mini">${v}</div></div>
+      <svg width="${w}" height="${h}"><path d="${p}" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="delta">+${s[s.length - 1]}%</span></div>`;
+  }).join('');
+
+  // 4. Levers
+  const levers = [['Mais peso', 41, '#1D1D1F'], ['Mais reps', 35, '#55555B'], ['Menos descanso', 12, '#8E8E93'], ['Variante mais difícil', 12, '#C7C7CC']];
+  document.getElementById('seg').innerHTML = levers.map(([, p, c]) => `<div style="flex:${p};background:${c}"></div>`).join('');
+  document.getElementById('legend').innerHTML = levers.map(([n, p, c]) => `<div><span class="dot" style="background:${c}"></span>${n} <b style="float:right">${p}%</b></div>`).join('');
+</script>
+</body>
+</html>
