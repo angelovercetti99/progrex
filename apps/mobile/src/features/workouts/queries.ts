@@ -436,3 +436,13 @@ export async function listFinishedWorkouts(): Promise<WorkoutSummary[]> {
     };
   });
 }
+
+/** True once any workout has been finished (used to tell a brand-new user apart). */
+export async function hasFinishedWorkout(): Promise<boolean> {
+  const row = await db
+    .select({ id: workouts.id })
+    .from(workouts)
+    .where(and(isNotNull(workouts.finishedAt), isNull(workouts.deletedAt)))
+    .get();
+  return row !== undefined;
+}

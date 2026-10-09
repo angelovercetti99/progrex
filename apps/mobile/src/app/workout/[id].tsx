@@ -26,17 +26,37 @@ export default function WorkoutScreen() {
   const catalog = useLiveQuery(listExercises, ['exercises'], []).data ?? [];
   const equipment = detail.data?.location?.equipment ?? [];
 
-  // The card with the set logger open. When an exercise is added, open it.
+  // An exercise is "done" when every planned set is logged.
+  const isDone = (item: (typeof items)[number]) =>
+    item.target !== null && item.sets.length >= item.target.sets.length;
+  const firstOpen = items.find((item) => !isDone(item))?.id ?? null;
+  const allDone = items.length > 0 && items.every(isDone);
+
+  // The card with the set logger open:
+  // - on opening (or a plan starting), the first exercise not done yet;
+  // - when you add one, the new one;
+  // - when you finish the last set of an exercise, the next one (no tap needed).
   const [activeId, setActiveId] = useState<string | null>(null);
   const previousCount = useRef(0);
   const count = items.length;
   const lastId = items.at(-1)?.id ?? null;
   useEffect(() => {
     if (count > previousCount.current) {
-      setActiveId(lastId);
+      setActiveId(previousCount.current === 0 ? (firstOpen ?? lastId) : lastId);
     }
     previousCount.current = count;
-  }, [count, lastId]);
+  }, [count, lastId, firstOpen]);
+
+  const active = items.find((item) => item.id === activeId);
+  const activeSets = active?.sets.length ?? 0;
+  const activeDone = active ? isDone(active) : false;
+  const previousActive = useRef({ id: activeId, sets: activeSets });
+  useEffect(() => {
+    const before = previousActive.current;
+    const justFinished = before.id === activeId && activeSets > before.sets && activeDone;
+    if (justFinished && firstOpen) setActiveId(firstOpen);
+    previousActive.current = { id: activeId, sets: activeSets };
+  }, [activeId, activeSets, activeDone, firstOpen]);
 
   const lastCompletedAt =
     items
@@ -121,7 +141,11 @@ export default function WorkoutScreen() {
               label={t('workout.addExercise')}
               onPress={() => router.push({ pathname: '/add-exercise', params: { workoutId: id } })}
             />
-            <Button variant="secondary" label={t('workout.finish')} onPress={finish} />
+            <Button
+              variant={allDone ? 'primary' : 'secondary'}
+              label={t('workout.finish')}
+              onPress={finish}
+            />
           </View>
         </View>
       </ScrollView>

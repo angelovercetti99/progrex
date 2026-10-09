@@ -73,12 +73,13 @@ export function selectVariant<T extends VariantCandidate>({
     return preferred;
   }
 
-  // Closest to the target difficulty; on a tie, prefer loadable exercises
-  // (adding weight is the easiest way to keep progressing), then the easier one.
+  // Loadable exercises first when the place has the gear (weight is the lever
+  // that keeps progress going longest; a gym shouldn't pick assisted pistols),
+  // then the closest to the target difficulty, then the easier one.
   return [...possible].sort(
     (a, b) =>
-      Math.abs(a.difficulty - targetDifficulty) - Math.abs(b.difficulty - targetDifficulty) ||
       loadRank(a.loadType) - loadRank(b.loadType) ||
+      Math.abs(a.difficulty - targetDifficulty) - Math.abs(b.difficulty - targetDifficulty) ||
       a.difficulty - b.difficulty
   )[0];
 }

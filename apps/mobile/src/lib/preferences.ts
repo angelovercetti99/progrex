@@ -107,3 +107,12 @@ export async function getTravel(): Promise<Travel | null> {
 export async function setTravel(travel: Travel | null): Promise<void> {
   await setPreference('travel', travel ? JSON.stringify(travel) : '');
 }
+
+/** The user chose to train without a plan (skips the first-run guide). */
+export async function getQuickStartSkipped(): Promise<boolean> {
+  return (await getPreference('quickStartSkipped')) === '1';
+}
+
+export async function skipQuickStart(): Promise<void> {
+  await setPreference('quickStartSkipped', '1');
+}

@@ -1,6 +1,8 @@
 import * as Haptics from 'expo-haptics';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
 
+import i18n from '@/i18n';
+
 import { Text } from './Text';
 import { radius, space, touch } from './theme';
 import { useTheme } from './useTheme';
@@ -96,9 +98,10 @@ function StepButton({
   );
 }
 
-/** 22.5 → "22.5", 20 → "20" */
+/** 22.5 → "22,5" in Portuguese, "22.5" in English; 20 → "20". */
 export function formatNumber(value: number): string {
-  return String(Math.round(value * 100) / 100);
+  const text = String(Math.round(value * 100) / 100);
+  return i18n.language === 'pt' ? text.replace('.', ',') : text;
 }
 
 const styles = StyleSheet.create({

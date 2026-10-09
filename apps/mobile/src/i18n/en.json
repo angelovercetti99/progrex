@@ -127,14 +127,16 @@
     "lastTime": "Last time: {{summary}}",
     "repsLabel": "Reps",
     "target": "Target",
-    "autoAdjusted": "Adjusted to your last set"
+    "autoAdjusted": "Adjusted to your last set",
+    "swap": "Swap"
   },
   "addExercise": {
     "title": "Add exercise",
     "search": "Search exercises",
     "available": "Available here",
     "all": "All",
-    "noResults": "No exercises found."
+    "noResults": "No exercises found.",
+    "swapTitle": "Swap exercise"
   },
   "patterns": {
     "squat": "Squat",
@@ -411,5 +413,17 @@
     "because_pain": "pain",
     "because_time": "time",
     "disclaimer": "If the pain persists, see a health professional."
+  },
+  "quickStart": {
+    "step": "{{n}} of {{total}}",
+    "where": "Where will you train?",
+    "gymHint": "Weights, machines and bars",
+    "homeHint": "Dumbbells up to 20 kg, bands and a bar",
+    "nothing": "No equipment",
+    "nothingHint": "Hotel, park, living room",
+    "goal": "What do you want to achieve?",
+    "days": "How many days a week?",
+    "later": "60-minute workouts. You can fine-tune everything later in the Plan tab.",
+    "skip": "Train without a plan"
   }
 }

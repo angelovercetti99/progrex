@@ -73,6 +73,18 @@ describe('selectVariant', () => {
   });
 });
 
+describe('choosing with gear available', () => {
+  it('picks a loaded squat at the gym, not an assisted pistol', () => {
+    const choice = selectVariant({ pattern: 'squat', available: gym, candidates });
+    expect(choice?.loadType).toBe('external');
+  });
+
+  it('uses the dumbbells at home', () => {
+    const choice = selectVariant({ pattern: 'squat', available: home, candidates });
+    expect(choice?.equipment).toContain('dumbbells');
+  });
+});
+
 describe('harderVariant', () => {
   it('steps up from push-ups to decline push-ups', () => {
     const pushUp = candidates.find((c) => c.id === id('push_up'))!;

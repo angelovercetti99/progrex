@@ -1,9 +1,11 @@
 import * as Haptics from 'expo-haptics';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { fontFamilyFor } from './fonts';
 import { formatNumber } from './Stepper';
 import { Text } from './Text';
-import { radius, space } from './theme';
+import { radius, space, typography } from './theme';
 import { useTheme } from './useTheme';
 
 type BigStepperProps = {
@@ -24,6 +26,17 @@ const BUTTON = 60;
  */
 export function BigStepper({ label, value, onChange, step = 1, min = 0, max = 999, unit }: BigStepperProps) {
   const theme = useTheme();
+  // Big jumps (0 → 60 kg) are faster typed than tapped: tap the number to type it.
+  const [draft, setDraft] = useState<string | null>(null);
+
+  function commit() {
+    if (draft === null) return;
+    const parsed = Number(draft.replace(',', '.'));
+    if (Number.isFinite(parsed)) {
+      onChange(Math.min(max, Math.max(min, Math.round(parsed * 100) / 100)));
+    }
+    setDraft(null);
+  }
 
   function change(delta: number) {
     const next = Math.round((value + delta) * 100) / 100;
@@ -47,16 +60,38 @@ export function BigStepper({ label, value, onChange, step = 1, min = 0, max = 99
           disabled={value - step < min}
           background={theme.surfaceMuted}
         />
-        <View style={styles.value}>
-          <Text variant="display" numeric>
-            {formatNumber(value)}
-          </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${label}: ${formatNumber(value)}`}
+          onPress={() => setDraft(formatNumber(value))}
+          style={styles.value}>
+          {draft === null ? (
+            <Text variant="display" numeric>
+              {formatNumber(value)}
+            </Text>
+          ) : (
+            <TextInput
+              autoFocus
+              selectTextOnFocus
+              keyboardType="decimal-pad"
+              returnKeyType="done"
+              value={draft}
+              onChangeText={setDraft}
+              onSubmitEditing={commit}
+              onBlur={commit}
+              style={[
+                typography.display,
+                styles.input,
+                { color: theme.text, fontFamily: fontFamilyFor('600'), fontWeight: undefined },
+              ]}
+            />
+          )}
           {unit ? (
             <Text variant="heading" color="textMuted">
               {unit}
             </Text>
           ) : null}
-        </View>
+        </Pressable>
         <RoundButton
           symbol="+"
           label="increase"
@@ -111,6 +146,11 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     justifyContent: 'center',
     gap: space.xs,
+  },
+  input: {
+    minWidth: 80,
+    textAlign: 'center',
+    padding: 0,
   },
   button: {
     width: BUTTON,

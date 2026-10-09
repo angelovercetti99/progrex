@@ -6,14 +6,15 @@ import { useLiveQuery } from '@/db/live';
 import { getActiveTravel, getCurrentLocation } from '@/features/locations/queries';
 import { TravelBanner } from '@/features/locations/TravelBanner';
 import { useEquipmentSummary } from '@/features/locations/useEquipmentSummary';
+import { QuickStart } from '@/features/onboarding/QuickStart';
 import { NextSession } from '@/features/plan/NextSession';
 import { getPlanState } from '@/features/plan/queries';
-import { getActiveWorkout, startWorkout } from '@/features/workouts/queries';
+import { getActiveWorkout, hasFinishedWorkout, startWorkout } from '@/features/workouts/queries';
+import { getQuickStartSkipped } from '@/lib/preferences';
 import { Button } from '@/ui/Button';
 import { Card } from '@/ui/Card';
-import { EmptyState } from '@/ui/EmptyState';
 import { ListRow } from '@/ui/ListRow';
-import { Logo, LogoMark } from '@/ui/Logo';
+import { Logo } from '@/ui/Logo';
 import { Screen } from '@/ui/Screen';
 import { Text } from '@/ui/Text';
 import { space, touch } from '@/ui/theme';
@@ -25,8 +26,16 @@ export default function TodayScreen() {
   const location = useLiveQuery(getCurrentLocation, ['locations', 'preferences'], []);
   const plan = useLiveQuery(getPlanState, ['mesocycles', 'workouts'], []);
   const travel = useLiveQuery(getActiveTravel, ['preferences', 'locations'], []).data ?? null;
+  const trained = useLiveQuery(hasFinishedWorkout, ['workouts'], []);
+  const skipped = useLiveQuery(getQuickStartSkipped, ['preferences'], []);
 
-  if (active.status !== 'ready' || location.status !== 'ready' || plan.status !== 'ready') {
+  if (
+    active.status !== 'ready' ||
+    location.status !== 'ready' ||
+    plan.status !== 'ready' ||
+    trained.status !== 'ready' ||
+    skipped.status !== 'ready'
+  ) {
     return (
       <Screen title={t('today.title')} header={<Logo size={30} />}>
         {null}
@@ -54,18 +63,11 @@ export default function TodayScreen() {
     );
   }
 
-  // 2. No places yet: we need to know what equipment there is.
-  if (!location.data) {
+  // 2. First run (no plan, never trained): three taps (where, goal, days) and the plan is ready.
+  if (!location.data || (!plan.data && !trained.data && !skipped.data)) {
     return (
       <Screen title={t('today.title')} header={<Logo size={30} />}>
-        <View style={styles.welcomeLogo}>
-          <LogoMark size={88} />
-        </View>
-        <EmptyState
-          title={t('today.emptyTitle')}
-          description={t('today.emptyDescription')}
-          action={<Button label={t('today.addLocation')} onPress={() => router.push('/locations/new')} />}
-        />
+        <QuickStart hasPlace={Boolean(location.data)} />
       </Screen>
     );
   }
@@ -125,10 +127,6 @@ export default function TodayScreen() {
 }
 
 const styles = StyleSheet.create({
-  welcomeLogo: {
-    alignItems: 'center',
-    marginTop: space.xxxl,
-  },
   center: {
     flex: 1,
     justifyContent: 'center',

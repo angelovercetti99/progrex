@@ -127,14 +127,16 @@
     "lastTime": "Última vez: {{summary}}",
     "repsLabel": "Repetições",
     "target": "Alvo",
-    "autoAdjusted": "Ajustado à série anterior"
+    "autoAdjusted": "Ajustado à série anterior",
+    "swap": "Trocar"
   },
   "addExercise": {
     "title": "Adicionar exercício",
     "search": "Procurar exercício",
     "available": "Disponíveis aqui",
     "all": "Todos",
-    "noResults": "Nenhum exercício encontrado."
+    "noResults": "Nenhum exercício encontrado.",
+    "swapTitle": "Trocar exercício"
   },
   "patterns": {
     "squat": "Agachar",
@@ -411,5 +413,17 @@
     "because_pain": "dor",
     "because_time": "tempo",
     "disclaimer": "Se a dor persistir, fala com um profissional de saúde."
+  },
+  "quickStart": {
+    "step": "{{n}} de {{total}}",
+    "where": "Onde vais treinar?",
+    "gymHint": "Pesos, máquinas e barras",
+    "homeHint": "Halteres até 20 kg, elásticos e barra",
+    "nothing": "Sem equipamento",
+    "nothingHint": "Hotel, parque, sala de casa",
+    "goal": "O que queres alcançar?",
+    "days": "Quantos dias por semana?",
+    "later": "Treinos de 60 min. Podes afinar tudo depois no separador Plano.",
+    "skip": "Treinar sem plano"
   }
 }

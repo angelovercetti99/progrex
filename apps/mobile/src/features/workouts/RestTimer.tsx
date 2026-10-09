@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useEffect, useRef, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Text } from '@/ui/Text';
@@ -22,11 +23,19 @@ export function RestTimer({ since, targetSeconds }: { since: string | null; targ
     return () => clearInterval(timer);
   }, []);
 
-  if (!since) return null;
-  const seconds = Math.max(0, Math.floor((now - Date.parse(since)) / 1000));
-  if (seconds > HIDE_AFTER_SECONDS) return null;
+  const seconds = since ? Math.max(0, Math.floor((now - Date.parse(since)) / 1000)) : 0;
+  const done = since !== null && targetSeconds !== null && seconds >= targetSeconds;
 
-  const done = targetSeconds !== null && seconds >= targetSeconds;
+  // Rest is over: a buzz, so you don't have to keep looking at the screen.
+  const wasDone = useRef(done);
+  useEffect(() => {
+    if (done && !wasDone.current && Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+    wasDone.current = done;
+  }, [done]);
+
+  if (!since || seconds > HIDE_AFTER_SECONDS) return null;
 
   return (
     <View style={[styles.pill, { backgroundColor: done ? theme.accent : theme.surfaceMuted }]}>

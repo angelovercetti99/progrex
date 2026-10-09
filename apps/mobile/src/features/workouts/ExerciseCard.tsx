@@ -1,6 +1,7 @@
 import { effortForRir, type Goal } from '@progrex/shared';
 import * as Haptics from 'expo-haptics';
 import { SymbolView } from 'expo-symbols';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -293,11 +294,26 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
             {editingSet ? (
               <Button variant="secondary" label={t('workout.deleteSet')} onPress={removeSet} />
             ) : (
-              <Pressable accessibilityRole="button" onPress={removeExercise} style={styles.textButton}>
-                <Text variant="label" color="textMuted">
-                  {t('workout.removeExercise')}
-                </Text>
-              </Pressable>
+              <View style={styles.cardActions}>
+                {item.sets.length === 0 && (
+                  // Machine taken, or just not today: another exercise for the same movement.
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() =>
+                      router.push({ pathname: '/add-exercise', params: { workoutId, replace: item.id } })
+                    }
+                    style={styles.textButton}>
+                    <Text variant="label" color="textMuted">
+                      {t('workout.swap')}
+                    </Text>
+                  </Pressable>
+                )}
+                <Pressable accessibilityRole="button" onPress={removeExercise} style={styles.textButton}>
+                  <Text variant="label" color="textMuted">
+                    {t('workout.removeExercise')}
+                  </Text>
+                </Pressable>
+              </View>
             )}
           </View>
         </>
@@ -355,6 +371,11 @@ const styles = StyleSheet.create({
   logger: {
     gap: space.lg,
     paddingTop: space.sm,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: space.xl,
   },
   textButton: {
     minHeight: touch.min,

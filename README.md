@@ -38,7 +38,7 @@ It's also my playground to design a real product end to end, training science on
   </tr>
 </table>
 
-**Convenience first.** On a normal day you don't fill anything in. The app infers what it can and only asks, with a single optional tap, for what it can't know.
+**Convenience first.** Three taps from install to your first workout (where, goal, days). On a normal day you don't fill anything in. The app infers what it can and only asks, with a single optional tap, for what it can't know.
 
 | Your conditions | What the plan does | You have to… |
 |---|---|---|
@@ -72,7 +72,7 @@ It's also my playground to design a real product end to end, training science on
 | Validation | Zod schemas shared across the app |
 | UI | Custom design system (tokens, Inter, monochrome), Reanimated, `react-native-svg` charts |
 | i18n | English and European Portuguese (i18next) |
-| Tests | Vitest: 84 tests, including 960 generated plans checked against domain rules |
+| Tests | Vitest: 86 tests, including 960 generated plans checked against domain rules |
 | Tooling | npm workspaces (monorepo), ESLint, Prettier |
 | Planned | Cloudflare Workers + D1 for sync between devices |
 

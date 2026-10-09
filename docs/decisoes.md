@@ -743,3 +743,25 @@ Detalhes que importam:
   mede só o efeito do sítio; o efeito do tempo tem a sua própria frase.
 - A recuperação conta do zero depois de um deload, para não entrar num ciclo de deloads.
 - A dor mostra sempre: "Se a dor persistir, fala com um profissional de saúde."
+
+---
+
+## 42. Ronda de conveniência: contar toques
+
+Percorremos a app como um utilizador novo e contámos os toques. O que mudou:
+
+| Momento | Antes | Agora |
+|---|---|---|
+| Primeira vez até ao 1.º treino | ~10 toques, formulário de espaço + ecrã do plano | **3 toques**: onde → objetivo → dias (o resto com valores sensatos) |
+| Pôr 60 kg num exercício novo | 24 toques no "+" | **tocar no número e escrever** |
+| Passar ao exercício seguinte | tocar no cartão | **automático** quando completas as séries |
+| Acabar o treino | botão discreto no fundo | **botão principal** quando está tudo feito |
+| Máquina ocupada | só quando o motor sugeria | **"Trocar"** em qualquer exercício por começar |
+| Fim do descanso | olhar para o ecrã | **vibra** |
+
+E um defeito de qualidade que este teste apanhou: no ginásio, para força, a app escolhia o
+"agachamento pistol assistido" porque tinha a dificuldade certa. Agora, **havendo carga
+disponível, prefere exercícios com carga**: é a alavanca que dá progresso durante mais tempo.
+
+**Princípio:** cada toque que a app consegue poupar, poupa. Valores por defeito sensatos,
+afinar depois e nunca antes.

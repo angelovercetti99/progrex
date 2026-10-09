@@ -1,5 +1,5 @@
 import { hasEquipmentFor, MOVEMENT_PATTERNS } from '@progrex/shared';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SectionList, StyleSheet, View } from 'react-native';
@@ -8,7 +8,7 @@ import { useLiveQuery } from '@/db/live';
 import type { Exercise } from '@/db/schema';
 import { listExercises } from '@/features/exercises/queries';
 import { useExerciseName } from '@/features/exercises/useExerciseName';
-import { addExerciseToWorkout, getWorkoutDetail } from '@/features/workouts/queries';
+import { addExerciseToWorkout, getWorkoutDetail, swapExercise } from '@/features/workouts/queries';
 import { ListRow } from '@/ui/ListRow';
 import { SegmentedControl } from '@/ui/SegmentedControl';
 import { Text } from '@/ui/Text';
@@ -25,18 +25,23 @@ export default function AddExerciseScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
   const exerciseName = useExerciseName();
-  const { workoutId } = useLocalSearchParams<{ workoutId: string }>();
+  // With `replace`, this screen swaps an exercise (machine taken…) instead of adding one.
+  const { workoutId, replace } = useLocalSearchParams<{ workoutId: string; replace?: string }>();
   const [filter, setFilter] = useState<'available' | 'all'>('available');
   const [search, setSearch] = useState('');
 
   const all = useLiveQuery(listExercises, ['exercises'], []);
   const workout = useLiveQuery(() => getWorkoutDetail(workoutId), ['workouts', 'locations'], [workoutId]);
   const equipment = workout.data?.location?.equipment ?? [];
+  const replacing = workout.data?.exercises.find((item) => item.id === replace);
 
   const query = normalize(search.trim());
   const visible = (all.data ?? []).filter(
     (exercise) =>
       (filter === 'all' || hasEquipmentFor(exercise.equipment, equipment)) &&
+      // Swapping: same movement, a different exercise.
+      (!replacing ||
+        (exercise.pattern === replacing.exercise.pattern && exercise.id !== replacing.exerciseId)) &&
       (!query || normalize(exerciseName(exercise)).includes(query))
   );
 
@@ -54,56 +59,63 @@ export default function AddExerciseScreen() {
   }
 
   async function add(exercise: Exercise) {
-    await addExerciseToWorkout(workoutId, exercise.id);
+    if (replacing) {
+      await swapExercise(replacing.id, exercise.id);
+    } else {
+      await addExerciseToWorkout(workoutId, exercise.id);
+    }
     router.back();
   }
 
   return (
-    <SectionList
-      style={{ backgroundColor: theme.background }}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
-      stickySectionHeadersEnabled={false}
-      sections={sections}
-      keyExtractor={(exercise) => exercise.id}
-      ListHeaderComponent={
-        <View style={styles.header}>
-          <TextField
-            value={search}
-            onChangeText={setSearch}
-            placeholder={t('addExercise.search')}
-            autoCorrect={false}
-            clearButtonMode="while-editing"
-          />
-          <SegmentedControl
-            value={filter}
-            onChange={setFilter}
-            options={[
-              { value: 'available', label: t('addExercise.available') },
-              { value: 'all', label: t('addExercise.all') },
-            ]}
-          />
-        </View>
-      }
-      renderSectionHeader={({ section }) => (
-        <Text variant="label" color="textMuted" style={styles.sectionTitle}>
-          {section.title}
-        </Text>
-      )}
-      renderItem={({ item }) => (
-        <View style={[styles.item, { backgroundColor: theme.surface }]}>
-          <ListRow title={exerciseName(item)} subtitle={equipmentLabel(item)} onPress={() => add(item)} />
-        </View>
-      )}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
-      ListEmptyComponent={
-        all.status === 'ready' ? (
-          <Text color="textMuted" align="center" style={styles.empty}>
-            {t('addExercise.noResults')}
+    <>
+      {replacing && <Stack.Screen options={{ title: t('addExercise.swapTitle') }} />}
+      <SectionList
+        style={{ backgroundColor: theme.background }}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        stickySectionHeadersEnabled={false}
+        sections={sections}
+        keyExtractor={(exercise) => exercise.id}
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <TextField
+              value={search}
+              onChangeText={setSearch}
+              placeholder={t('addExercise.search')}
+              autoCorrect={false}
+              clearButtonMode="while-editing"
+            />
+            <SegmentedControl
+              value={filter}
+              onChange={setFilter}
+              options={[
+                { value: 'available', label: t('addExercise.available') },
+                { value: 'all', label: t('addExercise.all') },
+              ]}
+            />
+          </View>
+        }
+        renderSectionHeader={({ section }) => (
+          <Text variant="label" color="textMuted" style={styles.sectionTitle}>
+            {section.title}
           </Text>
-        ) : null
-      }
-    />
+        )}
+        renderItem={({ item }) => (
+          <View style={[styles.item, { backgroundColor: theme.surface }]}>
+            <ListRow title={exerciseName(item)} subtitle={equipmentLabel(item)} onPress={() => add(item)} />
+          </View>
+        )}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ListEmptyComponent={
+          all.status === 'ready' ? (
+            <Text color="textMuted" align="center" style={styles.empty}>
+              {t('addExercise.noResults')}
+            </Text>
+          ) : null
+        }
+      />
+    </>
   );
 }
 
