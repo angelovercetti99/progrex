@@ -132,7 +132,7 @@ export function estimateMinutes(slots: Slot[], restSeconds: number): number {
  * 4. sets from prioritised main slots (min 2).
  * What the user chose to improve is always the last thing to go.
  */
-function fitToTime(slots: Slot[], minutes: number, restSeconds: number): Slot[] {
+export function fitToTime(slots: Slot[], minutes: number, restSeconds: number): Slot[] {
   let result = slots.map((slot) => ({ ...slot, setsPerWeek: [...slot.setsPerWeek] }));
 
   const dropIsolation = (priority: boolean) => {

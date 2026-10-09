@@ -34,7 +34,11 @@ export type TargetLever =
   /** Not all sets were done last time: complete them first. */
   | 'complete_sets'
   /** Recovery week: same weight, fewer sets, easy effort. */
-  | 'deload';
+  | 'deload'
+  /** Today isn't the day to push (low energy, coming back from a break): repeat. */
+  | 'hold'
+  /** No improvement for several sessions: change the stimulus (another variant). */
+  | 'plateau';
 
 export type Target = {
   lever: TargetLever;
@@ -59,7 +63,14 @@ export type ProgressionInput = {
   planned?: boolean;
   /** Deload week of the plan. */
   deload?: boolean;
+  /** Don't progress today: repeat last time (low energy, coming back from a break). */
+  hold?: boolean;
+  /** Sessions in a row without beating the best (see `stalledSessions`). */
+  stalled?: number;
 };
+
+/** After this many sessions without improvement, insisting stops working: change something. */
+export const PLATEAU_SESSIONS = 3;
 
 export function nextTarget({
   config,
@@ -69,6 +80,8 @@ export function nextTarget({
   maxLoadKg,
   planned = false,
   deload = false,
+  hold = false,
+  stalled = 0,
 }: ProgressionInput): Target {
   // A deload resets rest and tempo; otherwise they carry over from last time.
   const carried = lastTarget?.lever === 'deload' ? null : lastTarget;
@@ -131,9 +144,19 @@ export function nextTarget({
     });
   }
 
+  // Not today: same as last time. Progress resumes next session.
+  if (hold) {
+    return target('hold');
+  }
+
   // Not every set was done: finish the prescription before pushing further.
   if (lastSets.length < setCount) {
     return target('complete_sets');
+  }
+
+  // Stuck for several sessions: another +1 rep won't help. Change the stimulus.
+  if (stalled >= PLATEAU_SESSIONS) {
+    return target('plateau');
   }
 
   // Inside the range: one more rep on the first set that hasn't hit the top.
@@ -211,4 +234,18 @@ function repeat(count: number, set: SetTarget): SetTarget[] {
 /** Avoids float noise like 22.499999999. */
 function round(value: number): number {
   return Math.round(value * 100) / 100;
+}
+
+/**
+ * How many sessions in a row (most recent last) failed to beat the best score
+ * before them. 0 = the last session was a new best (or there's too little data).
+ */
+export function stalledSessions(scores: number[]): number {
+  let count = 0;
+  for (let i = scores.length - 1; i > 0; i--) {
+    const bestBefore = Math.max(...scores.slice(0, i));
+    if (scores[i] > bestBefore) break;
+    count++;
+  }
+  return count;
 }

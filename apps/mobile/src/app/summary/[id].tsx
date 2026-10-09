@@ -88,7 +88,11 @@ export default function WorkoutSummaryScreen() {
         </Animated.View>
         <Text variant="title" align="center">
           {workout?.planSession !== null && workout?.planSession !== undefined
-            ? t('summary.sessionTitle', { key: String.fromCharCode(65 + workout.planSession) })
+            ? t('summary.sessionTitle', {
+                key: (workout.planSessionsCovered ?? [workout.planSession])
+                  .map((index) => String.fromCharCode(65 + index))
+                  .join(' + '),
+              })
             : t('summary.title')}
         </Text>
         {workout && (

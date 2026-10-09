@@ -70,11 +70,19 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
   // What the user changed with the steppers (null = use the suggestion).
   const [override, setOverride] = useState<SetValues | null>(null);
 
+  // Today's last set fell 2+ reps short of its target: not your day for this one.
+  const lastIndex = item.sets.length - 1;
+  const fellShort =
+    lastIndex >= 0 && target?.sets[lastIndex] !== undefined
+      ? item.sets[lastIndex].reps <= target.sets[lastIndex].reps - 2
+      : false;
+
   /**
    * Pre-filled values, so a set that goes as planned is ONE tap.
    * - Weight: the weight you chose today wins; else the target; else last time.
    * - Reps: the target for this set (that's where "+1 rep" lives), except when
-   *   calibrating — then follow what you just did.
+   *   calibrating, or when the last set today fell 2+ reps short: then follow
+   *   what you actually did (auto-regulation, no question asked).
    */
   function suggestion(): SetValues {
     const index = item.sets.length;
@@ -82,7 +90,7 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
     const previous = previousToday ?? lastSets[index] ?? lastSets.at(-1);
     const planned = target?.sets[index];
     if (planned) {
-      const followToday = target?.lever === 'calibrate' && previousToday;
+      const followToday = (target?.lever === 'calibrate' || fellShort) && previousToday;
       return {
         reps: followToday ? previousToday.reps : planned.reps,
         weightKg:
@@ -157,7 +165,8 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
         .filter(Boolean)
         .join(' · ')
     : '';
-  const canSwap = target?.lever === 'variant' && harder !== null && item.sets.length === 0;
+  const canSwap =
+    (target?.lever === 'variant' || target?.lever === 'plateau') && harder !== null && item.sets.length === 0;
 
   return (
     <Card style={styles.card}>
@@ -243,6 +252,11 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
             <Text variant="label" color="textMuted">
               {t('workout.set')} {editingSet ? item.sets.indexOf(editingSet) + 1 : item.sets.length + 1}
             </Text>
+            {fellShort && !editingSet && (
+              <Text variant="caption" color="textMuted">
+                {t('workout.autoAdjusted')}
+              </Text>
+            )}
             {usesWeight && (
               <BigStepper
                 label={t('workout.weight')}

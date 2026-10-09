@@ -126,7 +126,8 @@
     "rest": "Rest",
     "lastTime": "Last time: {{summary}}",
     "repsLabel": "Reps",
-    "target": "Target"
+    "target": "Target",
+    "autoAdjusted": "Adjusted to your last set"
   },
   "addExercise": {
     "title": "Add exercise",
@@ -267,7 +268,10 @@
     "deload": "Recovery week: same weight, fewer sets, don't push to the limit.",
     "reserve_one": "leave {{count}} rep in the tank",
     "reserve_other": "leave {{count}} reps in the tank",
-    "reserveNone": "go all out"
+    "reserveNone": "go all out",
+    "hold": "Hold today: same as last time.",
+    "plateau": "You've stalled here. Change the stimulus: try {{exercise}}.",
+    "plateauNone": "You've stalled here. Keep it and focus on technique; the plan will adjust."
   },
   "goals": {
     "hypertrophy": "Build muscle",
@@ -387,5 +391,25 @@
     "glutes": "Glutes",
     "legs": "Legs",
     "calves": "Calves"
+  },
+  "adapt": {
+    "little_time": "Short on time",
+    "tired": "Tired",
+    "pain": "Pain",
+    "minutes": "{{n}} min",
+    "whereHurts": "Where does it hurt?",
+    "reasons": {
+      "pain": "{{areas}} pain: we left out what loads it and kept the rest.",
+      "short_time": "{{minutes}} min: the main exercises stay.",
+      "tired": "Tired day: same as last time, a bit further from failure.",
+      "comeback": "Back after {{days}} days: today is about getting the rhythm back.",
+      "long_break": "Back after {{days}} days: an easier re-entry with fewer sets.",
+      "compressed": "Busy week: we merged {{count}} workouts into one so you don't fall behind.",
+      "early_deload": "Several exercises stalled: today you recover to come back stronger."
+    },
+    "left_out": "Left out today",
+    "because_pain": "pain",
+    "because_time": "time",
+    "disclaimer": "If the pain persists, see a health professional."
   }
 }

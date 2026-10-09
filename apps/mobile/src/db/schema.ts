@@ -2,9 +2,11 @@ import type {
   EquipmentType,
   LoadType,
   LocationEquipment,
+  AdaptReason,
   Mesocycle,
   MovementPattern,
   Target,
+  TodayConditions,
 } from '@progrex/shared';
 import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
@@ -88,6 +90,19 @@ export const workouts = sqliteTable(
     mesocycleId: text('mesocycle_id').references(() => mesocycles.id),
     planWeek: integer('plan_week'),
     planSession: integer('plan_session'),
+    /** When sessions were merged (busy week): every session index this workout covers. */
+    planSessionsCovered: text('plan_sessions_covered', { mode: 'json' }).$type<number[]>(),
+    /** How today was adapted: what the user said and what the app inferred. */
+    conditions: text('conditions', { mode: 'json' }).$type<
+      TodayConditions & {
+        reasons: AdaptReason[];
+        hold: boolean;
+        effortDelta: number;
+        earlyDeload: boolean;
+        /** Today's sets per slot (after trimming or easing in). */
+        sets: Record<string, number>;
+      }
+    >(),
     notes: text('notes'),
     ...syncColumns,
   },

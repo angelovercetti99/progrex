@@ -1,4 +1,12 @@
-import { GOAL_CONFIG, maxLoadFor, nextTarget, slotProgressionConfig, type Target } from '@progrex/shared';
+import {
+  GOAL_CONFIG,
+  maxLoadFor,
+  nextTarget,
+  sessionScore,
+  slotProgressionConfig,
+  stalledSessions,
+  type Target,
+} from '@progrex/shared';
 import { and, asc, desc, eq, inArray, isNotNull, isNull, max } from 'drizzle-orm';
 
 import { db } from '@/db/client';
@@ -140,12 +148,14 @@ export async function getLastPerformance(exerciseId: string): Promise<LastPerfor
 
 /**
  * Today's target for an exercise. Inside a plan, the slot and week set the
- * reps, sets, effort and rest; otherwise the goal's defaults apply.
+ * reps, sets, effort and rest; otherwise the goal's defaults apply. Today's
+ * conditions (tired, a break, stagnation…) adjust it: see docs/decisoes.md §41.
  */
 async function computeTarget(exercise: Exercise, workout: Workout, slotId: string | null): Promise<Target> {
-  const [goal, last, location, plan] = await Promise.all([
+  const [goal, last, recent, location, plan] = await Promise.all([
     getGoal(),
     getLastPerformance(exercise.id),
+    recentScores(exercise.id),
     db.select().from(locations).where(eq(locations.id, workout.locationId)).get(),
     workout.mesocycleId
       ? db.select().from(mesocycles).where(eq(mesocycles.id, workout.mesocycleId)).get()
@@ -155,21 +165,70 @@ async function computeTarget(exercise: Exercise, workout: Workout, slotId: strin
   const slot = plan?.plan.sessions.flatMap((session) => session.slots).find((item) => item.id === slotId);
   const weekIndex = workout.planWeek ?? 0;
   const inPlan = plan !== undefined && slot !== undefined;
+  const conditions = workout.conditions;
+
+  const base = inPlan ? slotProgressionConfig(plan.plan, slot, weekIndex) : GOAL_CONFIG[goal];
+  const config = {
+    ...base,
+    sets: (slotId && conditions?.sets[slotId]) || base.sets,
+    targetRir: Math.min(5, base.targetRir + (conditions?.effortDelta ?? 0)),
+  };
 
   return nextTarget({
-    config: inPlan ? slotProgressionConfig(plan.plan, slot, weekIndex) : GOAL_CONFIG[goal],
+    config,
     exercise,
     lastSets: last.sets,
     lastTarget: last.target,
     maxLoadKg: maxLoadFor(exercise.equipment, location?.equipment ?? []),
     planned: inPlan,
-    deload: inPlan && plan.plan.weeks[weekIndex]?.deload === true,
+    deload: (inPlan && plan.plan.weeks[weekIndex]?.deload === true) || Boolean(conditions?.earlyDeload),
+    hold: Boolean(conditions?.hold),
+    stalled: stalledSessions(recent),
   });
+}
+
+/** Scores of this exercise's recent sessions since its last deload (oldest first). */
+async function recentScores(exerciseId: string): Promise<number[]> {
+  const rows = await db
+    .select({ itemId: workoutExercises.id, target: workoutExercises.target, startedAt: workouts.startedAt })
+    .from(workoutExercises)
+    .innerJoin(workouts, eq(workoutExercises.workoutId, workouts.id))
+    .innerJoin(exercises, eq(workoutExercises.exerciseId, exercises.id))
+    .where(
+      and(
+        eq(workoutExercises.exerciseId, exerciseId),
+        isNull(workoutExercises.deletedAt),
+        isNull(workouts.deletedAt),
+        isNotNull(workouts.finishedAt)
+      )
+    )
+    .orderBy(desc(workouts.startedAt))
+    .limit(6);
+  const exercise = await db.select().from(exercises).where(eq(exercises.id, exerciseId)).get();
+  if (!exercise) return [];
+
+  const scores: number[] = [];
+  for (const row of rows) {
+    if (row.target?.lever === 'deload') break; // count only since the last recovery
+    const rowSets = await db
+      .select()
+      .from(sets)
+      .where(and(eq(sets.workoutExerciseId, row.itemId), isNull(sets.deletedAt)));
+    if (rowSets.length) scores.unshift(sessionScore({ loadType: exercise.loadType, sets: rowSets }));
+  }
+  return scores;
 }
 
 // ---------- Writes ----------
 
-export type PlanLink = { mesocycleId: string; week: number; session: number };
+export type PlanLink = {
+  mesocycleId: string;
+  week: number;
+  session: number;
+  /** Every session this workout covers (more than one in a busy week). */
+  covered?: number[];
+  conditions?: Workout['conditions'];
+};
 
 export async function startWorkout(locationId: string, planLink?: PlanLink): Promise<string> {
   const id = newId();
@@ -181,6 +240,8 @@ export async function startWorkout(locationId: string, planLink?: PlanLink): Pro
     mesocycleId: planLink?.mesocycleId ?? null,
     planWeek: planLink?.week ?? null,
     planSession: planLink?.session ?? null,
+    planSessionsCovered: planLink?.covered && planLink.covered.length > 1 ? planLink.covered : null,
+    conditions: planLink?.conditions ?? null,
     ...insertStamps(),
   });
   notifyChanged('workouts');

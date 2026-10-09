@@ -714,3 +714,32 @@ prioridade a ficarem com *menos* exercícios do que sem prioridade.
 (que o utilizador confirma) e comparar fotos ao longo do tempo. As fotos ficam **só no
 telemóvel** e só saem no momento da análise. Precisa do servidor (Fase 4) e de créditos na
 API Claude, cerca de 5 cêntimos por análise.
+
+---
+
+## 41. O plano adapta-se a ti; o registo é uma consequência
+
+A Progrex não é um registo de treinos. **O produto é o mesociclo a adaptar-se às tuas
+condições, sejam elas quais forem**, para continuares a progredir. Com uma regra por cima de
+tudo: **conveniência**. Num dia normal não preenches nada; a app deduz o que pode e só
+pergunta, com um toque opcional, o que não pode adivinhar.
+
+| Condição | Como sabemos | O que muda |
+|---|---|---|
+| Pouco tempo | toque "Pouco tempo" → 20/30/45 | as regras de corte do gerador, com os minutos de hoje |
+| Cansado | toque "Cansado" | alvos `hold` (mantém) e +1 rep de reserva |
+| Dor | toque "Dor" → zona | sai o que carrega a zona (lista mais larga de propósito) |
+| Série má a meio | automático | se uma série falha o alvo por 2+ reps, as seguintes ajustam-se |
+| 7+ dias sem treinar | automático | `hold`; com 14+ dias, reentrada com menos séries |
+| Semana apertada | automático | se faltam mais sessões do que dias, juntam-se (nunca ficas para trás) |
+| Estagnação num exercício | automático | 3 sessões sem melhorar → muda de estímulo (`plateau`) |
+| Estagnação geral | automático | metade dos exercícios parados → recuperação antecipada |
+
+Detalhes que importam:
+- A lógica está em `packages/shared/src/adapt` (funções puras, testadas). A app só a chama.
+- Cada adaptação mostra **uma frase com o porquê**. Uma app que muda o treino sem explicar
+  parece avariada.
+- O **estímulo equivalente** em viagem compara a mesma sessão ajustada nos dois sítios. Assim
+  mede só o efeito do sítio; o efeito do tempo tem a sua própria frase.
+- A recuperação conta do zero depois de um deload, para não entrar num ciclo de deloads.
+- A dor mostra sempre: "Se a dor persistir, fala com um profissional de saúde."

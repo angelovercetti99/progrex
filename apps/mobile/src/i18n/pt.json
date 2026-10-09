@@ -126,7 +126,8 @@
     "rest": "Descanso",
     "lastTime": "Última vez: {{summary}}",
     "repsLabel": "Repetições",
-    "target": "Alvo"
+    "target": "Alvo",
+    "autoAdjusted": "Ajustado à série anterior"
   },
   "addExercise": {
     "title": "Adicionar exercício",
@@ -267,7 +268,10 @@
     "deload": "Semana de recuperação: mesmo peso, menos séries, sem ir ao limite.",
     "reserve_one": "deixa {{count}} rep de reserva",
     "reserve_other": "deixa {{count}} reps de reserva",
-    "reserveNone": "vai até ao limite"
+    "reserveNone": "vai até ao limite",
+    "hold": "Hoje mantém: o mesmo que da última vez.",
+    "plateau": "Estagnaste aqui. Muda de estímulo: experimenta {{exercise}}.",
+    "plateauNone": "Estagnaste aqui. Mantém e foca na técnica; o plano vai ajustar."
   },
   "goals": {
     "hypertrophy": "Ganhar músculo",
@@ -387,5 +391,25 @@
     "glutes": "Glúteos",
     "legs": "Pernas",
     "calves": "Gémeos"
+  },
+  "adapt": {
+    "little_time": "Pouco tempo",
+    "tired": "Cansado",
+    "pain": "Dor",
+    "minutes": "{{n}} min",
+    "whereHurts": "Onde dói?",
+    "reasons": {
+      "pain": "Dor em {{areas}}: tirámos o que puxa por aí e mantivemos o resto.",
+      "short_time": "{{minutes}} min: ficaram os exercícios principais.",
+      "tired": "Dia cansado: mesmo que da última vez, sem ir tão perto do limite.",
+      "comeback": "Voltaste depois de {{days}} dias: hoje é para retomar o ritmo.",
+      "long_break": "Voltaste depois de {{days}} dias: reentrada mais leve, com menos séries.",
+      "compressed": "Semana apertada: juntámos {{count}} treinos num só para não ficares para trás.",
+      "early_deload": "Vários exercícios estagnaram: hoje recuperas para voltares mais forte."
+    },
+    "left_out": "Hoje fica de fora",
+    "because_pain": "dor",
+    "because_time": "tempo",
+    "disclaimer": "Se a dor persistir, fala com um profissional de saúde."
   }
 }

@@ -15,7 +15,8 @@ export function useTargetMessage() {
         return t(usesLoad ? 'progression.calibrate' : 'progression.calibrateNoLoad', {
           min: config.repMin,
           max: config.repMax,
-          rir: config.targetRir,
+          // Today's effort (it may be eased, e.g. on a tired day).
+          rir: target.sets[0]?.rir ?? config.targetRir,
         });
       case 'reps': {
         const index = target.focusSet ?? 0;
@@ -33,6 +34,10 @@ export function useTargetMessage() {
         return t(`progression.${target.lever}`, { sets: target.sets.length });
       case 'deload':
         return t('progression.deload');
+      case 'hold':
+        return t('progression.hold');
+      case 'plateau':
+        return harderName ? t('progression.plateau', { exercise: harderName }) : t('progression.plateauNone');
       case 'variant':
         return harderName ? t('progression.variant', { exercise: harderName }) : t('progression.variantNone');
     }

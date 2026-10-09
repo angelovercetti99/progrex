@@ -1,4 +1,4 @@
-import { harderVariant } from '@progrex/shared';
+import { harderVariant, selectVariant } from '@progrex/shared';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,7 +51,9 @@ export default function WorkoutScreen() {
     workout && workout.planWeek !== null && workout.planSession !== null
       ? t('plan.nextSession', {
           week: workout.planWeek + 1,
-          key: String.fromCharCode(65 + workout.planSession),
+          key: (workout.planSessionsCovered ?? [workout.planSession])
+            .map((index) => String.fromCharCode(65 + index))
+            .join(' + '),
         })
       : (workout?.location?.name ?? '');
 
@@ -95,7 +97,18 @@ export default function WorkoutScreen() {
               item={item}
               goal={goal}
               harder={
-                item.target?.lever === 'variant' ? harderVariant(item.exercise, equipment, catalog) : null
+                item.target?.lever === 'variant'
+                  ? harderVariant(item.exercise, equipment, catalog)
+                  : item.target?.lever === 'plateau'
+                    ? // A different stimulus at the same level (not necessarily harder).
+                      selectVariant({
+                        pattern: item.exercise.pattern,
+                        available: equipment,
+                        candidates: catalog.filter((candidate) => candidate.id !== item.exerciseId),
+                        targetDifficulty: item.exercise.difficulty,
+                        allowFallback: false,
+                      })
+                    : null
               }
               active={item.id === activeId}
               onActivate={() => setActiveId(item.id)}
