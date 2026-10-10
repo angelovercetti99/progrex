@@ -252,6 +252,432 @@
     "dumbbell_hip_thrust": "Hip thrust com halter",
     "barbell_hip_thrust": "Hip thrust com barra"
   },
+  "howTo": {
+    "open": "Como se faz",
+    "close": "Fechar",
+    "cues": {
+      "bodyweight_squat": [
+        "Pés à largura dos ombros, pontas ligeiramente para fora.",
+        "Desce com a anca para trás e os joelhos na direção dos pés.",
+        "Calcanhares no chão e peito alto até ao fim."
+      ],
+      "assisted_pistol_squat": [
+        "Segura-te a um apoio à frente, só para equilíbrio.",
+        "Desce numa perna, com a outra esticada à frente.",
+        "Usa as mãos o menos possível para subir."
+      ],
+      "pistol_squat": [
+        "Numa perna, com a outra esticada à frente.",
+        "Braços à frente para equilibrar e desce devagar.",
+        "Calcanhar no chão e joelho alinhado com o pé."
+      ],
+      "goblet_squat": [
+        "Segura o halter junto ao peito, cotovelos para baixo.",
+        "Desce entre os joelhos, com o tronco direito.",
+        "Empurra o chão com o pé inteiro para subir."
+      ],
+      "kettlebell_goblet_squat": [
+        "Segura a kettlebell pelas pegas, junto ao peito.",
+        "Desce entre os joelhos, com o tronco direito.",
+        "Empurra o chão com o pé inteiro para subir."
+      ],
+      "leg_press": [
+        "Costas e anca encostadas ao banco o tempo todo.",
+        "Desce até os joelhos fazerem cerca de 90°.",
+        "Empurra com o pé inteiro, sem trancar os joelhos."
+      ],
+      "back_squat": [
+        "Barra em cima dos ombros, não no pescoço.",
+        "Contrai o abdominal e desce com a anca para trás.",
+        "Joelhos na direção dos pés e peito alto a subir."
+      ],
+      "front_squat": [
+        "Barra à frente dos ombros, cotovelos altos.",
+        "Tronco o mais direito possível ao descer.",
+        "Mantém os cotovelos altos para a barra não cair."
+      ],
+      "single_leg_rdl": [
+        "Numa perna, joelho ligeiramente fletido.",
+        "Inclina o tronco e leva a outra perna para trás, em linha.",
+        "Costas direitas; sobe a apertar o glúteo."
+      ],
+      "sliding_leg_curl": [
+        "Deitado, calcanhares numa toalha ou deslizador.",
+        "Sobe a anca e mantém-na no ar.",
+        "Puxa os calcanhares para ti e estica devagar."
+      ],
+      "nordic_curl": [
+        "De joelhos, com os pés presos.",
+        "Corpo direito dos joelhos à cabeça; desce o mais devagar possível.",
+        "Trava a queda com as mãos e volta a subir."
+      ],
+      "band_good_morning": [
+        "Elástico debaixo dos pés e atrás do pescoço.",
+        "Joelhos ligeiramente fletidos; anca para trás.",
+        "Costas direitas; sobe a apertar o glúteo."
+      ],
+      "dumbbell_rdl": [
+        "Halteres junto às pernas, joelhos ligeiramente fletidos.",
+        "Leva a anca para trás até sentires a parte de trás das coxas.",
+        "Costas direitas; sobe a empurrar a anca para a frente."
+      ],
+      "single_leg_dumbbell_rdl": [
+        "Numa perna, halteres junto às pernas.",
+        "Inclina o tronco e leva a outra perna para trás, em linha.",
+        "Costas direitas; anca virada para o chão."
+      ],
+      "kettlebell_swing": [
+        "O movimento é da anca, não dos braços.",
+        "Leva a kettlebell entre as pernas, com as costas direitas.",
+        "Estica a anca com força; os braços só acompanham."
+      ],
+      "leg_curl_machine": [
+        "Joelhos no limite do banco, rolo acima dos calcanhares.",
+        "Puxa os calcanhares para o glúteo.",
+        "Desce devagar, sem levantar a anca."
+      ],
+      "barbell_rdl": [
+        "Barra junto às pernas, joelhos ligeiramente fletidos.",
+        "Leva a anca para trás até sentires a parte de trás das coxas.",
+        "Costas direitas; a barra desce rente às pernas."
+      ],
+      "deadlift": [
+        "Barra sobre o meio do pé, junto às canelas.",
+        "Costas direitas e peito alto antes de puxar.",
+        "Empurra o chão e estica anca e joelhos ao mesmo tempo."
+      ],
+      "reverse_lunge": [
+        "Dá um passo atrás e desce a direito.",
+        "Joelho de trás quase a tocar no chão.",
+        "Empurra com o pé da frente para voltar."
+      ],
+      "step_up": [
+        "Pé inteiro em cima do banco ou degrau.",
+        "Sobe a empurrar com a perna de cima, não com a de baixo.",
+        "Desce devagar e controlado."
+      ],
+      "split_squat": [
+        "Um pé à frente, outro atrás, afastados.",
+        "Desce a direito até o joelho de trás quase tocar no chão.",
+        "O peso fica sobretudo no pé da frente."
+      ],
+      "bulgarian_split_squat": [
+        "Pé de trás em cima de um banco ou cadeira.",
+        "Desce a direito, com o tronco ligeiramente inclinado.",
+        "Empurra com o pé da frente para subir."
+      ],
+      "dumbbell_walking_lunge": [
+        "Um halter em cada mão, braços esticados.",
+        "Passo largo em frente; desce até o joelho de trás quase tocar no chão.",
+        "Empurra e avança com a outra perna."
+      ],
+      "dumbbell_bulgarian_split_squat": [
+        "Pé de trás num banco, halteres junto ao corpo.",
+        "Desce a direito, com o tronco ligeiramente inclinado.",
+        "Empurra com o pé da frente para subir."
+      ],
+      "incline_push_up": [
+        "Mãos num banco ou mesa, à largura dos ombros.",
+        "Corpo direito dos calcanhares à cabeça.",
+        "Leva o peito à beira do apoio e empurra."
+      ],
+      "push_up": [
+        "Mãos por baixo dos ombros, corpo direito.",
+        "Desce até o peito quase tocar no chão.",
+        "Cotovelos a cerca de 45° do corpo, não abertos."
+      ],
+      "decline_push_up": [
+        "Pés num banco ou cadeira, mãos no chão.",
+        "Corpo direito, sem deixar a anca cair.",
+        "Desce o peito até perto do chão e empurra."
+      ],
+      "archer_push_up": [
+        "Mãos bem afastadas.",
+        "Desce para um lado; o outro braço fica esticado.",
+        "Alterna os lados a cada repetição."
+      ],
+      "dip": [
+        "Braços esticados nas barras, ombros baixos.",
+        "Desce até os cotovelos fazerem cerca de 90°.",
+        "Tronco ligeiramente inclinado; empurra até cima."
+      ],
+      "band_chest_press": [
+        "Elástico preso atrás de ti, à altura do peito.",
+        "Um pé à frente para te firmares.",
+        "Empurra em frente e volta devagar."
+      ],
+      "dumbbell_floor_press": [
+        "Deitado no chão, joelhos fletidos.",
+        "Desce até os cotovelos tocarem no chão.",
+        "Empurra os halteres para cima do peito."
+      ],
+      "machine_chest_press": [
+        "Ajusta o banco: pegas à altura do meio do peito.",
+        "Costas encostadas; empurra em frente.",
+        "Volta devagar, sem deixar o peso bater."
+      ],
+      "dumbbell_bench_press": [
+        "Omoplatas juntas e pés firmes no chão.",
+        "Desce os halteres para os lados do peito.",
+        "Empurra para cima, sem bater os halteres."
+      ],
+      "barbell_bench_press": [
+        "Omoplatas juntas, pés firmes, olhos por baixo da barra.",
+        "Desce a barra até ao meio do peito.",
+        "Empurra para cima e ligeiramente para trás."
+      ],
+      "pike_push_up": [
+        "Anca alta, corpo em V invertido.",
+        "Desce a cabeça entre as mãos.",
+        "Empurra o chão até esticar os braços."
+      ],
+      "elevated_pike_push_up": [
+        "Pés num banco, anca alta por cima das mãos.",
+        "Desce a cabeça até perto do chão.",
+        "Empurra até esticar os braços."
+      ],
+      "handstand_push_up": [
+        "Pino com os pés apoiados numa parede.",
+        "Desce a cabeça devagar até perto do chão.",
+        "Empurra até esticar os braços. Só com bom controlo."
+      ],
+      "band_overhead_press": [
+        "Elástico debaixo dos pés, mãos aos ombros.",
+        "Empurra por cima da cabeça até esticar.",
+        "Abdominal contraído, sem arquear as costas."
+      ],
+      "dumbbell_shoulder_press": [
+        "Halteres à altura dos ombros.",
+        "Empurra por cima da cabeça até esticar.",
+        "Abdominal contraído, sem arquear as costas."
+      ],
+      "machine_shoulder_press": [
+        "Ajusta o banco: pegas à altura dos ombros.",
+        "Costas encostadas; empurra para cima.",
+        "Desce devagar até aos ombros."
+      ],
+      "kettlebell_press": [
+        "Kettlebell apoiada no antebraço, junto ao ombro.",
+        "Empurra a direito por cima da cabeça.",
+        "Abdominal e glúteo contraídos."
+      ],
+      "barbell_overhead_press": [
+        "Barra apoiada à frente dos ombros.",
+        "Afasta a cabeça e empurra a direito para cima.",
+        "Abdominal e glúteo contraídos, sem arquear."
+      ],
+      "towel_door_row": [
+        "Toalha à volta de um puxador de porta bem fechada.",
+        "Inclina-te para trás com o corpo direito.",
+        "Puxa o peito até às mãos, apertando as omoplatas."
+      ],
+      "table_row": [
+        "Deitado debaixo de uma mesa firme, agarrado à beira.",
+        "Corpo direito dos calcanhares aos ombros.",
+        "Puxa o peito até à mesa e desce devagar."
+      ],
+      "suspension_row": [
+        "Segura as pegas e inclina-te para trás.",
+        "Corpo direito, como numa prancha.",
+        "Puxa o peito até às mãos, cotovelos junto ao corpo."
+      ],
+      "band_row": [
+        "Elástico preso à frente, à altura do peito.",
+        "Puxa os cotovelos para trás, junto ao corpo.",
+        "Aperta as omoplatas no fim e volta devagar."
+      ],
+      "dumbbell_row": [
+        "Uma mão apoiada no banco, costas direitas.",
+        "Puxa o halter até à anca, cotovelo junto ao corpo.",
+        "Desce devagar até esticar o braço."
+      ],
+      "kettlebell_row": [
+        "Uma mão apoiada, costas direitas.",
+        "Puxa a kettlebell até à anca.",
+        "Desce devagar até esticar o braço."
+      ],
+      "seated_cable_row": [
+        "Pés na plataforma, joelhos ligeiramente fletidos.",
+        "Puxa a pega até à barriga, peito alto.",
+        "Aperta as omoplatas e volta devagar."
+      ],
+      "barbell_row": [
+        "Tronco inclinado, costas direitas.",
+        "Puxa a barra até à barriga.",
+        "Desce devagar, sem dar balanço."
+      ],
+      "band_pulldown": [
+        "Elástico preso bem alto.",
+        "Puxa os cotovelos para baixo, até junto ao corpo.",
+        "Aperta as costas e volta devagar."
+      ],
+      "negative_pull_up": [
+        "Começa em cima, com o queixo acima da barra (salta ou usa um banco).",
+        "Desce o mais devagar possível.",
+        "Até esticar os braços por completo."
+      ],
+      "band_assisted_pull_up": [
+        "Elástico preso à barra, debaixo dos pés ou joelhos.",
+        "Puxa até o queixo passar a barra.",
+        "Desce devagar até esticar os braços."
+      ],
+      "chin_up": [
+        "Palmas viradas para ti, à largura dos ombros.",
+        "Puxa até o queixo passar a barra.",
+        "Desce devagar até esticar os braços."
+      ],
+      "pull_up": [
+        "Palmas viradas para a frente, um pouco mais afastadas que os ombros.",
+        "Puxa os cotovelos para baixo até o queixo passar a barra.",
+        "Desce devagar até esticar os braços."
+      ],
+      "lat_pulldown": [
+        "Coxas presas por baixo do apoio.",
+        "Puxa a barra até ao peito, cotovelos para baixo.",
+        "Volta devagar até esticar os braços."
+      ],
+      "dead_bug": [
+        "Deitado, braços para cima, joelhos a 90°.",
+        "Estica um braço e a perna contrária, devagar.",
+        "Costas coladas ao chão o tempo todo."
+      ],
+      "plank": [
+        "Antebraços no chão, cotovelos por baixo dos ombros.",
+        "Corpo direito: nem anca alta, nem a descair.",
+        "Aperta abdominal e glúteo e respira."
+      ],
+      "side_plank": [
+        "De lado, cotovelo por baixo do ombro.",
+        "Sobe a anca até o corpo ficar direito.",
+        "Não deixes a anca descair."
+      ],
+      "hollow_hold": [
+        "Deitado, costas coladas ao chão.",
+        "Sobe ombros e pernas, braços esticados para trás.",
+        "Quanto mais baixas as pernas, mais difícil."
+      ],
+      "hanging_knee_raise": [
+        "Pendurado na barra, sem balançar.",
+        "Sobe os joelhos até ao peito.",
+        "Desce devagar e controlado."
+      ],
+      "pallof_press": [
+        "De lado para o ponto onde o elástico está preso.",
+        "Empurra as mãos em frente, a partir do peito.",
+        "Não deixes o tronco rodar."
+      ],
+      "cable_crunch": [
+        "De joelhos, corda junto à cabeça.",
+        "Enrola o tronco para baixo, a contrair o abdominal.",
+        "A anca fica parada; volta devagar."
+      ],
+      "band_curl": [
+        "Elástico debaixo dos pés.",
+        "Cotovelos colados ao corpo; dobra até aos ombros.",
+        "Desce devagar até esticar."
+      ],
+      "dumbbell_curl": [
+        "Cotovelos colados ao corpo.",
+        "Dobra até aos ombros, palmas para cima.",
+        "Desce devagar, sem dar balanço."
+      ],
+      "hammer_curl": [
+        "Palmas viradas uma para a outra.",
+        "Cotovelos colados ao corpo; dobra até aos ombros.",
+        "Desce devagar, sem dar balanço."
+      ],
+      "cable_curl": [
+        "De frente para a polia baixa.",
+        "Cotovelos colados ao corpo; dobra até aos ombros.",
+        "Desce devagar até esticar."
+      ],
+      "barbell_curl": [
+        "Mãos à largura dos ombros, palmas para cima.",
+        "Cotovelos parados; dobra até aos ombros.",
+        "Desce devagar, sem dar balanço."
+      ],
+      "bench_dip": [
+        "Mãos na beira de um banco ou cadeira, atrás de ti.",
+        "Desce até os cotovelos fazerem cerca de 90°.",
+        "Anca perto do banco; empurra até esticar."
+      ],
+      "diamond_push_up": [
+        "Mãos juntas por baixo do peito.",
+        "Cotovelos junto ao corpo ao descer.",
+        "Corpo direito dos calcanhares à cabeça."
+      ],
+      "band_pushdown": [
+        "Elástico preso bem alto.",
+        "Cotovelos colados ao corpo; empurra para baixo.",
+        "Estica por completo e volta devagar."
+      ],
+      "dumbbell_overhead_extension": [
+        "Halter por cima da cabeça, seguro com as duas mãos.",
+        "Desce atrás da cabeça, cotovelos a apontar para cima.",
+        "Estica os braços sem mexer os cotovelos."
+      ],
+      "cable_pushdown": [
+        "Cotovelos colados ao corpo.",
+        "Empurra a pega para baixo até esticar.",
+        "Volta devagar, sem mexer os cotovelos."
+      ],
+      "band_lateral_raise": [
+        "Elástico debaixo dos pés.",
+        "Sobe os braços para os lados até aos ombros.",
+        "Cotovelos ligeiramente fletidos; desce devagar."
+      ],
+      "dumbbell_lateral_raise": [
+        "Halteres ao lado do corpo.",
+        "Sobe os braços para os lados até aos ombros.",
+        "Sem balanço; desce devagar."
+      ],
+      "cable_lateral_raise": [
+        "De lado para a polia baixa.",
+        "Sobe o braço para o lado até ao ombro.",
+        "Desce devagar, sem encostar o peso."
+      ],
+      "calf_raise": [
+        "De pé, peso na parte da frente dos pés.",
+        "Sobe o mais alto possível.",
+        "Desce devagar até os calcanhares tocarem no chão."
+      ],
+      "single_leg_calf_raise": [
+        "Numa perna, apoiado numa parede para equilíbrio.",
+        "Sobe o mais alto possível.",
+        "Desce devagar e controlado."
+      ],
+      "dumbbell_calf_raise": [
+        "Halteres ao lado do corpo.",
+        "Sobe o mais alto possível.",
+        "Desce devagar até os calcanhares tocarem no chão."
+      ],
+      "machine_calf_raise": [
+        "Ombros por baixo dos apoios, joelhos esticados.",
+        "Sobe o mais alto possível.",
+        "Desce até sentires a barriga da perna a esticar."
+      ],
+      "glute_bridge": [
+        "Deitado, joelhos fletidos, pés no chão.",
+        "Sobe a anca até o corpo ficar direito.",
+        "Aperta o glúteo em cima e desce devagar."
+      ],
+      "single_leg_glute_bridge": [
+        "Deitado, um pé no chão e a outra perna no ar.",
+        "Sobe a anca a empurrar com o calcanhar.",
+        "Anca nivelada, sem rodar para um lado."
+      ],
+      "dumbbell_hip_thrust": [
+        "Costas apoiadas num banco, halter sobre a anca.",
+        "Sobe a anca até o tronco ficar paralelo ao chão.",
+        "Aperta o glúteo em cima; queixo ao peito."
+      ],
+      "barbell_hip_thrust": [
+        "Costas apoiadas num banco, barra sobre a anca.",
+        "Sobe a anca até o tronco ficar paralelo ao chão.",
+        "Aperta o glúteo em cima; queixo ao peito."
+      ]
+    }
+  },
   "progression": {
     "calibrate": "Primeira vez: escolhe um peso com que faças {{min}}–{{max}} reps e ainda consigas mais {{rir}}.",
     "calibrateNoLoad": "Primeira vez: faz {{min}}–{{max}} reps e para quando ainda conseguires mais {{rir}}.",

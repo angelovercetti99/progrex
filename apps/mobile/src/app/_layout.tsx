@@ -65,6 +65,7 @@ function AppNavigator() {
           <Stack.Screen name="history/index" options={{ title: t('history.title') }} />
           <Stack.Screen name="history/[id]" />
           <Stack.Screen name="summary/[id]" options={{ headerShown: false, presentation: 'modal' }} />
+          <Stack.Screen name="how-to/[id]" options={{ presentation: 'modal' }} />
           <Stack.Screen
             name="add-exercise"
             options={{ title: t('addExercise.title'), presentation: 'modal' }}

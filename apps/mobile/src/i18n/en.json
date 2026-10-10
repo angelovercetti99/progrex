@@ -252,6 +252,432 @@
     "dumbbell_hip_thrust": "Dumbbell hip thrust",
     "barbell_hip_thrust": "Barbell hip thrust"
   },
+  "howTo": {
+    "open": "How to do it",
+    "close": "Close",
+    "cues": {
+      "bodyweight_squat": [
+        "Feet shoulder-width apart, toes slightly out.",
+        "Sit your hips back, knees tracking over your toes.",
+        "Heels down and chest up the whole way."
+      ],
+      "assisted_pistol_squat": [
+        "Hold a support in front of you, just for balance.",
+        "Lower on one leg, the other straight out in front.",
+        "Use your hands as little as possible to stand up."
+      ],
+      "pistol_squat": [
+        "On one leg, the other straight out in front.",
+        "Arms forward for balance; lower slowly.",
+        "Heel down, knee in line with your foot."
+      ],
+      "goblet_squat": [
+        "Hold the dumbbell at your chest, elbows down.",
+        "Sit down between your knees, torso tall.",
+        "Push the floor away with your whole foot."
+      ],
+      "kettlebell_goblet_squat": [
+        "Hold the kettlebell by the horns, at your chest.",
+        "Sit down between your knees, torso tall.",
+        "Push the floor away with your whole foot."
+      ],
+      "leg_press": [
+        "Back and hips against the seat the whole time.",
+        "Lower until your knees are at about 90°.",
+        "Push through your whole foot without locking your knees."
+      ],
+      "back_squat": [
+        "Bar on your upper back, not your neck.",
+        "Brace your core and sit your hips back.",
+        "Knees over toes; chest up on the way up."
+      ],
+      "front_squat": [
+        "Bar on the front of your shoulders, elbows high.",
+        "Keep your torso as upright as you can.",
+        "Keep your elbows up so the bar doesn't roll."
+      ],
+      "single_leg_rdl": [
+        "On one leg, knee slightly bent.",
+        "Tip forward as the other leg goes back, in one line.",
+        "Flat back; squeeze your glute to stand up."
+      ],
+      "sliding_leg_curl": [
+        "Lie down, heels on a towel or slider.",
+        "Lift your hips and keep them up.",
+        "Pull your heels in, then slide them out slowly."
+      ],
+      "nordic_curl": [
+        "Kneel with your feet held down.",
+        "Straight from knees to head; lower as slowly as you can.",
+        "Catch yourself with your hands and come back up."
+      ],
+      "band_good_morning": [
+        "Band under your feet and behind your neck.",
+        "Knees slightly bent; push your hips back.",
+        "Flat back; squeeze your glutes to stand up."
+      ],
+      "dumbbell_rdl": [
+        "Dumbbells by your legs, knees slightly bent.",
+        "Push your hips back until you feel your hamstrings.",
+        "Flat back; drive your hips forward to stand."
+      ],
+      "single_leg_dumbbell_rdl": [
+        "On one leg, dumbbells by your legs.",
+        "Tip forward as the other leg goes back, in one line.",
+        "Flat back; hips square to the floor."
+      ],
+      "kettlebell_swing": [
+        "The power comes from your hips, not your arms.",
+        "Hike the bell between your legs with a flat back.",
+        "Snap your hips forward; your arms just follow."
+      ],
+      "leg_curl_machine": [
+        "Knees at the edge of the pad, roller above your heels.",
+        "Curl your heels towards your glutes.",
+        "Lower slowly without lifting your hips."
+      ],
+      "barbell_rdl": [
+        "Bar against your legs, knees slightly bent.",
+        "Push your hips back until you feel your hamstrings.",
+        "Flat back; the bar slides down your legs."
+      ],
+      "deadlift": [
+        "Bar over mid-foot, close to your shins.",
+        "Flat back and chest up before you pull.",
+        "Push the floor away; hips and knees straighten together."
+      ],
+      "reverse_lunge": [
+        "Step back and lower straight down.",
+        "Back knee almost touching the floor.",
+        "Push through your front foot to come back."
+      ],
+      "step_up": [
+        "Whole foot on the bench or step.",
+        "Drive up with the top leg, not the bottom one.",
+        "Step down slowly and under control."
+      ],
+      "split_squat": [
+        "One foot forward, one back, well apart.",
+        "Lower straight down until the back knee nearly touches.",
+        "Keep most of your weight on the front foot."
+      ],
+      "bulgarian_split_squat": [
+        "Back foot on a bench or chair.",
+        "Lower straight down, torso leaning slightly forward.",
+        "Push through your front foot to stand."
+      ],
+      "dumbbell_walking_lunge": [
+        "A dumbbell in each hand, arms straight.",
+        "Big step forward; lower until the back knee nearly touches.",
+        "Push off and step through with the other leg."
+      ],
+      "dumbbell_bulgarian_split_squat": [
+        "Back foot on a bench, dumbbells at your sides.",
+        "Lower straight down, torso leaning slightly forward.",
+        "Push through your front foot to stand."
+      ],
+      "incline_push_up": [
+        "Hands on a bench or table, shoulder-width apart.",
+        "Body straight from heels to head.",
+        "Bring your chest to the edge and push away."
+      ],
+      "push_up": [
+        "Hands under your shoulders, body straight.",
+        "Lower until your chest nearly touches the floor.",
+        "Elbows about 45° from your body, not flared."
+      ],
+      "decline_push_up": [
+        "Feet on a bench or chair, hands on the floor.",
+        "Body straight; don't let your hips drop.",
+        "Lower your chest close to the floor and push."
+      ],
+      "archer_push_up": [
+        "Hands very wide.",
+        "Lower towards one side; the other arm stays straight.",
+        "Switch sides every rep."
+      ],
+      "dip": [
+        "Arms straight on the bars, shoulders down.",
+        "Lower until your elbows are at about 90°.",
+        "Lean slightly forward; push all the way up."
+      ],
+      "band_chest_press": [
+        "Band anchored behind you at chest height.",
+        "One foot forward to brace.",
+        "Press forward, then return slowly."
+      ],
+      "dumbbell_floor_press": [
+        "Lie on the floor, knees bent.",
+        "Lower until your elbows touch the floor.",
+        "Press the dumbbells up over your chest."
+      ],
+      "machine_chest_press": [
+        "Set the seat so the handles are at mid-chest.",
+        "Back against the pad; press forward.",
+        "Return slowly without letting the stack touch."
+      ],
+      "dumbbell_bench_press": [
+        "Shoulder blades together, feet planted.",
+        "Lower the dumbbells to the sides of your chest.",
+        "Press up without clanking them together."
+      ],
+      "barbell_bench_press": [
+        "Shoulder blades together, feet planted, eyes under the bar.",
+        "Lower the bar to mid-chest.",
+        "Press up and slightly back."
+      ],
+      "pike_push_up": [
+        "Hips high, body in an upside-down V.",
+        "Lower your head between your hands.",
+        "Push the floor away until your arms are straight."
+      ],
+      "elevated_pike_push_up": [
+        "Feet on a bench, hips high over your hands.",
+        "Lower your head close to the floor.",
+        "Push until your arms are straight."
+      ],
+      "handstand_push_up": [
+        "Handstand with your feet against a wall.",
+        "Lower your head slowly close to the floor.",
+        "Push until your arms are straight. Only with good control."
+      ],
+      "band_overhead_press": [
+        "Band under your feet, hands at your shoulders.",
+        "Press overhead until your arms are straight.",
+        "Brace your core; don't arch your back."
+      ],
+      "dumbbell_shoulder_press": [
+        "Dumbbells at shoulder height.",
+        "Press overhead until your arms are straight.",
+        "Brace your core; don't arch your back."
+      ],
+      "machine_shoulder_press": [
+        "Set the seat so the handles are at shoulder height.",
+        "Back against the pad; press up.",
+        "Lower slowly to your shoulders."
+      ],
+      "kettlebell_press": [
+        "Bell resting on your forearm, by your shoulder.",
+        "Press straight up overhead.",
+        "Squeeze your core and glutes."
+      ],
+      "barbell_overhead_press": [
+        "Bar resting on the front of your shoulders.",
+        "Move your head back and press straight up.",
+        "Squeeze your core and glutes; don't arch."
+      ],
+      "towel_door_row": [
+        "Towel around the handle of a firmly closed door.",
+        "Lean back with your body straight.",
+        "Pull your chest to your hands, squeezing your shoulder blades."
+      ],
+      "table_row": [
+        "Lie under a sturdy table, holding the edge.",
+        "Body straight from heels to shoulders.",
+        "Pull your chest to the table and lower slowly."
+      ],
+      "suspension_row": [
+        "Hold the handles and lean back.",
+        "Body straight, like a plank.",
+        "Pull your chest to your hands, elbows close."
+      ],
+      "band_row": [
+        "Band anchored in front of you at chest height.",
+        "Pull your elbows back, close to your body.",
+        "Squeeze your shoulder blades, then return slowly."
+      ],
+      "dumbbell_row": [
+        "One hand on the bench, flat back.",
+        "Pull the dumbbell to your hip, elbow close.",
+        "Lower slowly until your arm is straight."
+      ],
+      "kettlebell_row": [
+        "One hand supported, flat back.",
+        "Pull the kettlebell to your hip.",
+        "Lower slowly until your arm is straight."
+      ],
+      "seated_cable_row": [
+        "Feet on the platform, knees slightly bent.",
+        "Pull the handle to your belly, chest up.",
+        "Squeeze your shoulder blades and return slowly."
+      ],
+      "barbell_row": [
+        "Torso tipped forward, flat back.",
+        "Pull the bar to your belly.",
+        "Lower slowly, no swinging."
+      ],
+      "band_pulldown": [
+        "Band anchored up high.",
+        "Pull your elbows down to your sides.",
+        "Squeeze your back and return slowly."
+      ],
+      "negative_pull_up": [
+        "Start at the top, chin over the bar (jump or use a step).",
+        "Lower as slowly as you can.",
+        "All the way down to straight arms."
+      ],
+      "band_assisted_pull_up": [
+        "Band looped on the bar, under your feet or knees.",
+        "Pull until your chin clears the bar.",
+        "Lower slowly to straight arms."
+      ],
+      "chin_up": [
+        "Palms facing you, shoulder-width apart.",
+        "Pull until your chin clears the bar.",
+        "Lower slowly to straight arms."
+      ],
+      "pull_up": [
+        "Palms facing away, a bit wider than your shoulders.",
+        "Drive your elbows down until your chin clears the bar.",
+        "Lower slowly to straight arms."
+      ],
+      "lat_pulldown": [
+        "Thighs locked under the pad.",
+        "Pull the bar to your chest, elbows down.",
+        "Return slowly to straight arms."
+      ],
+      "dead_bug": [
+        "On your back, arms up, knees at 90°.",
+        "Slowly reach one arm and the opposite leg out.",
+        "Lower back pressed into the floor throughout."
+      ],
+      "plank": [
+        "Forearms down, elbows under your shoulders.",
+        "Body straight: hips neither high nor sagging.",
+        "Squeeze your core and glutes, and breathe."
+      ],
+      "side_plank": [
+        "On your side, elbow under your shoulder.",
+        "Lift your hips until your body is straight.",
+        "Don't let your hips sag."
+      ],
+      "hollow_hold": [
+        "On your back, lower back pressed down.",
+        "Lift shoulders and legs, arms reaching back.",
+        "The lower your legs, the harder it gets."
+      ],
+      "hanging_knee_raise": [
+        "Hang from the bar without swinging.",
+        "Bring your knees up to your chest.",
+        "Lower slowly and under control."
+      ],
+      "pallof_press": [
+        "Stand side-on to where the band is anchored.",
+        "Press your hands straight out from your chest.",
+        "Don't let your torso twist."
+      ],
+      "cable_crunch": [
+        "Kneel with the rope by your head.",
+        "Curl your torso down, squeezing your abs.",
+        "Hips stay still; return slowly."
+      ],
+      "band_curl": [
+        "Band under your feet.",
+        "Elbows pinned to your sides; curl to your shoulders.",
+        "Lower slowly to straight arms."
+      ],
+      "dumbbell_curl": [
+        "Elbows pinned to your sides.",
+        "Curl to your shoulders, palms up.",
+        "Lower slowly, no swinging."
+      ],
+      "hammer_curl": [
+        "Palms facing each other.",
+        "Elbows pinned to your sides; curl to your shoulders.",
+        "Lower slowly, no swinging."
+      ],
+      "cable_curl": [
+        "Face the low pulley.",
+        "Elbows pinned to your sides; curl to your shoulders.",
+        "Lower slowly to straight arms."
+      ],
+      "barbell_curl": [
+        "Hands shoulder-width apart, palms up.",
+        "Elbows still; curl to your shoulders.",
+        "Lower slowly, no swinging."
+      ],
+      "bench_dip": [
+        "Hands on the edge of a bench or chair behind you.",
+        "Lower until your elbows are at about 90°.",
+        "Hips close to the bench; push until straight."
+      ],
+      "diamond_push_up": [
+        "Hands together under your chest.",
+        "Elbows close to your body as you lower.",
+        "Body straight from heels to head."
+      ],
+      "band_pushdown": [
+        "Band anchored up high.",
+        "Elbows pinned to your sides; push down.",
+        "Straighten fully, then return slowly."
+      ],
+      "dumbbell_overhead_extension": [
+        "Dumbbell overhead, held with both hands.",
+        "Lower it behind your head, elbows pointing up.",
+        "Straighten your arms without moving your elbows."
+      ],
+      "cable_pushdown": [
+        "Elbows pinned to your sides.",
+        "Push the handle down until your arms are straight.",
+        "Return slowly without moving your elbows."
+      ],
+      "band_lateral_raise": [
+        "Band under your feet.",
+        "Raise your arms out to the sides, to shoulder height.",
+        "Elbows slightly bent; lower slowly."
+      ],
+      "dumbbell_lateral_raise": [
+        "Dumbbells at your sides.",
+        "Raise your arms out to the sides, to shoulder height.",
+        "No swinging; lower slowly."
+      ],
+      "cable_lateral_raise": [
+        "Stand side-on to the low pulley.",
+        "Raise your arm out to the side, to shoulder height.",
+        "Lower slowly without resting the weight."
+      ],
+      "calf_raise": [
+        "Stand with your weight on the balls of your feet.",
+        "Rise as high as you can.",
+        "Lower slowly until your heels touch the floor."
+      ],
+      "single_leg_calf_raise": [
+        "On one leg, a hand on the wall for balance.",
+        "Rise as high as you can.",
+        "Lower slowly and under control."
+      ],
+      "dumbbell_calf_raise": [
+        "Dumbbells at your sides.",
+        "Rise as high as you can.",
+        "Lower slowly until your heels touch the floor."
+      ],
+      "machine_calf_raise": [
+        "Shoulders under the pads, knees straight.",
+        "Rise as high as you can.",
+        "Lower until you feel your calves stretch."
+      ],
+      "glute_bridge": [
+        "On your back, knees bent, feet flat.",
+        "Lift your hips until your body is straight.",
+        "Squeeze your glutes at the top; lower slowly."
+      ],
+      "single_leg_glute_bridge": [
+        "On your back, one foot down, the other leg up.",
+        "Lift your hips, pushing through your heel.",
+        "Keep your hips level, no tilting."
+      ],
+      "dumbbell_hip_thrust": [
+        "Upper back on a bench, dumbbell on your hips.",
+        "Lift your hips until your torso is level with the floor.",
+        "Squeeze your glutes at the top; chin tucked."
+      ],
+      "barbell_hip_thrust": [
+        "Upper back on a bench, bar on your hips.",
+        "Lift your hips until your torso is level with the floor.",
+        "Squeeze your glutes at the top; chin tucked."
+      ]
+    }
+  },
   "progression": {
     "calibrate": "First time: pick a weight for {{min}}–{{max}} reps that still leaves {{rir}} in the tank.",
     "calibrateNoLoad": "First time: do {{min}}–{{max}} reps and stop with {{rir}} still in the tank.",

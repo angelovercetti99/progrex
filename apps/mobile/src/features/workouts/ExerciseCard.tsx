@@ -171,14 +171,31 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
 
   return (
     <Card style={styles.card}>
-      <Pressable onPress={onActivate} disabled={active} style={styles.header}>
-        <Text variant="heading">{exerciseName(item.exercise)}</Text>
-        {lastSummary ? (
-          <Text variant="caption" color="textMuted">
-            {t('workout.lastTime', { summary: lastSummary })}
-          </Text>
-        ) : null}
-      </Pressable>
+      <View style={styles.headerRow}>
+        <Pressable onPress={onActivate} disabled={active} style={styles.header}>
+          <Text variant="heading">{exerciseName(item.exercise)}</Text>
+          {lastSummary ? (
+            <Text variant="caption" color="textMuted">
+              {t('workout.lastTime', { summary: lastSummary })}
+            </Text>
+          ) : null}
+        </Pressable>
+        {/* Built-in exercises have a demo; custom ones don't. */}
+        {item.exercise.nameKey && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('howTo.open')}
+            hitSlop={8}
+            onPress={() => router.push({ pathname: '/how-to/[id]', params: { id: item.exerciseId } })}
+            style={styles.howTo}>
+            <SymbolView
+              name={{ ios: 'info.circle', android: 'info', web: 'info' }}
+              tintColor={theme.textMuted}
+              size={22}
+            />
+          </Pressable>
+        )}
+      </View>
 
       {target && (
         <View style={[styles.target, { borderColor: theme.accent }]}>
@@ -327,8 +344,22 @@ const styles = StyleSheet.create({
     paddingVertical: space.lg,
     gap: space.md,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: space.sm,
+  },
   header: {
+    flex: 1,
     gap: 2,
+  },
+  howTo: {
+    width: touch.min,
+    height: touch.min,
+    marginTop: -space.md,
+    marginRight: -space.md,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   target: {
     borderLeftWidth: 3,

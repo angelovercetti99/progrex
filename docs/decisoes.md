@@ -793,3 +793,33 @@ modo escuro, dois separadores) e leitura do código.
 
 **Ainda por verificar (precisa do telemóvel):** vibração, teclado numérico, tabs nativas,
 desempenho do SQLite nativo e o comportamento real do teclado no iPhone.
+
+## 44. Demonstração dos exercícios: boneco animado + 3 dicas
+
+Mudar de sítio leva muitas vezes a uma variante que nunca fizeste (remada debaixo da mesa no
+hotel, búlgaro numa cadeira). Por isso, cada exercício de base tem um ecrã **"Como se faz"**
+(ícone ⓘ no cartão do exercício, durante o treino): uma animação curta em loop e três
+dicas curtas.
+
+**Porquê um boneco desenhado em código, e não vídeos ou GIFs:**
+- funciona offline e quase não aumenta o tamanho da app (vídeos de 84 exercícios seriam
+  dezenas de MB, ou precisariam de internet);
+- é monocromático e usa as cores do tema, por isso fica certo no claro e no escuro;
+- não há licenças de terceiros;
+- as variantes do mesmo movimento partilham poses (o RDL com halteres e o RDL com barra só
+  diferem no que seguram).
+
+**Como funciona** (`packages/shared/src/howto`): cada demo são 2 poses-chave (onde estão a
+anca, as mãos e os pés, e quanto o tronco inclina). Os cotovelos e os joelhos são calculados
+com "cinemática inversa" de dois ossos, por isso braços e pernas nunca mudam de comprimento,
+mesmo entre poses. Os exercícios de lado (elevações laterais) usam uma vista de frente.
+
+**Testes:** todos os exercícios do catálogo têm demo; em cada pose-chave as mãos e os pés
+chegam onde devem (à barra, ao chão, ao banco); os ossos mantêm o comprimento em todos os
+fotogramas; nada sai do enquadramento nem entra no chão.
+
+**As dicas** vivem nas traduções (`howTo.cues.<exercício>`, três por exercício, PT e EN).
+Os exercícios personalizados não têm demo nem dicas, e o ícone não aparece.
+
+**Acessibilidade:** com "reduzir movimento" ligado, mostram-se as poses lado a lado em vez
+da animação. Para leitores de ecrã, a animação é decorativa e as dicas dizem o mesmo.
