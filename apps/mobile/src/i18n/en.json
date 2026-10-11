@@ -1029,5 +1029,15 @@
       ]
     },
     "disclaimer": "Progrex adapts your training using public guidance (ACOG, ADA, ACSM), but it doesn't replace advice from a health professional. This data stays on your devices (and your own server, if you use sync)."
+  },
+  "wearables": {
+    "title": "Watch and health",
+    "apple_health": "Apple Health",
+    "health_connect": "Health Connect",
+    "connect": "Connect to {{name}}",
+    "hint": "Workouts go to {{name}} and the summary shows the heart rate your watch measured (Apple Watch, Wear OS, Galaxy Watch and others that sync with {{name}}).",
+    "unavailable": "{{name}} only works in the installed app (not in Expo Go).",
+    "denied": "Not allowed. You can allow it in {{name}}'s settings.",
+    "heartRate": "Heart rate: avg {{avg}} · max {{max}} bpm"
   }
 }

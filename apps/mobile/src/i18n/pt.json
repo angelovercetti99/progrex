@@ -1029,5 +1029,15 @@
       ]
     },
     "disclaimer": "A Progrex adapta o treino com base em recomendações públicas (ACOG, ADA, ACSM), mas não substitui o aconselhamento de um profissional de saúde. Estes dados ficam nos teus dispositivos (e no teu servidor, se usares a sincronização)."
+  },
+  "wearables": {
+    "title": "Relógio e saúde",
+    "apple_health": "Apple Health",
+    "health_connect": "Health Connect",
+    "connect": "Ligar ao {{name}}",
+    "hint": "Os treinos vão para o {{name}} e o resumo mostra o ritmo cardíaco medido pelo relógio (Apple Watch, Wear OS, Galaxy Watch e outros que sincronizem com o {{name}}).",
+    "unavailable": "O {{name}} só funciona na app instalada (não no Expo Go).",
+    "denied": "Sem autorização. Podes dá-la nas definições do {{name}}.",
+    "heartRate": "Ritmo cardíaco: média {{avg}} · máx. {{max}} bpm"
   }
 }

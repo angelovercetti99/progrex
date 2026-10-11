@@ -9,6 +9,7 @@ import { useLiveQuery } from '@/db/live';
 import { useExerciseName } from '@/features/exercises/useExerciseName';
 import { formatPercent } from '@/features/progress/ProgressView';
 import { getWorkoutSummary } from '@/features/progress/queries';
+import { getWorkoutHeartRate } from '@/features/wearables/queries';
 import { getWorkoutDetail } from '@/features/workouts/queries';
 import { Button } from '@/ui/Button';
 import { Card, Divider } from '@/ui/Card';
@@ -26,6 +27,12 @@ export default function WorkoutSummaryScreen() {
   const detail = useLiveQuery(() => getWorkoutDetail(id), ['workouts'], [id]);
   const data = summary.data;
   const workout = detail.data;
+  // What the watch measured, read back from Apple Health / Health Connect.
+  const heartRate = useLiveQuery(
+    () => (workout ? getWorkoutHeartRate(workout) : Promise.resolve(null)),
+    ['preferences'],
+    [workout?.id, workout?.finishedAt]
+  ).data;
 
   const minutes =
     workout?.finishedAt && workout.startedAt
@@ -122,6 +129,11 @@ export default function WorkoutSummaryScreen() {
             />
             <Metric label={t('summary.bests')} value={String(data.personalBests)} />
           </Animated.View>
+        )}
+        {heartRate && (
+          <Text variant="caption" color="textMuted" align="center" numeric>
+            {t('wearables.heartRate', { avg: heartRate.avg, max: heartRate.max })}
+          </Text>
         )}
 
         <Card style={styles.card}>

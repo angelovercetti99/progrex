@@ -8,6 +8,7 @@ import { useLiveQuery } from '@/db/live';
 import { listExercises } from '@/features/exercises/queries';
 import { getActiveHealth, isExerciseAllowed } from '@/features/health/queries';
 import { ExerciseCard } from '@/features/workouts/ExerciseCard';
+import { exportWorkout } from '@/features/wearables/queries';
 import { finishWorkout, getWorkoutDetail } from '@/features/workouts/queries';
 import { RestTimer } from '@/features/workouts/RestTimer';
 import { DEFAULT_GOAL, getGoal } from '@/lib/preferences';
@@ -107,6 +108,9 @@ export default function WorkoutScreen() {
   async function finish() {
     const result = await finishWorkout(id);
     if (result === 'finished') {
+      // To Apple Health / Health Connect, if turned on (in the background, never blocks).
+      const finished = await getWorkoutDetail(id);
+      if (finished) void exportWorkout(finished, `Progrex · ${title}`);
       // Swap the workout screen for its summary (back then returns to Today).
       router.replace(`/summary/${id}`);
     } else if (router.canGoBack()) {

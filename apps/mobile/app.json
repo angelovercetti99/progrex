@@ -8,7 +8,8 @@
     "scheme": "progrex",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/icon.png"
+      "icon": "./assets/images/icon.png",
+      "bundleIdentifier": "com.angelosobral.progrex"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +18,12 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.angelosobral.progrex",
+      "permissions": [
+        "android.permission.health.WRITE_EXERCISE",
+        "android.permission.health.READ_HEART_RATE"
+      ]
     },
     "web": {
       "output": "single",
@@ -48,7 +54,24 @@
       "expo-localization",
       "expo-sqlite",
       "expo-sharing",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "A Progrex lê o ritmo cardíaco medido pelo teu relógio durante o treino, para o mostrar no resumo.",
+          "NSHealthUpdateUsageDescription": "A Progrex guarda os teus treinos de força no Apple Health, para contarem na tua atividade diária.",
+          "background": false
+        }
+      ],
+      "react-native-health-connect",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -4,6 +4,7 @@ export * from './catalog';
 export * from './effort';
 export * from './equipment';
 export * from './health';
+export * from './heartRate';
 export * from './howto';
 export * from './metrics';
 export * from './plan';

@@ -959,3 +959,39 @@ servidor do próprio utilizador.
 
 **Ainda não:** retinopatia diabética (sem cargas máximas), diástase abdominal medida,
 asma, artroses específicas. Entram como novas regras na mesma tabela, sem mexer no motor.
+
+## 51. Relógios: através do Apple Health e do Health Connect
+
+Pedido do utilizador: integração com o Apple Watch "e outros relógios".
+
+**A decisão:** em vez de falar com cada relógio (Garmin, Wear OS, Fitbit… cada um com a sua
+API), a app fala com a **plataforma de saúde do telemóvel**: o **Apple Health** no iPhone e o
+**Health Connect** no Android. Os relógios já escrevem lá o ritmo cardíaco (o Apple Watch
+sempre, o Wear OS e o Galaxy Watch diretamente, e outros através das suas apps). Uma integração
+serve quase todos.
+
+O que faz (Definições → Relógio e saúde, desligado por defeito):
+- **Ao terminar um treino**, guarda-o como "treino de força" no Apple Health / Health Connect
+  (conta nos anéis e na atividade diária).
+- **No resumo do treino**, mostra o ritmo cardíaco médio e máximo que o relógio mediu nesse
+  intervalo. Não se guarda na base da Progrex: lê-se outra vez quando é preciso, e assim não
+  mexe no esquema nem na sincronização.
+- Falhas são silenciosas. Um relógio nunca pode impedir o registo de um treino.
+
+Como está construído:
+- `features/wearables/platform(.ios|.android).ts`: o React Native escolhe o ficheiro pela
+  plataforma. Na web, `healthPlatform` é `null` e a secção não aparece.
+- Bibliotecas: `@kingstinct/react-native-healthkit` (iOS) e `react-native-health-connect`
+  (Android, que traz o seu próprio plugin Expo desde a v4). Ambas têm código nativo, por isso
+  **não funcionam no Expo Go**: carregam-se com `require` dentro de `try`, só fora do Expo Go,
+  e no Expo Go a app continua a funcionar e diz "só na app instalada".
+- O resumo do ritmo cardíaco (`summarizeHeartRate`, em `packages/shared`) ignora leituras fora
+  do treino e valores impossíveis, e precisa de pelo menos 3 leituras.
+- `app.json`: textos de permissão em português, permissões de saúde no Android, `minSdkVersion`
+  26 (exigido pelo Health Connect), e identificadores `com.angelosobral.progrex` (podem mudar
+  até à primeira publicação nas lojas; depois disso ficam para sempre).
+- `eas.json`: perfis `preview` (instalação direta no telemóvel, APK no Android) e `production`.
+  Os builds correm na nuvem da Expo e precisam da conta do utilizador.
+
+Para publicar na Google Play é preciso declarar o acesso ao Health Connect na Play Console
+(aprovação até ~2 semanas).

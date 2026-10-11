@@ -12,6 +12,7 @@ import { pickBackupFile, saveBackupFile } from '@/features/backup/backupFile';
 import { exportBackup, restoreBackup } from '@/features/backup/queries';
 import { resetAllData } from '@/features/reset/queries';
 import { SyncSettings } from '@/features/sync/SyncSettings';
+import { WearableSettings } from '@/features/wearables/WearableSettings';
 import { resolveLanguage } from '@/i18n';
 import { confirm } from '@/lib/confirm';
 import {
@@ -196,6 +197,8 @@ export default function SettingsScreen() {
             {t('settings.showRirHint')}
           </Text>
         </View>
+
+        <WearableSettings />
 
         <SyncSettings />
 
