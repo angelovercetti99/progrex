@@ -860,3 +860,42 @@ no ecrã Hoje (Inter, Archivo larga, Barlow Condensed e Manrope) e o utilizador 
   (`apps/mobile/assets/fonts/`, licença OFL; o comando está no README dessa pasta).
 - O `Text` escolhe a letra pela variante (`DISPLAY_VARIANTS` em `theme.ts`); `face="display"`
   força a Archivo onde não há variante própria (os botões).
+
+## 47. Sincronização (Fase 4): como ficou construída
+
+Segue as §8–10 (last-write-wins, cursor do servidor, chave pessoal, Workers + D1 + Hono).
+O que se decidiu ao construir:
+
+- **O servidor guarda tudo numa só tabela** (`sync_rows`: tabela, id, `updated_at`, a linha
+  em JSON, `server_seq`). Não precisa de perceber o que é um treino ou uma série: valida
+  cada linha com Zod, guarda a versão mais recente e numera cada mudança. Assim, acrescentar
+  uma coluna na app não obriga a mudar o servidor, e não há dois esquemas para manter iguais.
+- **O contrato é partilhado** (`packages/shared/src/sync.ts`): o pedido e a resposta usam os
+  mesmos schemas Zod das cópias de segurança (§48), por isso há uma só definição de cada tabela.
+- **O número de cada mudança é dado pelo SQLite**, dentro de uma transação (um `batch` do D1):
+  dois dispositivos a sincronizar ao mesmo tempo nunca recebem o mesmo número.
+- **Páginas de 500 linhas.** Um histórico grande vem em várias voltas (`more: true`).
+- **Na app** (`features/sync`): envia as linhas `dirty`, aplica as que chegam se forem mais
+  recentes (as recebidas não ficam `dirty`), e só limpa o `dirty` de uma linha se ela não
+  mudou entretanto. O cursor fica nas preferências locais.
+- **Quando sincroniza:** ao abrir a app, ao voltar a ela, e 4 s depois de gravares (várias
+  séries seguidas = uma só sincronização). Falhas são silenciosas: os dados ficam por enviar
+  e seguem na tentativa seguinte. As Definições mostram o estado e o último problema.
+- **A chave e o endereço** ficam no Keychain/Keystore (`expo-secure-store`) e, na web, em
+  `localStorage` (§9). Ligar um dispositivo testa logo a chave; se falhar, não fica guardada.
+- **Dados de exemplo** nunca sincronizam (nascem sem `dirty`). "Apagar tudo" sincroniza: os
+  outros dispositivos também ficam vazios.
+- **Dispositivo novo:** o primeiro ecrã tem "Já uso a Progrex noutro dispositivo", que leva
+  às Definições para ligar e receber tudo.
+- **Testes:** o Worker é testado num runtime local verdadeiro (`@cloudflare/vitest-pool-workers`,
+  versão 0.12, a última compatível com o Vitest 3 do projeto). Também testámos de ponta a ponta
+  com o Worker local e dois browsers: o que se regista num aparece no outro.
+- **O deploy é teu** (pedido do utilizador): os passos estão em `apps/api/README.md`.
+
+## 48. Cópia de segurança (exportar/importar)
+
+Nas Definições: **Exportar** guarda um ficheiro JSON com todos os treinos (folha de partilha
+no telemóvel, download na web) e **Importar** junta-o ao que já tens. O ficheiro é validado
+com Zod antes de se escrever o que quer que seja, e a importação nunca apaga nada nem
+substitui uma versão mais recente (a mesma regra da sincronização). Dados de exemplo ficam
+de fora. O idioma e a aparência não vão no ficheiro: são do dispositivo.

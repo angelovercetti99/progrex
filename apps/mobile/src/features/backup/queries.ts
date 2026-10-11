@@ -3,30 +3,20 @@ import {
   BACKUP_VERSION,
   extraActiveMesocycles,
   parseBackup,
-  rowsToRestore,
   type Backup,
-  type BackupTable,
 } from '@progrex/shared';
-import { eq, getTableColumns, inArray, sql } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 import { db } from '@/db/client';
 import { notifyChanged } from '@/db/live';
+import { upsertNewerRows } from '@/db/upsert';
 import { exercises, locations, mesocycles, preferences, sets, workoutExercises, workouts } from '@/db/schema';
 import { nowIso, todayLocalDate, updateStamps } from '@/db/stamps';
 
 /**
- * Backup: every row of your training in one JSON file (docs/decisoes.md §44).
+ * Backup: every row of your training in one JSON file (docs/decisoes.md §48).
  * The file format and its checks live in `packages/shared/src/backup.ts`.
  */
-
-const TABLES = {
-  exercises,
-  locations,
-  mesocycles,
-  workouts,
-  workoutExercises,
-  sets,
-};
 
 /** Settings that describe you, not this device. Language and theme stay per device. */
 const BACKUP_PREFERENCES = ['goal', 'currentLocationId', 'showRir', 'effortIntroSeen', 'quickStartSkipped'];
@@ -84,7 +74,8 @@ export async function restoreBackup(text: string): Promise<RestoreResult> {
 
   let restoredWorkouts = 0;
   for (const name of BACKUP_TABLES) {
-    const restored = await restoreTable(name, backup.tables[name]);
+    // Restored rows still have to reach the server: they stay dirty.
+    const restored = await upsertNewerRows(name, backup.tables[name], true);
     if (name === 'workouts') restoredWorkouts = restored;
   }
 
@@ -115,35 +106,4 @@ export async function restoreBackup(text: string): Promise<RestoreResult> {
     'preferences'
   );
   return { ok: true, workouts: restoredWorkouts };
-}
-
-/** Writes the rows of one table that are new or newer. Returns how many. */
-async function restoreTable(name: BackupTable, rows: { id: string; updatedAt: string }[]): Promise<number> {
-  // Drizzle can't type a function that works on any of our tables, so we
-  // use `sets` as the stand-in type: all tables share id/updatedAt/dirty.
-  const table = TABLES[name] as unknown as typeof sets;
-  const local = await db.select({ id: table.id, updatedAt: table.updatedAt }).from(table);
-  const changed = rowsToRestore(local, rows).map((row) => ({
-    ...row,
-    // Restored custom exercises are still custom; rows go to the server on the next sync.
-    ...(name === 'exercises' ? { isBuiltin: false } : {}),
-    dirty: true,
-  }));
-
-  // "Insert, or replace the old version": every column takes the file's value.
-  // (`excluded` is SQLite's name for the row we tried to insert.)
-  const set = Object.fromEntries(
-    Object.entries(getTableColumns(table))
-      .filter(([key]) => key !== 'id')
-      .map(([key, column]) => [key, sql.raw(`excluded."${column.name}"`)])
-  ) as Partial<typeof sets.$inferInsert>;
-
-  // Small batches keep each SQL statement short.
-  for (let i = 0; i < changed.length; i += 20) {
-    await db
-      .insert(table)
-      .values(changed.slice(i, i + 20) as unknown as (typeof sets.$inferInsert)[])
-      .onConflictDoUpdate({ target: table.id, set });
-  }
-  return changed.length;
 }

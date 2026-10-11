@@ -112,6 +112,35 @@
     "resetConfirm": "Erase everything and start over? Your workouts, plan and places will be gone. To keep a copy, export your data first.",
     "resetAction": "Erase everything"
   },
+  "sync": {
+    "title": "Sync",
+    "url": "Server address",
+    "urlPlaceholder": "https://progrex-api.….workers.dev",
+    "key": "Personal key",
+    "keyPlaceholder": "Personal key",
+    "connect": "Connect this device",
+    "connecting": "Connecting…",
+    "hint": "Connect your phone, computer and browser to your server to have the same workouts everywhere. The key is stored only on this device.",
+    "connectedHint": "Connected to {{server}}. Syncs by itself when the app opens and after you save. Offline, it keeps everything and sends it later.",
+    "now": "Sync now",
+    "waiting": "Waiting for the first sync",
+    "justNow": "Synced just now",
+    "minutesAgo_one": "Synced {{count}} minute ago",
+    "minutesAgo_other": "Synced {{count}} minutes ago",
+    "hoursAgo_one": "Synced {{count}} hour ago",
+    "hoursAgo_other": "Synced {{count}} hours ago",
+    "since": "Synced on {{date}}",
+    "disconnect": "Disconnect this device",
+    "disconnectConfirm": "Disconnect this device? The data stays here; it just stops syncing.",
+    "badUrl": "Type the server's full address, starting with https://",
+    "noKey": "The personal key is missing.",
+    "errors": {
+      "unauthorized": "The key is wrong. Check it matches the server's (APP_TOKEN).",
+      "unreachable": "Couldn't reach the server. Check the address and your connection; we'll try again later.",
+      "server": "The server answered with an error. We'll try again later.",
+      "off": "Sync is off on this device."
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -883,7 +912,8 @@
     "goal": "What do you want to achieve?",
     "days": "How many days a week?",
     "later": "60-minute workouts. You can fine-tune everything later in the Plan tab.",
-    "skip": "Train without a plan"
+    "skip": "Train without a plan",
+    "haveData": "I already use Progrex on another device"
   },
   "startup": {
     "otherTabTitle": "Progrex is already open in another tab",

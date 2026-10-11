@@ -1,0 +1,3 @@
+# Copy to .dev.vars for `npm run dev`. Use a long random value, e.g.:
+#   node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+APP_TOKEN=change-me

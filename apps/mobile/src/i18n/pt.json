@@ -112,6 +112,35 @@
     "resetConfirm": "Apagar tudo e começar do zero? Os teus treinos, o plano e os espaços desaparecem. Se quiseres guardar uma cópia, exporta primeiro os teus dados.",
     "resetAction": "Apagar tudo"
   },
+  "sync": {
+    "title": "Sincronização",
+    "url": "Endereço do servidor",
+    "urlPlaceholder": "https://progrex-api.….workers.dev",
+    "key": "Chave pessoal",
+    "keyPlaceholder": "Chave pessoal",
+    "connect": "Ligar este dispositivo",
+    "connecting": "A ligar…",
+    "hint": "Liga o telemóvel, o computador e o browser ao teu servidor para teres os mesmos treinos em todos. A chave fica guardada só neste dispositivo.",
+    "connectedHint": "Ligado a {{server}}. Sincroniza sozinho ao abrir a app e depois de gravares. Sem internet, guarda tudo e envia depois.",
+    "now": "Sincronizar agora",
+    "waiting": "À espera da primeira sincronização",
+    "justNow": "Sincronizado agora mesmo",
+    "minutesAgo_one": "Sincronizado há {{count}} minuto",
+    "minutesAgo_other": "Sincronizado há {{count}} minutos",
+    "hoursAgo_one": "Sincronizado há {{count}} hora",
+    "hoursAgo_other": "Sincronizado há {{count}} horas",
+    "since": "Sincronizado a {{date}}",
+    "disconnect": "Desligar este dispositivo",
+    "disconnectConfirm": "Desligar este dispositivo? Os dados ficam aqui; só deixam de sincronizar.",
+    "badUrl": "Escreve o endereço completo do servidor, a começar por https://",
+    "noKey": "Falta a chave pessoal.",
+    "errors": {
+      "unauthorized": "A chave não está certa. Confirma que é a mesma do servidor (APP_TOKEN).",
+      "unreachable": "Não foi possível chegar ao servidor. Confirma o endereço e a internet; tentamos outra vez mais tarde.",
+      "server": "O servidor respondeu com um erro. Tentamos outra vez mais tarde.",
+      "off": "A sincronização está desligada neste dispositivo."
+    }
+  },
   "common": {
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -883,7 +912,8 @@
     "goal": "O que queres alcançar?",
     "days": "Quantos dias por semana?",
     "later": "Treinos de 60 min. Podes afinar tudo depois no separador Plano.",
-    "skip": "Treinar sem plano"
+    "skip": "Treinar sem plano",
+    "haveData": "Já uso a Progrex noutro dispositivo"
   },
   "startup": {
     "otherTabTitle": "A Progrex já está aberta noutro separador",

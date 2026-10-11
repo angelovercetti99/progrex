@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { useLiveQuery } from '@/db/live';
 import { ExerciseThumb } from '@/features/exercises/ExerciseThumb';
+import { useNow } from '@/lib/useNow';
 import { useExerciseName } from '@/features/exercises/useExerciseName';
 import { Button } from '@/ui/Button';
 import { Card, Divider } from '@/ui/Card';
@@ -16,16 +17,6 @@ import { space, touch } from '@/ui/theme';
 import { useTheme } from '@/ui/useTheme';
 
 import { getWorkoutDetail } from './queries';
-
-/** The current time, refreshed every `ms` (rendering must not read the clock directly). */
-function useNow(ms: number): number {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), ms);
-    return () => clearInterval(timer);
-  }, [ms]);
-  return now;
-}
 
 /** Today, while a workout is open: how far you are, and one button to carry on. */
 export function ActiveWorkout({ workoutId }: { workoutId: string }) {

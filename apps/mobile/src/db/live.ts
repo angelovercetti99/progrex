@@ -19,6 +19,12 @@ export function notifyChanged(...tables: TableName[]): void {
   listeners.forEach((listener) => listener(changed));
 }
 
+/** Listen to every write outside React (e.g. to sync after saving). Returns "stop listening". */
+export function subscribeChanges(listener: Listener): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
 type LiveQueryState<T> =
   | { status: 'loading'; data: undefined; error: undefined }
   | { status: 'ready'; data: T; error: undefined }

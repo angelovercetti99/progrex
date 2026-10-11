@@ -1,4 +1,5 @@
 import { DAYS_PER_WEEK, GOALS, type Goal } from '@progrex/shared';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -98,6 +99,15 @@ export function QuickStart({ hasPlace }: { hasPlace: boolean }) {
             {t('quickStart.later')}
           </Text>
         </Animated.View>
+      )}
+
+      {/* A new phone or browser: get your data from the server instead of starting over. */}
+      {!hasPlace && (
+        <Pressable accessibilityRole="button" onPress={() => router.push('/settings')} style={styles.skip}>
+          <Text variant="label" color="textMuted">
+            {t('quickStart.haveData')}
+          </Text>
+        </Pressable>
       )}
 
       {hasPlace && (

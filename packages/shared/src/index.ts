@@ -7,4 +7,5 @@ export * from './howto';
 export * from './metrics';
 export * from './plan';
 export * from './progression';
+export * from './sync';
 export * from './training';

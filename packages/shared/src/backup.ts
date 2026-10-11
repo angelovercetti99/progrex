@@ -12,7 +12,7 @@ import {
 
 /**
  * Backup file: every row of your training in one JSON file, to keep somewhere
- * safe or move to another device (docs/decisoes.md §44).
+ * safe or move to another device (docs/decisoes.md §48).
  *
  * The file is untrusted input (it could be edited or come from an older app),
  * so it is checked with Zod before anything is written. Unknown fields are

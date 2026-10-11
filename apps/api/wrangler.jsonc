@@ -1,0 +1,17 @@
+{
+  // The Progrex sync server (docs/decisoes.md §8–10 and §47).
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "progrex-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "progrex",
+      // Replace with the id printed by `npx wrangler d1 create progrex` (see README.md).
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ]
+  // The secret APP_TOKEN is NOT here: `npx wrangler secret put APP_TOKEN` (README.md).
+}

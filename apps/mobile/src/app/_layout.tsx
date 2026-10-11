@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 
 import { DatabaseGate } from '@/db/DatabaseGate';
+import { AutoSync } from '@/features/sync/AutoSync';
 import { FONT_ASSETS, fontFamilyFor } from '@/ui/fonts';
 import { colors } from '@/ui/theme';
 import { ThemeModeProvider, useColorMode } from '@/ui/ThemeMode';
@@ -46,6 +47,7 @@ function AppNavigator() {
     <ThemeProvider value={navigationTheme}>
       <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
       <DatabaseGate>
+        <AutoSync />
         <Stack
           screenOptions={{
             headerShadowVisible: false,

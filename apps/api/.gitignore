@@ -1,0 +1,4 @@
+# Local secrets (APP_TOKEN) — never commit.
+.dev.vars
+# Wrangler's local state (local D1 database, caches).
+.wrangler/
