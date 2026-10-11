@@ -1,7 +1,6 @@
 import {
   BAR_KG,
   DEFAULT_SET,
-  effortForRir,
   exerciseDemo,
   fellShort,
   type Goal,
@@ -16,7 +15,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
-import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
+import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated';
 
 import { useLiveQuery } from '@/db/live';
 import type { Exercise, WorkoutSet } from '@/db/schema';
@@ -30,6 +29,8 @@ import { BigStepper } from '@/ui/BigStepper';
 import { Button } from '@/ui/Button';
 import { Card, Divider } from '@/ui/Card';
 import { Chip } from '@/ui/Chip';
+import { DURATION } from '@/ui/motion';
+import { PressableScale } from '@/ui/PressableScale';
 import { formatNumber, Stepper } from '@/ui/Stepper';
 import { Text } from '@/ui/Text';
 import { radius, space, touch } from '@/ui/theme';
@@ -47,8 +48,11 @@ import {
   type SetValues,
   type WorkoutExerciseDetail,
 } from './queries';
+import { SetDots } from './SetDots';
 
 const DEFAULT_VALUES = DEFAULT_SET;
+/** The animated figure next to the name of the exercise you're on. */
+const DEMO_SIZE = 96;
 
 type ExerciseCardProps = {
   workoutId: string;
@@ -56,7 +60,7 @@ type ExerciseCardProps = {
   goal: Goal;
   /** For the "variant" lever: the next step up available here. */
   harder: Exercise | null;
-  /** Only the active card shows the set logger. */
+  /** Only the active card shows the set logger; the others are one compact row. */
   active: boolean;
   /** "2 of 6": where this exercise is in today's workout. */
   position: { n: number; total: number };
@@ -65,16 +69,58 @@ type ExerciseCardProps = {
   onActivate: () => void;
 };
 
-export function ExerciseCard({
-  workoutId,
-  item,
-  goal,
-  harder,
-  active,
-  position,
-  warmup = false,
-  onActivate,
-}: ExerciseCardProps) {
+export function ExerciseCard(props: ExerciseCardProps) {
+  return (
+    // The card grows and shrinks smoothly when it becomes (or stops being) the active one.
+    <Animated.View layout={LinearTransition.duration(DURATION.base)}>
+      {props.active ? <ActiveCard {...props} /> : <CompactCard {...props} />}
+    </Animated.View>
+  );
+}
+
+/** Not the one you're on: one row. Tap to make it the active one. */
+function CompactCard({ item, position, onActivate }: ExerciseCardProps) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const exerciseName = useExerciseName();
+  const planned = item.target?.sets.length ?? 0;
+  const complete = item.sets.length > 0 && item.sets.length >= planned;
+
+  return (
+    <PressableScale accessibilityRole="button" onPress={onActivate} scaleTo={0.98}>
+      <Card style={[styles.compact, complete && styles.completeCard]}>
+        <ExerciseThumb exercise={item.exercise} size={44} />
+        <View style={styles.compactTexts}>
+          <Text variant="caption" color="textMuted" numeric>
+            {t('workout.position', position)}
+            {planned ? ` · ${t('today.setsOf', { done: item.sets.length, total: planned })}` : ''}
+          </Text>
+          <Text variant="label" numberOfLines={1}>
+            {exerciseName(item.exercise)}
+          </Text>
+        </View>
+        {complete ? (
+          <Animated.View entering={FadeIn.duration(DURATION.base)}>
+            <SymbolView
+              name={{ ios: 'checkmark.circle.fill', android: 'check_circle', web: 'check_circle' }}
+              tintColor={theme.text}
+              size={24}
+            />
+          </Animated.View>
+        ) : (
+          <SymbolView
+            name={{ ios: 'chevron.down', android: 'expand_more', web: 'expand_more' }}
+            tintColor={theme.textMuted}
+            size={18}
+          />
+        )}
+      </Card>
+    </PressableScale>
+  );
+}
+
+/** The exercise you're on: what to do, your sets so far, and the set logger. */
+function ActiveCard({ workoutId, item, goal, harder, position, warmup = false }: ExerciseCardProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const exerciseName = useExerciseName();
@@ -122,8 +168,11 @@ export function ExerciseCard({
     setOverride(null);
   }
 
-  function startEditing(set: WorkoutSet) {
-    onActivate();
+  function toggleEditing(set: WorkoutSet) {
+    if (editingSet?.id === set.id) {
+      stopEditing();
+      return;
+    }
     setEditingSet(set);
     setOverride({ reps: set.reps, weightKg: set.weightKg, rir: set.rir });
   }
@@ -193,51 +242,35 @@ export function ExerciseCard({
 
   const canSwap =
     (target?.lever === 'variant' || target?.lever === 'plateau') && harder !== null && item.sets.length === 0;
+  const setNumber = editingSet ? item.sets.indexOf(editingSet) + 1 : item.sets.length + 1;
 
   return (
     <Card style={styles.card}>
       <View style={styles.headerRow}>
-        {!active && <ExerciseThumb exercise={item.exercise} size={44} />}
-        <Pressable onPress={onActivate} disabled={active} style={styles.header}>
+        {/* How it's done, always in view while you do it. Tap for the cues. */}
+        {demo ? (
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityLabel={t('howTo.open')}
+            onPress={openHowTo}
+            style={[styles.demo, { backgroundColor: theme.surfaceMuted }]}>
+            <ExerciseDemoView demo={demo} />
+          </PressableScale>
+        ) : (
+          <ExerciseThumb exercise={item.exercise} size={DEMO_SIZE} />
+        )}
+        <View style={styles.header}>
           <Text variant="eyebrow" color="textMuted" numeric>
             {t('workout.position', position)}
           </Text>
           <Text variant="heading">{exerciseName(item.exercise)}</Text>
           {lastSummary ? (
-            <Text variant="caption" color="textMuted">
+            <Text variant="caption" color="textMuted" numberOfLines={2}>
               {t('workout.lastTime', { summary: lastSummary })}
             </Text>
           ) : null}
-        </Pressable>
-        {/* The active card shows the demo itself; the others just a shortcut to it. */}
-        {demo && !active && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('howTo.open')}
-            hitSlop={8}
-            onPress={openHowTo}
-            style={styles.howTo}>
-            <SymbolView
-              name={{ ios: 'info.circle', android: 'info', web: 'info' }}
-              tintColor={theme.textMuted}
-              size={22}
-            />
-          </Pressable>
-        )}
+        </View>
       </View>
-
-      {active && demo && (
-        // How the exercise is done, always in view while you do it. Tap for the cues.
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('howTo.open')}
-          onPress={openHowTo}
-          style={[styles.demo, { backgroundColor: theme.surfaceMuted }]}>
-          <View style={styles.demoFigure}>
-            <ExerciseDemoView demo={demo} />
-          </View>
-        </Pressable>
-      )}
 
       {target && (
         <View style={[styles.target, { borderColor: theme.accent }]}>
@@ -256,175 +289,139 @@ export function ExerciseCard({
       )}
 
       {(item.sets.length > 0 || remainingTargets.length > 0) && (
-        <View style={styles.sets}>
-          {item.sets.map((set) => (
-            <Animated.View
-              key={set.id}
-              entering={FadeInDown.duration(250)}
-              layout={LinearTransition.duration(200)}>
-              <Pressable
-                onPress={() => (editingSet?.id === set.id ? stopEditing() : startEditing(set))}
-                style={[styles.setRow, editingSet?.id === set.id && { backgroundColor: theme.surfaceMuted }]}>
-                <View style={styles.setIndex}>
-                  <SymbolView
-                    name={{ ios: 'checkmark.circle.fill', android: 'check_circle', web: 'check_circle' }}
-                    tintColor={theme.text}
-                    size={20}
-                  />
-                </View>
-                <Text numeric style={styles.setMain}>
-                  {usesWeight ? formatSet(set, kg) : `${set.reps} ${t('workout.reps')}`}
-                </Text>
-                {set.rir !== null && (
-                  <Text variant="caption" color="textMuted" numeric>
-                    {showRir ? `${t('workout.rir')} ${set.rir}` : t(`effort.${effortForRir(set.rir)}`)}
-                  </Text>
-                )}
-              </Pressable>
-            </Animated.View>
-          ))}
-          {/* What's still planned for today, in a quieter style. */}
-          {remainingTargets.map((planned, offset) => (
-            <Animated.View
-              key={`target-${item.sets.length + offset}`}
-              layout={LinearTransition.duration(200)}
-              style={styles.setRow}>
-              <View style={styles.setIndex}>
-                <View style={[styles.pendingDot, { borderColor: theme.border }]} />
-              </View>
-              <Text color="textMuted" numeric style={styles.setMain}>
-                {usesWeight && planned.weightKg !== null
-                  ? formatSet(planned, kg)
-                  : `${planned.reps} ${t('workout.reps')}`}
-              </Text>
-              <Text variant="caption" color="textMuted">
-                {t('workout.target')}
-              </Text>
-            </Animated.View>
-          ))}
-        </View>
+        <SetDots
+          done={item.sets}
+          remaining={remainingTargets}
+          editingId={editingSet?.id ?? null}
+          onEdit={toggleEditing}
+        />
       )}
 
-      {active && (
-        <>
-          <Divider />
-          <View style={styles.logger}>
-            <Text variant="label" color="textMuted">
-              {t('workout.set')} {editingSet ? item.sets.indexOf(editingSet) + 1 : item.sets.length + 1}
+      <Divider />
+      <View style={styles.logger}>
+        <View style={styles.loggerHeader}>
+          <Text variant="label" color="textMuted">
+            {editingSet ? t('workout.editingSet', { n: setNumber }) : `${t('workout.set')} ${setNumber}`}
+          </Text>
+          {shortToday && !editingSet && (
+            <Text variant="caption" color="textMuted">
+              {t('workout.autoAdjusted')}
             </Text>
-            {shortToday && !editingSet && (
-              <Text variant="caption" color="textMuted">
-                {t('workout.autoAdjusted')}
-              </Text>
-            )}
-            {warmupSteps.length > 0 && (
-              <Text variant="caption" color="textMuted" numeric>
-                {t('workout.warmup', {
-                  steps: warmupSteps.map((step) => formatSet(step, kg)).join(' · '),
-                })}
-              </Text>
-            )}
-            {usesWeight && (
-              <View style={styles.weight}>
-                <BigStepper
-                  label={t('workout.weight')}
-                  unit={kg}
-                  value={values.weightKg ?? 0}
-                  step={item.exercise.loadIncrementKg || 1}
-                  max={500}
-                  onChange={(weightKg) => change({ weightKg })}
-                />
-                {platesText && (
-                  <Text variant="caption" color="textMuted" align="center" numeric>
-                    {platesText}
-                  </Text>
-                )}
-              </View>
-            )}
+          )}
+        </View>
+        {warmupSteps.length > 0 && (
+          <Text variant="caption" color="textMuted" numeric>
+            {t('workout.warmup', {
+              steps: warmupSteps.map((step) => formatSet(step, kg)).join(' · '),
+            })}
+          </Text>
+        )}
+        {usesWeight && (
+          <View style={styles.weight}>
             <BigStepper
-              label={t('workout.repsLabel')}
-              value={values.reps}
-              min={1}
-              max={100}
-              onChange={(reps) => change({ reps })}
+              label={t('workout.weight')}
+              unit={kg}
+              value={values.weightKg ?? 0}
+              step={item.exercise.loadIncrementKg || 1}
+              max={500}
+              onChange={(next) => change({ weightKg: next })}
             />
-            {showRir ? (
-              <Stepper
-                label={t('workout.rir')}
-                hint={t('workout.rirHint')}
-                value={values.rir ?? DEFAULT_VALUES.rir}
-                max={5}
-                onChange={(rir) => change({ rir })}
-              />
-            ) : (
-              <EffortPicker
-                rir={values.rir ?? targetRir}
-                targetRir={targetRir}
-                onChange={(rir) => change({ rir })}
-              />
-            )}
-            <Button label={editingSet ? t('workout.updateSet') : t('workout.completeSet')} onPress={submit} />
-            {editingSet ? (
-              <Button variant="secondary" label={t('workout.deleteSet')} onPress={removeSet} />
-            ) : (
-              <View style={styles.cardActions}>
-                {item.sets.length === 0 && (
-                  // Machine taken, or just not today: another exercise for the same movement.
-                  <Pressable
-                    accessibilityRole="button"
-                    onPress={() =>
-                      router.push({ pathname: '/add-exercise', params: { workoutId, replace: item.id } })
-                    }
-                    style={styles.textButton}>
-                    <Text variant="label" color="textMuted">
-                      {t('workout.swap')}
-                    </Text>
-                  </Pressable>
-                )}
-                <Pressable accessibilityRole="button" onPress={removeExercise} style={styles.textButton}>
-                  <Text variant="label" color="textMuted">
-                    {t('workout.removeExercise')}
-                  </Text>
-                </Pressable>
-              </View>
+            {platesText && (
+              <Text variant="caption" color="textMuted" align="center" numeric>
+                {platesText}
+              </Text>
             )}
           </View>
-        </>
-      )}
+        )}
+        <BigStepper
+          label={t('workout.repsLabel')}
+          value={values.reps}
+          min={1}
+          max={100}
+          onChange={(reps) => change({ reps })}
+        />
+        {showRir ? (
+          <Stepper
+            label={t('workout.rir')}
+            hint={t('workout.rirHint')}
+            value={values.rir ?? DEFAULT_VALUES.rir}
+            max={5}
+            onChange={(rir) => change({ rir })}
+          />
+        ) : (
+          <EffortPicker
+            rir={values.rir ?? targetRir}
+            targetRir={targetRir}
+            onChange={(rir) => change({ rir })}
+          />
+        )}
+        <Button label={editingSet ? t('workout.updateSet') : t('workout.completeSet')} onPress={submit} />
+        {editingSet ? (
+          <View style={styles.cardActions}>
+            <TextButton label={t('common.cancel')} onPress={stopEditing} />
+            <TextButton label={t('workout.deleteSet')} onPress={removeSet} />
+          </View>
+        ) : (
+          <View style={styles.cardActions}>
+            {item.sets.length === 0 && (
+              // Machine taken, or just not today: another exercise for the same movement.
+              <TextButton
+                label={t('workout.swap')}
+                onPress={() =>
+                  router.push({ pathname: '/add-exercise', params: { workoutId, replace: item.id } })
+                }
+              />
+            )}
+            <TextButton label={t('workout.removeExercise')} onPress={removeExercise} />
+          </View>
+        )}
+      </View>
     </Card>
+  );
+}
+
+function TextButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.textButton}>
+      <Text variant="label" color="textMuted">
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     paddingVertical: space.lg,
+    gap: space.lg,
+  },
+  compact: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: space.md,
+    paddingVertical: space.md,
+  },
+  completeCard: {
+    opacity: 0.6,
+  },
+  compactTexts: {
+    flex: 1,
+    gap: 2,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.md,
+    gap: space.lg,
   },
   header: {
     flex: 1,
     gap: 2,
   },
-  howTo: {
-    width: touch.min,
-    height: touch.min,
-    marginTop: -space.md,
-    marginRight: -space.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   demo: {
-    alignItems: 'center',
-    borderRadius: radius.sm,
-    paddingVertical: space.xs,
-  },
-  demoFigure: {
-    width: '100%',
-    height: 150,
+    width: DEMO_SIZE,
+    height: DEMO_SIZE,
+    borderRadius: radius.md,
+    overflow: 'hidden',
   },
   target: {
     borderLeftWidth: 3,
@@ -439,42 +436,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: space.sm,
   },
-  sets: {
-    gap: 2,
-  },
-  setRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.md,
-    minHeight: touch.min - 8,
-    paddingHorizontal: space.sm,
-    marginHorizontal: -space.sm,
-    borderRadius: radius.sm,
-  },
-  setIndex: {
-    width: 22,
-    alignItems: 'center',
-  },
-  pendingDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1.5,
-  },
-  setMain: {
-    flex: 1,
-  },
   weight: {
     gap: space.xs,
   },
   logger: {
     gap: space.lg,
-    paddingTop: space.sm,
+  },
+  loggerHeader: {
+    gap: 2,
   },
   cardActions: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: space.xl,
+    marginTop: -space.sm,
   },
   textButton: {
     minHeight: touch.min,

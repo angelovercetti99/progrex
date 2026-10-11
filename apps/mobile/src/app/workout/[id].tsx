@@ -1,20 +1,25 @@
 import { harderVariant, needsWarmup, selectVariant, warmupRegion } from '@progrex/shared';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { useLiveQuery } from '@/db/live';
 import { listExercises } from '@/features/exercises/queries';
 import { getActiveHealth, isExerciseAllowed } from '@/features/health/queries';
+import { useExerciseName } from '@/features/exercises/useExerciseName';
 import { ExerciseCard } from '@/features/workouts/ExerciseCard';
+import { formatSet } from '@/features/workouts/formatSet';
 import { exportWorkout } from '@/features/wearables/queries';
 import { finishWorkout, getWorkoutDetail } from '@/features/workouts/queries';
+import { RestOverlay } from '@/features/workouts/RestOverlay';
 import { RestTimer } from '@/features/workouts/RestTimer';
 import { DEFAULT_GOAL, getGoal } from '@/lib/preferences';
 import { useKeepScreenOn } from '@/lib/useKeepScreenOn';
 import { Button } from '@/ui/Button';
-import { ProgressBar } from '@/ui/ProgressBar';
+import { stagger } from '@/ui/motion';
+import { SegmentedProgress } from '@/ui/SegmentedProgress';
 import { Text } from '@/ui/Text';
 import { maxContentWidth, space } from '@/ui/theme';
 import { useTheme } from '@/ui/useTheme';
@@ -23,6 +28,7 @@ import { useTheme } from '@/ui/useTheme';
 export default function WorkoutScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const exerciseName = useExerciseName();
   const { id } = useLocalSearchParams<{ id: string }>();
   const detail = useLiveQuery(() => getWorkoutDetail(id), ['workouts', 'workout_exercises', 'sets'], [id]);
   const items = detail.data?.exercises ?? [];
@@ -93,6 +99,45 @@ export default function WorkoutScreen() {
       .sort()
       .at(-1) ?? null;
 
+  // Between sets, the rest takes the whole screen. Only for a set just logged
+  // here (not when reopening a workout), and not after the very last one.
+  const [restFor, setRestFor] = useState<string | null>(null);
+  const seenCompletedAt = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (detail.status !== 'ready') return;
+    const before = seenCompletedAt.current;
+    seenCompletedAt.current = lastCompletedAt;
+    if (before === undefined || !lastCompletedAt || lastCompletedAt === before || allDone) return;
+    // Reacting to a set saved in the database (an external change), not to our own state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (Date.now() - Date.parse(lastCompletedAt) < 10_000) setRestFor(lastCompletedAt);
+  }, [detail.status, lastCompletedAt, allDone]);
+  const closeRest = useCallback(() => setRestFor(null), []);
+
+  // What comes after the rest: the active exercise (it moves on by itself) and its next set.
+  const upNext = items.find((item) => item.id === activeId);
+  const nextPlanned = upNext?.target?.sets[upNext.sets.length];
+  const nextWeight = upNext?.sets.at(-1)?.weightKg ?? nextPlanned?.weightKg ?? null;
+  const nextLabel = upNext
+    ? {
+        title: exerciseName(upNext.exercise),
+        detail: [
+          `${t('workout.set')} ${upNext.sets.length + 1}`,
+          nextPlanned ? formatSet({ reps: nextPlanned.reps, weightKg: nextWeight }, t('common.kg')) : null,
+        ]
+          .filter(Boolean)
+          .join(' · '),
+      }
+    : null;
+
+  // Keep the exercise you're on in view: scroll to it when it changes.
+  const scroll = useRef<ScrollView>(null);
+  const cardY = useRef(new Map<string, number>());
+  useEffect(() => {
+    const y = activeId ? cardY.current.get(activeId) : undefined;
+    if (y !== undefined) scroll.current?.scrollTo({ y: Math.max(0, y - space.sm), animated: true });
+  }, [activeId]);
+
   // Planned workouts show where they are in the plan; free ones show the place.
   const workout = detail.data;
   const title =
@@ -124,6 +169,7 @@ export default function WorkoutScreen() {
     <>
       <Stack.Screen options={{ title }} />
       <ScrollView
+        ref={scroll}
         style={{ backgroundColor: theme.background }}
         contentContainerStyle={styles.scroll}
         // iPhone: scroll the typed field above the keyboard.
@@ -143,11 +189,22 @@ export default function WorkoutScreen() {
               targetSeconds={items.find((item) => item.id === activeId)?.target?.restSeconds ?? null}
             />
           </View>
-          {setsPlanned > 0 && <ProgressBar value={setsDone / setsPlanned} />}
+          {/* One segment per exercise: how far you are, and how the workout is split. */}
+          {items.length > 0 && (
+            <SegmentedProgress
+              values={items.map((item) =>
+                item.target?.sets.length
+                  ? item.sets.length / item.target.sets.length
+                  : item.sets.length
+                    ? 1
+                    : 0
+              )}
+            />
+          )}
           {health && health.stages.length > 0 && (
             <Pressable accessibilityRole="link" onPress={() => router.push('/health')}>
               <Text variant="caption" color="textMuted">
-                {t('workout.stopSigns')} ›
+                {t('workout.stopSigns')}
               </Text>
             </Pressable>
           )}
@@ -159,30 +216,34 @@ export default function WorkoutScreen() {
           )}
 
           {items.map((item, index) => (
-            <ExerciseCard
+            <Animated.View
               key={item.id}
-              position={{ n: index + 1, total: items.length }}
-              workoutId={id}
-              item={item}
-              goal={goal}
-              harder={
-                item.target?.lever === 'variant'
-                  ? harderVariant(item.exercise, equipment, catalog)
-                  : item.target?.lever === 'plateau'
-                    ? // A different stimulus at the same level (not necessarily harder).
-                      selectVariant({
-                        pattern: item.exercise.pattern,
-                        available: equipment,
-                        candidates: catalog.filter((candidate) => candidate.id !== item.exerciseId),
-                        targetDifficulty: item.exercise.difficulty,
-                        allowFallback: false,
-                      })
-                    : null
-              }
-              active={item.id === activeId}
-              warmup={warmupIds.has(item.id)}
-              onActivate={() => setActiveId(item.id)}
-            />
+              entering={stagger(index)}
+              onLayout={(event) => cardY.current.set(item.id, event.nativeEvent.layout.y)}>
+              <ExerciseCard
+                position={{ n: index + 1, total: items.length }}
+                workoutId={id}
+                item={item}
+                goal={goal}
+                harder={
+                  item.target?.lever === 'variant'
+                    ? harderVariant(item.exercise, equipment, catalog)
+                    : item.target?.lever === 'plateau'
+                      ? // A different stimulus at the same level (not necessarily harder).
+                        selectVariant({
+                          pattern: item.exercise.pattern,
+                          available: equipment,
+                          candidates: catalog.filter((candidate) => candidate.id !== item.exerciseId),
+                          targetDifficulty: item.exercise.difficulty,
+                          allowFallback: false,
+                        })
+                      : null
+                }
+                active={item.id === activeId}
+                warmup={warmupIds.has(item.id)}
+                onActivate={() => setActiveId(item.id)}
+              />
+            </Animated.View>
           ))}
 
           <View style={styles.footer}>
@@ -199,6 +260,14 @@ export default function WorkoutScreen() {
           </View>
         </View>
       </ScrollView>
+      {restFor && nextLabel && active?.target && (
+        <RestOverlay
+          since={restFor}
+          targetSeconds={active.target.restSeconds}
+          next={nextLabel}
+          onClose={closeRest}
+        />
+      )}
     </>
   );
 }

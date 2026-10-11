@@ -283,9 +283,7 @@
       "indexes": {
         "sets_workout_exercise_idx": {
           "name": "sets_workout_exercise_idx",
-          "columns": [
-            "workout_exercise_id"
-          ],
+          "columns": ["workout_exercise_id"],
           "isUnique": false
         }
       },
@@ -294,12 +292,8 @@
           "name": "sets_workout_exercise_id_workout_exercises_id_fk",
           "tableFrom": "sets",
           "tableTo": "workout_exercises",
-          "columnsFrom": [
-            "workout_exercise_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workout_exercise_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -379,9 +373,7 @@
       "indexes": {
         "workout_exercises_workout_idx": {
           "name": "workout_exercises_workout_idx",
-          "columns": [
-            "workout_id"
-          ],
+          "columns": ["workout_id"],
           "isUnique": false
         }
       },
@@ -390,12 +382,8 @@
           "name": "workout_exercises_workout_id_workouts_id_fk",
           "tableFrom": "workout_exercises",
           "tableTo": "workouts",
-          "columnsFrom": [
-            "workout_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["workout_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -403,12 +391,8 @@
           "name": "workout_exercises_exercise_id_exercises_id_fk",
           "tableFrom": "workout_exercises",
           "tableTo": "exercises",
-          "columnsFrom": [
-            "exercise_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["exercise_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -495,9 +479,7 @@
       "indexes": {
         "workouts_date_idx": {
           "name": "workouts_date_idx",
-          "columns": [
-            "date"
-          ],
+          "columns": ["date"],
           "isUnique": false
         }
       },
@@ -506,12 +488,8 @@
           "name": "workouts_location_id_locations_id_fk",
           "tableFrom": "workouts",
           "tableTo": "locations",
-          "columnsFrom": [
-            "location_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["location_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

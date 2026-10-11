@@ -207,7 +207,12 @@
     "platesPerSide": "Por lado: {{plates}} kg",
     "platesApprox": "Por lado: {{plates}} kg (o mais perto possível)",
     "barOnly": "Só a barra",
-    "stopSigns": "Para se sentires tonturas, dor no peito ou falta de ar fora do normal. Ver sinais"
+    "stopSigns": "Sinais para parar ›",
+    "restOf": "de {{time}}",
+    "upNext": "A seguir",
+    "restMore": "+{{seconds}} s",
+    "skipRest": "Saltar descanso",
+    "editingSet": "A corrigir a série {{n}}"
   },
   "addExercise": {
     "title": "Adicionar exercício",

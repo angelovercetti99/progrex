@@ -207,7 +207,12 @@
     "platesPerSide": "Each side: {{plates}} kg",
     "platesApprox": "Each side: {{plates}} kg (as close as possible)",
     "barOnly": "Just the bar",
-    "stopSigns": "Stop if you feel dizzy, chest pain or unusual breathlessness. See signs"
+    "stopSigns": "Signs to stop ›",
+    "restOf": "of {{time}}",
+    "upNext": "Up next",
+    "restMore": "+{{seconds}} s",
+    "skipRest": "Skip rest",
+    "editingSet": "Fixing set {{n}}"
   },
   "addExercise": {
     "title": "Add exercise",

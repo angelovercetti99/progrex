@@ -1,5 +1,7 @@
 import * as Haptics from 'expo-haptics';
-import { Platform, Pressable, StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
+
+import { PressableScale } from './PressableScale';
 
 import { Text } from './Text';
 import { radius, space, touch } from './theme';
@@ -27,21 +29,21 @@ export function Button({ label, onPress, variant = 'primary', disabled = false }
   }
 
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={handlePress}
-      style={({ pressed }) => [
+      scaleTo={0.96}
+      style={[
         styles.base,
         { backgroundColor: isPrimary ? theme.accent : theme.surfaceMuted },
-        pressed && styles.pressed,
         disabled && styles.disabled,
       ]}>
       <Text variant="label" face="display" color={isPrimary ? 'onAccent' : 'text'} style={styles.label}>
         {label}
       </Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -57,10 +59,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
     letterSpacing: -0.2,
-  },
-  pressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
   },
   disabled: {
     opacity: 0.4,
