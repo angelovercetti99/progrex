@@ -89,7 +89,8 @@ export default function HealthScreen() {
                 label={t(`health.conditions.${condition}`)}
                 checked={profile.conditions.includes(condition)}
                 onToggle={() => toggle(condition)}>
-                {condition === 'pregnancy' && (
+                {/* The one number some conditions need, with − and + (never the keyboard). */}
+                {condition === 'pregnancy' ? (
                   <Stepper
                     label={t('health.pregnancyWeek')}
                     value={pregnancyWeeks}
@@ -97,8 +98,7 @@ export default function HealthScreen() {
                     max={42}
                     onChange={(week) => save({ dueDate: dueDateFromWeek(week, today) })}
                   />
-                )}
-                {condition === 'postpartum' && (
+                ) : condition === 'postpartum' ? (
                   <Stepper
                     label={t('health.weeksSinceBirth')}
                     value={postpartumWeeks}
@@ -106,7 +106,7 @@ export default function HealthScreen() {
                     max={52}
                     onChange={(weeks) => save({ birthDate: dateWeeksAgo(weeks, today) })}
                   />
-                )}
+                ) : undefined}
               </CheckRow>
             </Fragment>
           ))}

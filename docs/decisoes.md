@@ -995,3 +995,45 @@ Como está construído:
 
 Para publicar na Google Play é preciso declarar o acesso ao Health Connect na Play Console
 (aprovação até ~2 semanas).
+
+## 52. App para o Apple Watch
+
+**O que faz:** no pulso aparece a série que tens de fazer agora (exercício, "Série 2 de 4",
+"22,5 kg × 10") e **um botão: "Concluir série"**. O descanso conta no relógio e vibra quando
+acaba. É o mesmo "registar uma série = 1 toque" (§27), sem tirar o telemóvel do bolso.
+
+**A regra que manda em tudo: o telemóvel pensa, o relógio mostra.**
+- O iPhone envia o estado atual (com os textos já traduzidos e os números já formatados) por
+  `WatchConnectivity`, em `updateApplicationContext`: o relógio recebe sempre o **último**
+  estado, mesmo que estivesse a dormir.
+- O relógio envia de volta só "concluí a série N deste exercício". O iPhone regista-a com os
+  **mesmos valores pré-preenchidos** do toque no telemóvel (`suggestSet`, que passou do
+  `ExerciseCard` para `packages/shared`, com testes).
+- Um toque repetido ou atrasado nunca regista duas vezes: o comando leva o número da série e o
+  telemóvel só o aceita se for mesmo a seguinte (`acceptsCommand`).
+- O contrato está em `packages/shared/src/watch.ts` (schemas Zod, com testes) e em
+  `targets/watch/WatchState.swift`, que o espelha. **Mudar um obriga a mudar o outro.** Viaja
+  como uma string JSON porque o WatchConnectivity não aceita `null`.
+- O exercício atual é o primeiro que ainda não está feito, a mesma regra com que o telemóvel
+  avança sozinho. Assim os dois mostram sempre o mesmo.
+
+**Como está construído:**
+- `apps/mobile/targets/watch/`: SwiftUI (watchOS 10+), com três ficheiros pequenos. O
+  `@bacons/apple-targets` cria o alvo no Xcode durante o prebuild/EAS. Nunca se edita `ios/`.
+- No telemóvel: `features/watch` (`WatchSync`, montado na raiz como o `AutoSync`, e
+  `bridge.ios.ts` com `react-native-watch-connectivity`). Nas outras plataformas e no Expo Go
+  não faz nada.
+- Visual: fundo preto, texto branco, números grandes, botão em pílula branco. É a mesma
+  direção monocromática da app.
+
+**Verificado sem Xcode:** a sintaxe e os tipos do Swift foram verificados com o SDK do macOS e
+substitutos das duas APIs do relógio (e confirmou-se que essa verificação apanha erros). O
+prebuild gera o alvo `com.angelosobral.progrex.watch` ligado à app do iPhone. **Ainda não foi
+compilado para watchOS:** isso acontece no primeiro build EAS, que precisa do Apple Team ID
+(`ios.appleTeamId` no `app.json`) e de uma conta Apple Developer.
+
+**Ainda não (próximos passos possíveis):**
+- Sessão de treino no relógio (`HKWorkoutSession`): ritmo cardíaco contínuo e o treino a contar
+  nos anéis a partir do pulso. Quando existir, o telemóvel deixa de gravar o treino no Apple
+  Health para não o duplicar.
+- Wear OS: uma app própria em Kotlin. Hoje, os relógios Android entram pelo Health Connect (§51).

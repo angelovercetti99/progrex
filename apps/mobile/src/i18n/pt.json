@@ -1000,7 +1000,7 @@
     "rest": "Descanso: pelo menos {{seconds}} s entre séries.",
     "fewerSets": "Volume: uma série a menos por exercício.",
     "clearanceTitle": "Antes de começar",
-    "clearance": "Fala com o teu médico ou enfermeiro e confirma que podes treinar força. Se ele te der indicações diferentes, seguem-se as dele.",
+    "clearance": "Fala com o teu médico ou enfermeiro e confirma que podes treinar força. Se te derem indicações diferentes, segue-as.",
     "glucoseTitle": "Antes de cada treino",
     "glucose": "Mede a glicemia. Abaixo de 90 mg/dL, come primeiro algo com hidratos. Acima de 250 mg/dL com cetonas, hoje não treines. Tem sempre açúcar à mão.",
     "stopTitle": {
@@ -1039,5 +1039,9 @@
     "unavailable": "O {{name}} só funciona na app instalada (não no Expo Go).",
     "denied": "Sem autorização. Podes dá-la nas definições do {{name}}.",
     "heartRate": "Ritmo cardíaco: média {{avg}} · máx. {{max}} bpm"
+  },
+  "watch": {
+    "setOf": "Série {{n}} de {{total}}",
+    "done": "Tudo feito. Termina no iPhone."
   }
 }

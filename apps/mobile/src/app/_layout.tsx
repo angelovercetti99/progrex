@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { DatabaseGate } from '@/db/DatabaseGate';
 import { AutoSync } from '@/features/sync/AutoSync';
+import { WatchSync } from '@/features/watch/WatchSync';
 import { FONT_ASSETS, fontFamilyFor } from '@/ui/fonts';
 import { colors } from '@/ui/theme';
 import { ThemeModeProvider, useColorMode } from '@/ui/ThemeMode';
@@ -48,6 +49,7 @@ function AppNavigator() {
       <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
       <DatabaseGate>
         <AutoSync />
+        <WatchSync />
         <Stack
           screenOptions={{
             headerShadowVisible: false,
@@ -57,7 +59,8 @@ function AppNavigator() {
           }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="settings" options={{ title: t('settings.title') }} />
-          <Stack.Screen name="health" options={{ title: t('health.eyebrow') }} />
+          {/* The screen has its own big heading: an empty bar, just the back button. */}
+          <Stack.Screen name="health" options={{ title: '' }} />
           <Stack.Screen name="locations/index" options={{ title: t('locations.title') }} />
           <Stack.Screen name="locations/[id]" />
           <Stack.Screen

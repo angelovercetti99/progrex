@@ -1039,5 +1039,9 @@
     "unavailable": "{{name}} only works in the installed app (not in Expo Go).",
     "denied": "Not allowed. You can allow it in {{name}}'s settings.",
     "heartRate": "Heart rate: avg {{avg}} · max {{max}} bpm"
+  },
+  "watch": {
+    "setOf": "Set {{n}} of {{total}}",
+    "done": "All done. Finish on your iPhone."
   }
 }

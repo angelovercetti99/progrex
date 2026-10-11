@@ -1,10 +1,14 @@
 import {
+  BAR_KG,
+  DEFAULT_SET,
   effortForRir,
   exerciseDemo,
+  fellShort,
+  type Goal,
   platesPerSide,
+  suggestSet,
   usesBarbell,
   warmupSets,
-  type Goal,
 } from '@progrex/shared';
 import * as Haptics from 'expo-haptics';
 import { SymbolView } from 'expo-symbols';
@@ -44,7 +48,7 @@ import {
   type WorkoutExerciseDetail,
 } from './queries';
 
-const DEFAULT_VALUES = { reps: 10, rir: 2 };
+const DEFAULT_VALUES = DEFAULT_SET;
 
 type ExerciseCardProps = {
   workoutId: string;
@@ -96,40 +100,10 @@ export function ExerciseCard({
   const [override, setOverride] = useState<SetValues | null>(null);
 
   // Today's last set fell 2+ reps short of its target: not your day for this one.
-  const lastIndex = item.sets.length - 1;
-  const fellShort =
-    lastIndex >= 0 && target?.sets[lastIndex] !== undefined
-      ? item.sets[lastIndex].reps <= target.sets[lastIndex].reps - 2
-      : false;
+  const shortToday = fellShort(target, item.sets);
 
-  /**
-   * Pre-filled values, so a set that goes as planned is ONE tap.
-   * - Weight: the weight you chose today wins; else the target; else last time.
-   * - Reps: the target for this set (that's where "+1 rep" lives), except when
-   *   calibrating, or when the last set today fell 2+ reps short: then follow
-   *   what you actually did (auto-regulation, no question asked).
-   */
-  function suggestion(): SetValues {
-    const index = item.sets.length;
-    const previousToday = item.sets.at(-1);
-    const previous = previousToday ?? lastSets[index] ?? lastSets.at(-1);
-    const planned = target?.sets[index];
-    if (planned) {
-      const followToday = (target?.lever === 'calibrate' || fellShort) && previousToday;
-      return {
-        reps: followToday ? previousToday.reps : planned.reps,
-        weightKg:
-          previousToday?.weightKg ?? planned.weightKg ?? previous?.weightKg ?? (usesWeight ? 0 : null),
-        rir: planned.rir,
-      };
-    }
-    if (previous) {
-      return { reps: previous.reps, weightKg: previous.weightKg, rir: previous.rir ?? DEFAULT_VALUES.rir };
-    }
-    return { ...DEFAULT_VALUES, weightKg: usesWeight ? 0 : null };
-  }
-
-  const values = override ?? suggestion();
+  // Pre-filled values, so a set that goes as planned is ONE tap (shared with the watch).
+  const values = override ?? suggestSet({ target, today: item.sets, last: lastSets, usesWeight });
 
   function change(patch: Partial<SetValues>) {
     setOverride({ ...values, ...patch });
@@ -204,14 +178,18 @@ export function ExerciseCard({
           barbell,
         })
       : [];
-  const plates = barbell && values.weightKg !== null ? platesPerSide(values.weightKg) : null;
+  // The weight is the total, bar included. Below the bar's own weight there's nothing to load.
+  const weightKg = values.weightKg ?? 0;
+  const plates = barbell ? platesPerSide(weightKg) : null;
   const platesText = !barbell
     ? null
     : plates
       ? t(plates.exact ? 'workout.platesPerSide' : 'workout.platesApprox', {
           plates: plates.perSide.map(formatNumber).join(' + ') || '0',
         })
-      : t('workout.barOnly');
+      : weightKg === BAR_KG
+        ? t('workout.barOnly')
+        : null;
 
   const canSwap =
     (target?.lever === 'variant' || target?.lever === 'plateau') && harder !== null && item.sets.length === 0;
@@ -334,7 +312,7 @@ export function ExerciseCard({
             <Text variant="label" color="textMuted">
               {t('workout.set')} {editingSet ? item.sets.indexOf(editingSet) + 1 : item.sets.length + 1}
             </Text>
-            {fellShort && !editingSet && (
+            {shortToday && !editingSet && (
               <Text variant="caption" color="textMuted">
                 {t('workout.autoAdjusted')}
               </Text>

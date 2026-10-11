@@ -12,3 +12,4 @@ export * from './progression';
 export * from './sync';
 export * from './training';
 export * from './warmup';
+export * from './watch';
