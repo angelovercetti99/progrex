@@ -78,7 +78,16 @@
     "appearanceLight": "Light",
     "appearanceDark": "Dark",
     "showRir": "Show RIR",
-    "showRirHint": "Reps-in-reserve numbers, for people who know them."
+    "showRirHint": "Reps-in-reserve numbers, for people who know them.",
+    "backup": "Backup",
+    "backupExport": "Export my data",
+    "backupImport": "Import a backup",
+    "backupHint": "A file with all your workouts. Importing merges it with what you have and never deletes anything.",
+    "backupExported": "Backup created.",
+    "backupImported_one": "Backup imported: {{count}} new workout.",
+    "backupImported_other": "Backup imported: {{count}} new workouts.",
+    "backupInvalid": "This file isn't a Progrex backup (or it's from a newer version of the app).",
+    "backupFailed": "Couldn't finish. Please try again."
   },
   "common": {
     "save": "Save",

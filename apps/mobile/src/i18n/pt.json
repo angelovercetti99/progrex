@@ -78,7 +78,16 @@
     "appearanceLight": "Claro",
     "appearanceDark": "Escuro",
     "showRir": "Mostrar RIR",
-    "showRirHint": "Números de repetições em reserva, para quem já os conhece."
+    "showRirHint": "Números de repetições em reserva, para quem já os conhece.",
+    "backup": "Cópia de segurança",
+    "backupExport": "Exportar os meus dados",
+    "backupImport": "Importar uma cópia",
+    "backupHint": "Um ficheiro com todos os teus treinos. Importar junta-o ao que já tens e nunca apaga nada.",
+    "backupExported": "Cópia criada.",
+    "backupImported_one": "Cópia importada: {{count}} treino novo.",
+    "backupImported_other": "Cópia importada: {{count}} treinos novos.",
+    "backupInvalid": "Este ficheiro não é uma cópia da Progrex (ou é de uma versão mais recente da app).",
+    "backupFailed": "Não foi possível concluir. Tenta outra vez."
   },
   "common": {
     "save": "Guardar",

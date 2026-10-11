@@ -8,6 +8,8 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { getConnection } from '@/db/client';
 import { useLiveQuery } from '@/db/live';
+import { pickBackupFile, saveBackupFile } from '@/features/backup/backupFile';
+import { exportBackup, restoreBackup } from '@/features/backup/queries';
 import { resolveLanguage } from '@/i18n';
 import {
   DEFAULT_GOAL,
@@ -29,6 +31,7 @@ import { Logo } from '@/ui/Logo';
 import { SegmentedControl } from '@/ui/SegmentedControl';
 import { Text } from '@/ui/Text';
 import { maxContentWidth, radius, space } from '@/ui/theme';
+import { useSingleFlight } from '@/ui/useSingleFlight';
 import { useTheme } from '@/ui/useTheme';
 
 type StorageStatus =
@@ -42,6 +45,30 @@ export default function SettingsScreen() {
   const goal = useLiveQuery(getGoal, ['preferences'], []).data ?? DEFAULT_GOAL;
   const showRir = useLiveQuery(getShowRir, ['preferences'], []).data ?? false;
   const themePreference = useLiveQuery(getThemePreference, ['preferences'], []).data ?? 'system';
+
+  const [backupMessage, setBackupMessage] = useState<string | null>(null);
+
+  const exportData = useSingleFlight(async () => {
+    try {
+      await saveBackupFile(await exportBackup(), t('settings.backup'));
+      setBackupMessage(t('settings.backupExported'));
+    } catch {
+      setBackupMessage(t('settings.backupFailed'));
+    }
+  });
+
+  const importData = useSingleFlight(async () => {
+    try {
+      const text = await pickBackupFile();
+      if (text === null) return;
+      const result = await restoreBackup(text);
+      setBackupMessage(
+        result.ok ? t('settings.backupImported', { count: result.workouts }) : t('settings.backupInvalid')
+      );
+    } catch {
+      setBackupMessage(t('settings.backupFailed'));
+    }
+  });
 
   useEffect(() => {
     getLanguagePreference().then(setLanguage);
@@ -144,6 +171,20 @@ export default function SettingsScreen() {
           </Card>
           <Text variant="caption" color="textMuted">
             {t('settings.showRirHint')}
+          </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text variant="label" color="textMuted">
+            {t('settings.backup')}
+          </Text>
+          <Card>
+            <ListRow title={t('settings.backupExport')} onPress={exportData} showChevron={false} />
+            <Divider />
+            <ListRow title={t('settings.backupImport')} onPress={importData} showChevron={false} />
+          </Card>
+          <Text variant="caption" color="textMuted">
+            {backupMessage ?? t('settings.backupHint')}
           </Text>
         </View>
 
