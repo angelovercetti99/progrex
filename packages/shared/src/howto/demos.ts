@@ -189,6 +189,8 @@ const bandGoodMorning: ExerciseDemo = {
   ],
   props: [cable(pt(62, FLOOR_Y - 1))],
 };
+// The same movement with no band: the hinge on its own, safe almost anywhere.
+const goodMorning: ExerciseDemo = { poses: bandGoodMorning.poses };
 
 const swingBottom = pt(52, 58);
 const kettlebellSwing: ExerciseDemo = {
@@ -371,6 +373,12 @@ const pushUpDemo = pushUp(floorAnkle, 10, 18.7, 4.6, pt(93, 97.5));
 const archerPushUp = pushUp(floorAnkle, 10, 18.7, 4.6, [pt(93, 97.5), pt(102, 97)]);
 const diamondPushUp = pushUp(floorAnkle, 10, 18.7, 4.6, pt(95, 97.5));
 const inclinePushUp = with_(pushUp(pt(26, 95), 20, 38, 27, pt(88, 79)), box(84, 81, 34));
+// The incline push-up's top position, held: a plank without getting down to the floor.
+const inclinePlank: ExerciseDemo = {
+  ...with_(pushUp(pt(26, 95), 20, 38, 37.2, pt(88, 79)), box(84, 81, 34)),
+  move: 2,
+  hold: 1,
+};
 const declinePushUp = with_(pushUp(pt(20, 61), 0, -5, -15, pt(94, 97.5)), box(4, 64, 30));
 
 const dipBar = pt(72, 42);
@@ -761,6 +769,7 @@ export const EXERCISE_DEMOS: Record<string, ExerciseDemo> = {
   front_squat: barbellSquat(true),
 
   // Hinge
+  good_morning: goodMorning,
   single_leg_rdl: singleLegRdl,
   sliding_leg_curl: slidingLegCurl,
   nordic_curl: nordicCurl,
@@ -823,6 +832,7 @@ export const EXERCISE_DEMOS: Record<string, ExerciseDemo> = {
   lat_pulldown: latPulldown,
 
   // Core
+  incline_plank: inclinePlank,
   dead_bug: deadBug,
   plank,
   side_plank: sidePlank,

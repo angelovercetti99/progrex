@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { HealthProfileSchema, type HealthProfile } from '../health';
 import { GoalSchema, MovementPatternSchema, RirSchema } from '../training';
 
 /**
@@ -68,6 +69,8 @@ export const MesocycleSchema = z.object({
   sessions: z.array(SessionSchema).min(1),
   /** Body areas prioritised in this plan (optional: older plans don't have it). */
   priorityAreas: z.array(BodyAreaSchema).max(MAX_PRIORITY_AREAS).optional(),
+  /** Health conditions the plan respects (optional: most people have none). */
+  health: HealthProfileSchema.optional(),
 });
 export type Mesocycle = z.infer<typeof MesocycleSchema>;
 
@@ -77,4 +80,7 @@ export type MesocycleRequest = {
   daysPerWeek: number;
   sessionMinutes: number;
   priorityAreas?: BodyArea[];
+  health?: HealthProfile;
+  /** The day the plan starts (`YYYY-MM-DD`): health stages like a trimester depend on it. */
+  startDate?: string;
 };

@@ -1,4 +1,4 @@
-import type { EquipmentType, LoadType, MovementPattern } from './training';
+import type { EquipmentType, ExerciseTrait, LoadType, MovementPattern } from './training';
 
 /**
  * Built-in exercise catalog. Ids are stable forever (`builtin:<key>`): workouts
@@ -17,13 +17,16 @@ export type CatalogExercise = {
   difficulty: 1 | 2 | 3 | 4 | 5;
   /** Smallest sensible weight jump in kg (0 when weight doesn't apply). */
   loadIncrementKg: number;
+  /** Body positions and demands that matter for health conditions (see EXERCISE_TRAITS). */
+  traits: ExerciseTrait[];
 };
 
 const bw = (
   key: string,
   pattern: MovementPattern,
   difficulty: CatalogExercise['difficulty'],
-  equipment: EquipmentType[] = []
+  equipment: EquipmentType[] = [],
+  traits: ExerciseTrait[] = []
 ): CatalogExercise => ({
   key,
   pattern,
@@ -31,6 +34,7 @@ const bw = (
   loadType: 'bodyweight',
   difficulty,
   loadIncrementKg: 0,
+  traits,
 });
 
 const loaded = (
@@ -38,7 +42,8 @@ const loaded = (
   pattern: MovementPattern,
   difficulty: CatalogExercise['difficulty'],
   equipment: EquipmentType[],
-  loadIncrementKg: number
+  loadIncrementKg: number,
+  traits: ExerciseTrait[] = []
 ): CatalogExercise => ({
   key,
   pattern,
@@ -46,13 +51,15 @@ const loaded = (
   loadType: 'external',
   difficulty,
   loadIncrementKg,
+  traits,
 });
 
 const band = (
   key: string,
   pattern: MovementPattern,
   difficulty: CatalogExercise['difficulty'],
-  equipment: EquipmentType[] = ['bands']
+  equipment: EquipmentType[] = ['bands'],
+  traits: ExerciseTrait[] = []
 ): CatalogExercise => ({
   key,
   pattern,
@@ -60,55 +67,57 @@ const band = (
   loadType: 'band',
   difficulty,
   loadIncrementKg: 0,
+  traits,
 });
 
 export const CATALOG: CatalogExercise[] = [
   // Squat
   bw('bodyweight_squat', 'squat', 1),
-  bw('assisted_pistol_squat', 'squat', 3),
-  bw('pistol_squat', 'squat', 5),
+  bw('assisted_pistol_squat', 'squat', 3, [], ['balance']),
+  bw('pistol_squat', 'squat', 5, [], ['balance']),
   loaded('goblet_squat', 'squat', 2, ['dumbbells'], 2),
   loaded('kettlebell_goblet_squat', 'squat', 2, ['kettlebells'], 4),
   loaded('leg_press', 'squat', 2, ['machines'], 5),
-  loaded('back_squat', 'squat', 4, ['barbell', 'squat_rack'], 2.5),
-  loaded('front_squat', 'squat', 4, ['barbell', 'squat_rack'], 2.5),
+  loaded('back_squat', 'squat', 4, ['barbell', 'squat_rack'], 2.5, ['heavy_axial']),
+  loaded('front_squat', 'squat', 4, ['barbell', 'squat_rack'], 2.5, ['heavy_axial']),
 
   // Hinge
-  bw('single_leg_rdl', 'hinge', 2),
-  bw('sliding_leg_curl', 'hinge', 3),
-  bw('nordic_curl', 'hinge', 5),
+  bw('good_morning', 'hinge', 1),
+  bw('single_leg_rdl', 'hinge', 2, [], ['balance']),
+  bw('sliding_leg_curl', 'hinge', 3, [], ['supine', 'floor']),
+  bw('nordic_curl', 'hinge', 5, [], ['floor', 'prone']),
   band('band_good_morning', 'hinge', 1),
   loaded('dumbbell_rdl', 'hinge', 2, ['dumbbells'], 2),
-  loaded('single_leg_dumbbell_rdl', 'hinge', 3, ['dumbbells'], 2),
-  loaded('kettlebell_swing', 'hinge', 2, ['kettlebells'], 4),
-  loaded('leg_curl_machine', 'hinge', 2, ['machines'], 5),
+  loaded('single_leg_dumbbell_rdl', 'hinge', 3, ['dumbbells'], 2, ['balance']),
+  loaded('kettlebell_swing', 'hinge', 2, ['kettlebells'], 4, ['ballistic']),
+  loaded('leg_curl_machine', 'hinge', 2, ['machines'], 5, ['prone']),
   loaded('barbell_rdl', 'hinge', 3, ['barbell'], 2.5),
-  loaded('deadlift', 'hinge', 4, ['barbell'], 2.5),
+  loaded('deadlift', 'hinge', 4, ['barbell'], 2.5, ['heavy_axial']),
 
   // Lunge
   bw('reverse_lunge', 'lunge', 1),
   bw('step_up', 'lunge', 2),
   bw('split_squat', 'lunge', 2),
-  bw('bulgarian_split_squat', 'lunge', 3),
-  loaded('dumbbell_walking_lunge', 'lunge', 3, ['dumbbells'], 2),
-  loaded('dumbbell_bulgarian_split_squat', 'lunge', 4, ['dumbbells'], 2),
+  bw('bulgarian_split_squat', 'lunge', 3, [], ['balance']),
+  loaded('dumbbell_walking_lunge', 'lunge', 3, ['dumbbells'], 2, ['balance']),
+  loaded('dumbbell_bulgarian_split_squat', 'lunge', 4, ['dumbbells'], 2, ['balance']),
 
   // Horizontal push
   bw('incline_push_up', 'horizontal_push', 1),
-  bw('push_up', 'horizontal_push', 2),
-  bw('decline_push_up', 'horizontal_push', 3),
-  bw('archer_push_up', 'horizontal_push', 4),
+  bw('push_up', 'horizontal_push', 2, [], ['floor']),
+  bw('decline_push_up', 'horizontal_push', 3, [], ['floor', 'inverted']),
+  bw('archer_push_up', 'horizontal_push', 4, [], ['floor']),
   bw('dip', 'horizontal_push', 4, ['dip_bars']),
   band('band_chest_press', 'horizontal_push', 1),
-  loaded('dumbbell_floor_press', 'horizontal_push', 2, ['dumbbells'], 2),
+  loaded('dumbbell_floor_press', 'horizontal_push', 2, ['dumbbells'], 2, ['supine', 'floor']),
   loaded('machine_chest_press', 'horizontal_push', 2, ['machines'], 5),
-  loaded('dumbbell_bench_press', 'horizontal_push', 3, ['dumbbells', 'bench'], 2),
-  loaded('barbell_bench_press', 'horizontal_push', 4, ['barbell', 'bench'], 2.5),
+  loaded('dumbbell_bench_press', 'horizontal_push', 3, ['dumbbells', 'bench'], 2, ['supine']),
+  loaded('barbell_bench_press', 'horizontal_push', 4, ['barbell', 'bench'], 2.5, ['supine']),
 
   // Vertical push
-  bw('pike_push_up', 'vertical_push', 2),
-  bw('elevated_pike_push_up', 'vertical_push', 3),
-  bw('handstand_push_up', 'vertical_push', 5),
+  bw('pike_push_up', 'vertical_push', 2, [], ['floor', 'inverted']),
+  bw('elevated_pike_push_up', 'vertical_push', 3, [], ['floor', 'inverted']),
+  bw('handstand_push_up', 'vertical_push', 5, [], ['floor', 'inverted']),
   band('band_overhead_press', 'vertical_push', 1),
   loaded('dumbbell_shoulder_press', 'vertical_push', 2, ['dumbbells'], 2),
   loaded('machine_shoulder_press', 'vertical_push', 2, ['machines'], 5),
@@ -117,7 +126,7 @@ export const CATALOG: CatalogExercise[] = [
 
   // Horizontal pull
   bw('towel_door_row', 'horizontal_pull', 1),
-  bw('table_row', 'horizontal_pull', 2),
+  bw('table_row', 'horizontal_pull', 2, [], ['supine', 'floor']),
   bw('suspension_row', 'horizontal_pull', 2, ['suspension_trainer']),
   band('band_row', 'horizontal_pull', 1),
   loaded('dumbbell_row', 'horizontal_pull', 2, ['dumbbells'], 2),
@@ -127,20 +136,21 @@ export const CATALOG: CatalogExercise[] = [
 
   // Vertical pull (no bodyweight-only option: falls back to horizontal pull)
   band('band_pulldown', 'vertical_pull', 1),
-  bw('negative_pull_up', 'vertical_pull', 2, ['pull_up_bar']),
-  bw('band_assisted_pull_up', 'vertical_pull', 2, ['pull_up_bar', 'bands']),
-  bw('chin_up', 'vertical_pull', 3, ['pull_up_bar']),
-  bw('pull_up', 'vertical_pull', 4, ['pull_up_bar']),
+  bw('negative_pull_up', 'vertical_pull', 2, ['pull_up_bar'], ['hanging']),
+  bw('band_assisted_pull_up', 'vertical_pull', 2, ['pull_up_bar', 'bands'], ['hanging']),
+  bw('chin_up', 'vertical_pull', 3, ['pull_up_bar'], ['hanging']),
+  bw('pull_up', 'vertical_pull', 4, ['pull_up_bar'], ['hanging']),
   loaded('lat_pulldown', 'vertical_pull', 2, ['cable_machine'], 5),
 
   // Core
-  bw('dead_bug', 'core', 1),
-  bw('plank', 'core', 1),
-  bw('side_plank', 'core', 2),
-  bw('hollow_hold', 'core', 3),
-  bw('hanging_knee_raise', 'core', 3, ['pull_up_bar']),
+  bw('incline_plank', 'core', 1),
+  bw('dead_bug', 'core', 1, [], ['supine', 'floor']),
+  bw('plank', 'core', 1, [], ['floor', 'abdominal_load']),
+  bw('side_plank', 'core', 2, [], ['floor']),
+  bw('hollow_hold', 'core', 3, [], ['supine', 'floor', 'abdominal_load', 'spinal_flexion']),
+  bw('hanging_knee_raise', 'core', 3, ['pull_up_bar'], ['hanging', 'abdominal_load', 'spinal_flexion']),
   band('pallof_press', 'core', 2),
-  loaded('cable_crunch', 'core', 2, ['cable_machine'], 5),
+  loaded('cable_crunch', 'core', 2, ['cable_machine'], 5, ['spinal_flexion', 'abdominal_load']),
 
   // Biceps
   band('band_curl', 'biceps', 1),
@@ -151,7 +161,7 @@ export const CATALOG: CatalogExercise[] = [
 
   // Triceps
   bw('bench_dip', 'triceps', 2),
-  bw('diamond_push_up', 'triceps', 3),
+  bw('diamond_push_up', 'triceps', 3, [], ['floor']),
   band('band_pushdown', 'triceps', 1),
   loaded('dumbbell_overhead_extension', 'triceps', 2, ['dumbbells'], 1),
   loaded('cable_pushdown', 'triceps', 2, ['cable_machine'], 2.5),
@@ -163,16 +173,23 @@ export const CATALOG: CatalogExercise[] = [
 
   // Calves
   bw('calf_raise', 'calves', 1),
-  bw('single_leg_calf_raise', 'calves', 2),
+  bw('single_leg_calf_raise', 'calves', 2, [], ['balance']),
   loaded('dumbbell_calf_raise', 'calves', 2, ['dumbbells'], 2),
   loaded('machine_calf_raise', 'calves', 2, ['machines'], 5),
 
   // Glutes
-  bw('glute_bridge', 'glutes', 1),
-  bw('single_leg_glute_bridge', 'glutes', 2),
+  bw('glute_bridge', 'glutes', 1, [], ['supine', 'floor']),
+  bw('single_leg_glute_bridge', 'glutes', 2, [], ['supine', 'floor']),
   loaded('dumbbell_hip_thrust', 'glutes', 2, ['dumbbells', 'bench'], 2),
   loaded('barbell_hip_thrust', 'glutes', 3, ['barbell', 'bench'], 2.5),
 ];
+
+const BY_KEY = new Map(CATALOG.map((exercise) => [exercise.key, exercise]));
+
+/** A built-in exercise's traits. Custom exercises: none known (the user chose them). */
+export function exerciseTraits(nameKey: string | null | undefined): ExerciseTrait[] {
+  return (nameKey && BY_KEY.get(nameKey)?.traits) || [];
+}
 
 export function builtinExerciseId(key: string): string {
   return `builtin:${key}`;

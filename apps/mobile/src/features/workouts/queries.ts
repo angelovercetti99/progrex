@@ -25,6 +25,7 @@ import {
   type WorkoutSet,
 } from '@/db/schema';
 import { deleteStamps, insertStamps, newId, nowIso, todayLocalDate, updateStamps } from '@/db/stamps';
+import { getActiveHealth } from '@/features/health/queries';
 import { getGoal } from '@/lib/preferences';
 
 /** Rest longer than this isn't "rest between sets" anymore (e.g. a break). */
@@ -152,7 +153,7 @@ export async function getLastPerformance(exerciseId: string): Promise<LastPerfor
  * conditions (tired, a break, stagnation…) adjust it: see docs/decisoes.md §41.
  */
 async function computeTarget(exercise: Exercise, workout: Workout, slotId: string | null): Promise<Target> {
-  const [goal, last, recent, location, plan] = await Promise.all([
+  const [goal, last, recent, location, plan, health] = await Promise.all([
     getGoal(),
     getLastPerformance(exercise.id),
     recentScores(exercise.id),
@@ -160,6 +161,7 @@ async function computeTarget(exercise: Exercise, workout: Workout, slotId: strin
     workout.mesocycleId
       ? db.select().from(mesocycles).where(eq(mesocycles.id, workout.mesocycleId)).get()
       : Promise.resolve(undefined),
+    getActiveHealth(),
   ]);
 
   const slot = plan?.plan.sessions.flatMap((session) => session.slots).find((item) => item.id === slotId);
@@ -168,10 +170,13 @@ async function computeTarget(exercise: Exercise, workout: Workout, slotId: strin
   const conditions = workout.conditions;
 
   const base = inPlan ? slotProgressionConfig(plan.plan, slot, weekIndex) : GOAL_CONFIG[goal];
+  // Health conditions (§50): never closer to failure, nor less rest, than they allow.
   const config = {
     ...base,
     sets: (slotId && conditions?.sets[slotId]) || base.sets,
-    targetRir: Math.min(5, base.targetRir + (conditions?.effortDelta ?? 0)),
+    targetRir: Math.min(5, Math.max(health.minRir, base.targetRir + (conditions?.effortDelta ?? 0))),
+    restSeconds: Math.max(base.restSeconds, health.minRestSeconds),
+    minRestSeconds: Math.max(base.minRestSeconds, health.minRestSeconds),
   };
 
   return nextTarget({

@@ -69,7 +69,7 @@ export function NextSession({ state, next, location }: NextSessionProps) {
 
   const today = useLiveQuery(
     () => prepareToday(state, location, conditions),
-    ['exercises', 'workouts', 'locations'],
+    ['exercises', 'workouts', 'locations', 'preferences', 'mesocycles'],
     [state.mesocycle.id, next.week, state.group, location.id, location.updatedAt, conditions]
   ).data;
 
@@ -80,7 +80,7 @@ export function NextSession({ state, next, location }: NextSessionProps) {
   const homeChoices = useLiveQuery(
     () =>
       home && today
-        ? chooseExercises(today.adapted.slots, plan.experience, home)
+        ? chooseExercises(today.adapted.slots, plan.experience, home, today.health)
         : Promise.resolve([] as SlotChoice[]),
     ['exercises', 'workouts', 'locations'],
     [
@@ -90,6 +90,7 @@ export function NextSession({ state, next, location }: NextSessionProps) {
       home?.id ?? '',
       home?.updatedAt ?? '',
       today?.adapted.slots ?? [],
+      today?.health ?? null,
     ]
   ).data;
 
@@ -116,6 +117,10 @@ export function NextSession({ state, next, location }: NextSessionProps) {
         return t(`adapt.reasons.${reason}`, { days: state.daysSinceLastWorkout });
       case 'compressed':
         return t('adapt.reasons.compressed', { count: state.group.length });
+      case 'health':
+        return t('adapt.reasons.health', {
+          stages: (today?.health.stages ?? []).map((stage) => t(`health.stages.${stage}`)).join(', '),
+        });
       default:
         return t(`adapt.reasons.${reason}` as 'adapt.reasons.tired');
     }
@@ -242,6 +247,18 @@ export function NextSession({ state, next, location }: NextSessionProps) {
         </View>
       )}
 
+      {/* Diabetes: the one check the app can't do for you. Tap for the details. */}
+      {today?.health.preWorkoutCheck && (
+        <Pressable accessibilityRole="link" onPress={() => router.push('/health')}>
+          <Card style={styles.equivalence}>
+            <Text variant="label">{t('health.glucoseTitle')}</Text>
+            <Text variant="caption" color="textMuted">
+              {t('health.glucose')}
+            </Text>
+          </Card>
+        </Pressable>
+      )}
+
       {equivalence !== null && home && (
         <Card style={styles.equivalence}>
           <View style={styles.row}>
@@ -286,7 +303,9 @@ export function NextSession({ state, next, location }: NextSessionProps) {
                   <Text variant="caption" color="textMuted" numeric>
                     {exercise
                       ? `${t('today.setsReps', { sets: slot.setsPerWeek[next.week], min: slot.repMin, max: slot.repMax })}`
-                      : t('plan.skipped')}
+                      : today?.health.stages.length
+                        ? t('plan.skippedHealth')
+                        : t('plan.skipped')}
                   </Text>
                   {changed && (
                     <Text variant="caption" color="textMuted">

@@ -18,10 +18,12 @@ export type VariantCandidate = {
 /**
  * If a pattern is impossible here, train the closest one instead.
  * Vertical pulls need a bar, a band or a machine. With none of those, rowing
- * under a table still trains the back.
+ * under a table still trains the back. Vertical pushes without equipment are
+ * all head-down (pike push-ups): when that isn't safe (§50), push forwards.
  */
 export const PATTERN_FALLBACK: Partial<Record<MovementPattern, MovementPattern>> = {
   vertical_pull: 'horizontal_pull',
+  vertical_push: 'horizontal_push',
 };
 
 export type SelectVariantInput<T extends VariantCandidate> = {

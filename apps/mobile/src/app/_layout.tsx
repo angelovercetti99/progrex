@@ -57,6 +57,7 @@ function AppNavigator() {
           }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="settings" options={{ title: t('settings.title') }} />
+          <Stack.Screen name="health" options={{ title: t('health.eyebrow') }} />
           <Stack.Screen name="locations/index" options={{ title: t('locations.title') }} />
           <Stack.Screen name="locations/[id]" />
           <Stack.Screen

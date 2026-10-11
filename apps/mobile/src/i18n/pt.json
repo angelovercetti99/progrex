@@ -71,7 +71,17 @@
     "effort": "Esforço {{level}}",
     "effortTitle": "Esforço por semana",
     "thisWeek": "Esta semana",
-    "daysMinutes": "{{days}} dias · {{minutes}} min"
+    "daysMinutes": "{{days}} dias · {{minutes}} min",
+    "skippedHealth": "Sem opção segura aqui",
+    "healthLink": "Gravidez ou uma condição de saúde?",
+    "nextBlock": "Começar o próximo bloco",
+    "nextBlockHint": "Com as mesmas escolhas. Os alvos continuam de onde ficaste.",
+    "changeChoices": "Mudar escolhas",
+    "blockWorkouts_one": "treino",
+    "blockWorkouts_other": "treinos",
+    "blockPlaces_one": "sítio",
+    "blockPlaces_other": "sítios",
+    "blockIndex": "Índice Progrex"
   },
   "history": {
     "title": "Histórico",
@@ -110,7 +120,9 @@
     "reset": "Apagar tudo e começar do zero",
     "resetHint": "Apaga os treinos, o plano, os espaços e os exercícios que criaste, e volta ao primeiro ecrã. O idioma e a aparência ficam.",
     "resetConfirm": "Apagar tudo e começar do zero? Os teus treinos, o plano e os espaços desaparecem. Se quiseres guardar uma cópia, exporta primeiro os teus dados.",
-    "resetAction": "Apagar tudo"
+    "resetAction": "Apagar tudo",
+    "health": "Saúde",
+    "healthHint": "Gravidez, diabetes, tensão alta e outras condições."
   },
   "sync": {
     "title": "Sincronização",
@@ -190,7 +202,12 @@
     "target": "Alvo",
     "autoAdjusted": "Ajustado à série anterior",
     "swap": "Trocar",
-    "position": "{{n}} de {{total}}"
+    "position": "{{n}} de {{total}}",
+    "warmup": "Aquecimento: {{steps}}",
+    "platesPerSide": "Por lado: {{plates}} kg",
+    "platesApprox": "Por lado: {{plates}} kg (o mais perto possível)",
+    "barOnly": "Só a barra",
+    "stopSigns": "Para se sentires tonturas, dor no peito ou falta de ar fora do normal. Ver sinais"
   },
   "addExercise": {
     "title": "Adicionar exercício",
@@ -312,7 +329,9 @@
     "glute_bridge": "Ponte de glúteos",
     "single_leg_glute_bridge": "Ponte de glúteos unilateral",
     "dumbbell_hip_thrust": "Hip thrust com halter",
-    "barbell_hip_thrust": "Hip thrust com barra"
+    "barbell_hip_thrust": "Hip thrust com barra",
+    "good_morning": "Good morning",
+    "incline_plank": "Prancha com mãos elevadas"
   },
   "howTo": {
     "open": "Como se faz",
@@ -737,6 +756,16 @@
         "Costas apoiadas num banco, barra sobre a anca.",
         "Sobe a anca até o tronco ficar paralelo ao chão.",
         "Aperta o glúteo em cima; queixo ao peito."
+      ],
+      "good_morning": [
+        "Mãos no peito, pés à largura da anca.",
+        "Joelhos ligeiramente fletidos; leva a anca atrás.",
+        "Costas direitas; sobe a apertar o glúteo."
+      ],
+      "incline_plank": [
+        "Mãos num banco, mesa ou bancada, por baixo dos ombros.",
+        "Corpo direito dos calcanhares à cabeça.",
+        "Respira normalmente; não sustenhas o ar."
       ]
     }
   },
@@ -895,7 +924,8 @@
       "comeback": "Voltaste depois de {{days}} dias: hoje é para retomar o ritmo.",
       "long_break": "Voltaste depois de {{days}} dias: reentrada mais leve, com menos séries.",
       "compressed": "Semana apertada: juntámos {{count}} treinos num só para não ficares para trás.",
-      "early_deload": "Vários exercícios estagnaram: hoje recuperas para voltares mais forte."
+      "early_deload": "Vários exercícios estagnaram: hoje recuperas para voltares mais forte.",
+      "health": "Adaptado a: {{stages}}. Só exercícios seguros, sem ir à falha."
     },
     "left_out": "Hoje fica de fora",
     "because_pain": "dor",
@@ -921,5 +951,83 @@
     "errorTitle": "Não foi possível abrir os teus dados",
     "errorBody": "Os teus treinos continuam guardados. Tenta outra vez; se persistir, reinicia a app.",
     "retry": "Tentar outra vez"
+  },
+  "health": {
+    "eyebrow": "Saúde",
+    "title": "Treinar com cuidado",
+    "intro": "Escolhe o que se aplica. A app deixa de fora o que não é seguro, nunca te leva à falha e explica sempre o que mudou.",
+    "conditions": {
+      "pregnancy": "Gravidez",
+      "postpartum": "Pós-parto",
+      "obesity": "Obesidade",
+      "diabetes": "Diabetes",
+      "hypertension": "Tensão alta",
+      "heart_condition": "Doença cardíaca",
+      "older_adult": "65 anos ou mais",
+      "osteoporosis": "Osteoporose"
+    },
+    "pregnancyWeek": "Semana de gravidez",
+    "weeksSinceBirth": "Semanas desde o parto",
+    "stages": {
+      "pregnancy_1": "gravidez (1.º trimestre)",
+      "pregnancy_2": "gravidez (2.º trimestre)",
+      "pregnancy_3": "gravidez (3.º trimestre)",
+      "postpartum_early": "pós-parto (primeiras 6 semanas)",
+      "postpartum": "pós-parto",
+      "obesity": "obesidade",
+      "diabetes": "diabetes",
+      "hypertension": "tensão alta",
+      "heart_condition": "doença cardíaca",
+      "older_adult": "65+",
+      "osteoporosis": "osteoporose"
+    },
+    "today": "Hoje: {{stages}}",
+    "avoids": "Fica de fora: {{list}}.",
+    "traits": {
+      "supine": "deitado de costas",
+      "prone": "deitado de barriga para baixo",
+      "floor": "exercícios no chão",
+      "inverted": "cabeça abaixo do coração",
+      "hanging": "pendurado na barra",
+      "ballistic": "movimentos explosivos",
+      "balance": "equilíbrio numa perna",
+      "spinal_flexion": "abdominais a dobrar a coluna",
+      "abdominal_load": "esforço forte na barriga",
+      "heavy_axial": "cargas pesadas nas costas"
+    },
+    "effort_one": "Esforço: termina sempre com pelo menos {{count}} rep de reserva.",
+    "effort_other": "Esforço: termina sempre com pelo menos {{count}} reps de reserva.",
+    "rest": "Descanso: pelo menos {{seconds}} s entre séries.",
+    "fewerSets": "Volume: uma série a menos por exercício.",
+    "clearanceTitle": "Antes de começar",
+    "clearance": "Fala com o teu médico ou enfermeiro e confirma que podes treinar força. Se ele te der indicações diferentes, seguem-se as dele.",
+    "glucoseTitle": "Antes de cada treino",
+    "glucose": "Mede a glicemia. Abaixo de 90 mg/dL, come primeiro algo com hidratos. Acima de 250 mg/dL com cetonas, hoje não treines. Tem sempre açúcar à mão.",
+    "stopTitle": {
+      "pregnancy": "Para e contacta o médico se",
+      "diabetes": "Para e come açúcar se sentires",
+      "heart": "Para imediatamente se sentires"
+    },
+    "stopSigns": {
+      "pregnancy": [
+        "Sangramento vaginal ou perda de líquido",
+        "Contrações regulares e dolorosas",
+        "Tonturas, desmaio ou dor de cabeça forte",
+        "Dor no peito ou falta de ar antes do esforço",
+        "Dor ou inchaço na barriga da perna"
+      ],
+      "diabetes": [
+        "Tremores, suores ou fome súbita",
+        "Confusão, visão turva ou dificuldade em falar",
+        "Coração muito acelerado fora do normal"
+      ],
+      "heart": [
+        "Dor, aperto ou pressão no peito",
+        "Falta de ar fora do normal",
+        "Tonturas ou palpitações",
+        "Dor que irradia para o braço, pescoço ou maxilar"
+      ]
+    },
+    "disclaimer": "A Progrex adapta o treino com base em recomendações públicas (ACOG, ADA, ACSM), mas não substitui o aconselhamento de um profissional de saúde. Estes dados ficam nos teus dispositivos (e no teu servidor, se usares a sincronização)."
   }
 }

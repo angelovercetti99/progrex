@@ -29,11 +29,15 @@ function sampleBackup(): Record<string, unknown> {
           ...stamps,
         },
       ],
-      workouts: [{ id: 'w1', date: '2026-10-01', locationId: 'loc1', startedAt: T1, finishedAt: T1, ...stamps }],
+      workouts: [
+        { id: 'w1', date: '2026-10-01', locationId: 'loc1', startedAt: T1, finishedAt: T1, ...stamps },
+      ],
       workoutExercises: [
         { id: 'we1', workoutId: 'w1', exerciseId: 'builtin:push_up', position: 1, target: null, ...stamps },
       ],
-      sets: [{ id: 's1', workoutExerciseId: 'we1', position: 1, reps: 10, weightKg: null, rir: 2, ...stamps }],
+      sets: [
+        { id: 's1', workoutExerciseId: 'we1', position: 1, reps: 10, weightKg: null, rir: 2, ...stamps },
+      ],
     },
     preferences: { goal: 'strength' },
   };
@@ -57,7 +61,10 @@ describe('parseBackup', () => {
 
   it('drops fields it does not know (e.g. the local dirty flag)', () => {
     const file = sampleBackup();
-    (file.tables as Backup['tables']).sets[0] = { ...(file.tables as Backup['tables']).sets[0], dirty: true } as never;
+    (file.tables as Backup['tables']).sets[0] = {
+      ...(file.tables as Backup['tables']).sets[0],
+      dirty: true,
+    } as never;
     const backup = parseBackup(JSON.stringify(file))!;
     expect('dirty' in backup.tables.sets[0]).toBe(false);
   });
@@ -114,8 +121,8 @@ describe('extraActiveMesocycles', () => {
   });
 
   it('returns nothing when there is at most one active plan', () => {
-    expect(extraActiveMesocycles([{ id: 'a', startDate: '2026-09-28', updatedAt: T1, status: 'active' }])).toEqual(
-      []
-    );
+    expect(
+      extraActiveMesocycles([{ id: 'a', startDate: '2026-09-28', updatedAt: T1, status: 'active' }])
+    ).toEqual([]);
   });
 });

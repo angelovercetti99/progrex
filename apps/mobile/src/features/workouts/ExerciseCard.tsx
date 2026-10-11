@@ -1,4 +1,11 @@
-import { effortForRir, exerciseDemo, type Goal } from '@progrex/shared';
+import {
+  effortForRir,
+  exerciseDemo,
+  platesPerSide,
+  usesBarbell,
+  warmupSets,
+  type Goal,
+} from '@progrex/shared';
 import * as Haptics from 'expo-haptics';
 import { SymbolView } from 'expo-symbols';
 import { router } from 'expo-router';
@@ -19,7 +26,7 @@ import { BigStepper } from '@/ui/BigStepper';
 import { Button } from '@/ui/Button';
 import { Card, Divider } from '@/ui/Card';
 import { Chip } from '@/ui/Chip';
-import { Stepper } from '@/ui/Stepper';
+import { formatNumber, Stepper } from '@/ui/Stepper';
 import { Text } from '@/ui/Text';
 import { radius, space, touch } from '@/ui/theme';
 import { useTheme } from '@/ui/useTheme';
@@ -49,6 +56,8 @@ type ExerciseCardProps = {
   active: boolean;
   /** "2 of 6": where this exercise is in today's workout. */
   position: { n: number; total: number };
+  /** First heavy lift for these muscles today: show the warm-up sets. */
+  warmup?: boolean;
   onActivate: () => void;
 };
 
@@ -59,6 +68,7 @@ export function ExerciseCard({
   harder,
   active,
   position,
+  warmup = false,
   onActivate,
 }: ExerciseCardProps) {
   const { t } = useTranslation();
@@ -184,6 +194,25 @@ export function ExerciseCard({
         .filter(Boolean)
         .join(' · ')
     : '';
+  // Sums the app can do for you: warm-up steps and the plates on each side.
+  const barbell = usesBarbell(item.exercise.equipment);
+  const warmupSteps =
+    warmup && usesWeight && item.sets.length === 0 && !editingSet
+      ? warmupSets({
+          workKg: values.weightKg ?? 0,
+          incrementKg: item.exercise.loadIncrementKg,
+          barbell,
+        })
+      : [];
+  const plates = barbell && values.weightKg !== null ? platesPerSide(values.weightKg) : null;
+  const platesText = !barbell
+    ? null
+    : plates
+      ? t(plates.exact ? 'workout.platesPerSide' : 'workout.platesApprox', {
+          plates: plates.perSide.map(formatNumber).join(' + ') || '0',
+        })
+      : t('workout.barOnly');
+
   const canSwap =
     (target?.lever === 'variant' || target?.lever === 'plateau') && harder !== null && item.sets.length === 0;
 
@@ -310,15 +339,29 @@ export function ExerciseCard({
                 {t('workout.autoAdjusted')}
               </Text>
             )}
+            {warmupSteps.length > 0 && (
+              <Text variant="caption" color="textMuted" numeric>
+                {t('workout.warmup', {
+                  steps: warmupSteps.map((step) => formatSet(step, kg)).join(' · '),
+                })}
+              </Text>
+            )}
             {usesWeight && (
-              <BigStepper
-                label={t('workout.weight')}
-                unit={kg}
-                value={values.weightKg ?? 0}
-                step={item.exercise.loadIncrementKg || 1}
-                max={500}
-                onChange={(weightKg) => change({ weightKg })}
-              />
+              <View style={styles.weight}>
+                <BigStepper
+                  label={t('workout.weight')}
+                  unit={kg}
+                  value={values.weightKg ?? 0}
+                  step={item.exercise.loadIncrementKg || 1}
+                  max={500}
+                  onChange={(weightKg) => change({ weightKg })}
+                />
+                {platesText && (
+                  <Text variant="caption" color="textMuted" align="center" numeric>
+                    {platesText}
+                  </Text>
+                )}
+              </View>
             )}
             <BigStepper
               label={t('workout.repsLabel')}
@@ -442,6 +485,9 @@ const styles = StyleSheet.create({
   },
   setMain: {
     flex: 1,
+  },
+  weight: {
+    gap: space.xs,
   },
   logger: {
     gap: space.lg,

@@ -7,6 +7,7 @@ import { SectionList, StyleSheet, View } from 'react-native';
 import { useLiveQuery } from '@/db/live';
 import type { Exercise } from '@/db/schema';
 import { listExercises } from '@/features/exercises/queries';
+import { getActiveHealth, isExerciseAllowed } from '@/features/health/queries';
 import { ExerciseThumb } from '@/features/exercises/ExerciseThumb';
 import { useExerciseName } from '@/features/exercises/useExerciseName';
 import { addExerciseToWorkout, getWorkoutDetail, swapExercise } from '@/features/workouts/queries';
@@ -33,6 +34,7 @@ export default function AddExerciseScreen() {
   const [search, setSearch] = useState('');
 
   const all = useLiveQuery(listExercises, ['exercises'], []);
+  const health = useLiveQuery(getActiveHealth, ['preferences', 'mesocycles'], []).data;
   const workout = useLiveQuery(() => getWorkoutDetail(workoutId), ['workouts', 'locations'], [workoutId]);
   const equipment = workout.data?.location?.equipment ?? [];
   const replacing = workout.data?.exercises.find((item) => item.id === replace);
@@ -40,7 +42,10 @@ export default function AddExerciseScreen() {
   const query = normalize(search.trim());
   const visible = (all.data ?? []).filter(
     (exercise) =>
-      (filter === 'all' || hasEquipmentFor(exercise.equipment, equipment)) &&
+      // "Available here" = this place has the gear AND it's safe for your conditions (§50).
+      (filter === 'all' ||
+        (hasEquipmentFor(exercise.equipment, equipment) &&
+          (!health || isExerciseAllowed(exercise, health)))) &&
       // Swapping: same movement, a different exercise.
       (!replacing ||
         (exercise.pattern === replacing.exercise.pattern && exercise.id !== replacing.exerciseId)) &&

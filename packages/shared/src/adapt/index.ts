@@ -1,3 +1,4 @@
+import type { ActiveHealth } from '../health';
 import { PLATEAU_SESSIONS } from '../progression/engine';
 import { fitToTime } from '../plan/generate';
 import type { BodyArea, Mesocycle, Slot } from '../plan/schema';
@@ -21,7 +22,7 @@ export type TodayConditions = {
 };
 
 export type AdaptReason =
-  'pain' | 'short_time' | 'tired' | 'comeback' | 'long_break' | 'compressed' | 'early_deload';
+  'health' | 'pain' | 'short_time' | 'tired' | 'comeback' | 'long_break' | 'compressed' | 'early_deload';
 
 export type AdaptedSession = {
   slots: Slot[];
@@ -59,6 +60,8 @@ export type AdaptInput = TodayConditions & {
   plan: Pick<Mesocycle, 'sessionMinutes' | 'restSeconds'>;
   /** Days since the last finished workout (null = first workout ever). */
   daysSinceLastWorkout?: number | null;
+  /** Health rules that apply today (§50). Which exercises are safe is decided when choosing them. */
+  health?: ActiveHealth | null;
 };
 
 export function adaptSession({
@@ -68,11 +71,16 @@ export function adaptSession({
   tired = false,
   painAreas = [],
   daysSinceLastWorkout = null,
+  health = null,
 }: AdaptInput): AdaptedSession {
   const reasons: AdaptReason[] = [];
   const removed: AdaptedSession['removed'] = [];
   let hold = false;
   let effortDelta = 0;
+
+  // 0. Health: always first, it's the reason everything else sits on.
+  const gentler = Boolean(health?.fewerSets);
+  if (health && health.stages.length > 0) reasons.push('health');
 
   // 1. Pain: leave out what loads the sore area; keep training the rest.
   const avoid = new Set(painAreas.flatMap((area) => PAIN_PATTERNS[area]));
@@ -83,14 +91,18 @@ export function adaptSession({
   });
   if (removed.length) reasons.push('pain');
 
+  // Some conditions (late pregnancy, just after birth): one set fewer everywhere.
+  const oneSetFewer = (slot: Slot): Slot => ({
+    ...slot,
+    setsPerWeek: slot.setsPerWeek.map((sets) => Math.max(slot.main ? 2 : 1, sets - 1)),
+  });
+  if (gentler) kept = kept.map(oneSetFewer);
+
   // 2. A break: no progression today; after a long one, also fewer and easier sets.
   if (daysSinceLastWorkout !== null && daysSinceLastWorkout >= LONG_BREAK_DAYS) {
     hold = true;
     effortDelta = Math.max(effortDelta, 1);
-    kept = kept.map((slot) => ({
-      ...slot,
-      setsPerWeek: slot.setsPerWeek.map((sets) => Math.max(slot.main ? 2 : 1, sets - 1)),
-    }));
+    if (!gentler) kept = kept.map(oneSetFewer); // never two sets fewer for two reasons
     reasons.push('long_break');
   } else if (daysSinceLastWorkout !== null && daysSinceLastWorkout >= COMEBACK_DAYS) {
     hold = true;

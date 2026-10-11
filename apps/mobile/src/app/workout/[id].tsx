@@ -1,15 +1,17 @@
-import { harderVariant, selectVariant } from '@progrex/shared';
+import { harderVariant, needsWarmup, selectVariant, warmupRegion } from '@progrex/shared';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useLiveQuery } from '@/db/live';
 import { listExercises } from '@/features/exercises/queries';
+import { getActiveHealth, isExerciseAllowed } from '@/features/health/queries';
 import { ExerciseCard } from '@/features/workouts/ExerciseCard';
 import { finishWorkout, getWorkoutDetail } from '@/features/workouts/queries';
 import { RestTimer } from '@/features/workouts/RestTimer';
 import { DEFAULT_GOAL, getGoal } from '@/lib/preferences';
+import { useKeepScreenOn } from '@/lib/useKeepScreenOn';
 import { Button } from '@/ui/Button';
 import { ProgressBar } from '@/ui/ProgressBar';
 import { Text } from '@/ui/Text';
@@ -24,8 +26,25 @@ export default function WorkoutScreen() {
   const detail = useLiveQuery(() => getWorkoutDetail(id), ['workouts', 'workout_exercises', 'sets'], [id]);
   const items = detail.data?.exercises ?? [];
   const goal = useLiveQuery(getGoal, ['preferences'], []).data ?? DEFAULT_GOAL;
-  const catalog = useLiveQuery(listExercises, ['exercises'], []).data ?? [];
+  const health = useLiveQuery(getActiveHealth, ['preferences', 'mesocycles'], []).data;
+  // Suggestions to swap only ever offer what's safe for today's conditions (§50).
+  const allExercises = useLiveQuery(listExercises, ['exercises'], []).data ?? [];
+  const catalog = health
+    ? allExercises.filter((exercise) => isExerciseAllowed(exercise, health))
+    : allExercises;
   const equipment = detail.data?.location?.equipment ?? [];
+  // The phone sits on the floor between sets: don't let it lock.
+  useKeepScreenOn();
+
+  // Warm up once per region (legs, pushing, pulling): on its first heavy lift.
+  const warmupIds = new Set<string>();
+  const warmedUp = new Set<string>();
+  for (const item of items) {
+    const region = warmupRegion(item.exercise.pattern);
+    if (!region || warmedUp.has(region)) continue;
+    warmedUp.add(region);
+    if (needsWarmup(item.exercise)) warmupIds.add(item.id);
+  }
 
   // An exercise is "done" when every planned set is logged.
   const isDone = (item: (typeof items)[number]) =>
@@ -121,6 +140,13 @@ export default function WorkoutScreen() {
             />
           </View>
           {setsPlanned > 0 && <ProgressBar value={setsDone / setsPlanned} />}
+          {health && health.stages.length > 0 && (
+            <Pressable accessibilityRole="link" onPress={() => router.push('/health')}>
+              <Text variant="caption" color="textMuted">
+                {t('workout.stopSigns')} ›
+              </Text>
+            </Pressable>
+          )}
 
           {detail.status === 'ready' && items.length === 0 && (
             <Text color="textMuted" align="center" style={styles.empty}>
@@ -150,6 +176,7 @@ export default function WorkoutScreen() {
                     : null
               }
               active={item.id === activeId}
+              warmup={warmupIds.has(item.id)}
               onActivate={() => setActiveId(item.id)}
             />
           ))}

@@ -87,5 +87,34 @@ export const GOALS = ['hypertrophy', 'strength', 'fat_loss', 'general_health'] a
 export const GoalSchema = z.enum(GOALS);
 export type Goal = z.infer<typeof GoalSchema>;
 
+/**
+ * What an exercise asks of the body beyond its movement pattern. Used to leave
+ * out what isn't safe for a health condition (docs/decisoes.md §50).
+ */
+export const EXERCISE_TRAITS = [
+  /** Lying on the back. */
+  'supine',
+  /** Lying face down. */
+  'prone',
+  /** Starts or ends on the floor (getting down and up is part of it). */
+  'floor',
+  /** Head below the heart. */
+  'inverted',
+  /** Hanging from a bar. */
+  'hanging',
+  /** Fast, swinging or explosive. */
+  'ballistic',
+  /** Standing on one leg or on a narrow base. */
+  'balance',
+  /** Bending the spine forward against resistance (crunch-like). */
+  'spinal_flexion',
+  /** Hard work for the front of the abdomen (planks, leg raises). */
+  'abdominal_load',
+  /** A heavy load resting on the spine (back squat, deadlift). */
+  'heavy_axial',
+] as const;
+export const ExerciseTraitSchema = z.enum(EXERCISE_TRAITS);
+export type ExerciseTrait = z.infer<typeof ExerciseTraitSchema>;
+
 /** Reps in reserve: how many more good reps you could have done. 0 = failure. */
 export const RirSchema = z.number().int().min(0).max(5);

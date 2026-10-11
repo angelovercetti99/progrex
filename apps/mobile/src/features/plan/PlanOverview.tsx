@@ -7,17 +7,20 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { intensityForRir } from '@progrex/shared';
 
 import { useLiveQuery } from '@/db/live';
+import { formatPercent } from '@/features/progress/ProgressView';
 import { confirm } from '@/lib/confirm';
 import { getShowRir } from '@/lib/preferences';
 import { Button } from '@/ui/Button';
 import { Card, Divider } from '@/ui/Card';
 import { ListRow } from '@/ui/ListRow';
 import { ProgressBar } from '@/ui/ProgressBar';
+import { StatRow } from '@/ui/StatRow';
 import { Text } from '@/ui/Text';
 import { radius, space } from '@/ui/theme';
+import { useSingleFlight } from '@/ui/useSingleFlight';
 import { useTheme } from '@/ui/useTheme';
 
-import { endMesocycle, sessionKey, type PlanState } from './queries';
+import { endMesocycle, getBlockSummary, sessionKey, startNextBlock, type PlanState } from './queries';
 
 /**
  * The block at a glance: where you are, how hard each week is (a small bar
@@ -33,6 +36,13 @@ export function PlanOverview({ state }: { state: PlanState }) {
   const total = plan.weeks.length * plan.sessions.length;
 
   const showRir = useLiveQuery(getShowRir, ['preferences'], []).data ?? false;
+  // At the end of a block: what it gave you, and the next one in one tap.
+  const summary = useLiveQuery(
+    () => (complete ? getBlockSummary(state.mesocycle) : Promise.resolve(null)),
+    ['workouts', 'sets'],
+    [complete, state.mesocycle.id]
+  ).data;
+  const nextBlock = useSingleFlight(() => startNextBlock(state));
   const [selected, setSelected] = useState(currentWeek);
 
   async function newPlan() {
@@ -89,7 +99,30 @@ export function PlanOverview({ state }: { state: PlanState }) {
         </Text>
       </View>
 
-      {complete && <Button label={t('plan.newPlan')} onPress={newPlan} />}
+      {complete && (
+        <View style={styles.complete}>
+          {summary && (
+            <StatRow
+              items={[
+                {
+                  value: String(summary.workouts),
+                  label: t('plan.blockWorkouts', { count: summary.workouts }),
+                },
+                { value: String(summary.places), label: t('plan.blockPlaces', { count: summary.places }) },
+                {
+                  value: summary.index === null ? '–' : formatPercent(summary.index),
+                  label: t('plan.blockIndex'),
+                },
+              ]}
+            />
+          )}
+          <Button label={t('plan.nextBlock')} onPress={nextBlock} />
+          <Text variant="caption" color="textMuted" align="center">
+            {t('plan.nextBlockHint')}
+          </Text>
+          <Button variant="secondary" label={t('plan.changeChoices')} onPress={newPlan} />
+        </View>
+      )}
 
       {/* Effort per week: a bar per week, tap to see that week. */}
       <Card style={styles.chartCard}>
@@ -212,6 +245,9 @@ const styles = StyleSheet.create({
   },
   hero: {
     gap: space.xs,
+  },
+  complete: {
+    gap: space.md,
   },
   progress: {
     gap: space.sm,

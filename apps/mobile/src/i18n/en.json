@@ -71,7 +71,17 @@
     "effort": "{{level}} effort",
     "effortTitle": "Effort by week",
     "thisWeek": "This week",
-    "daysMinutes": "{{days}} days · {{minutes}} min"
+    "daysMinutes": "{{days}} days · {{minutes}} min",
+    "skippedHealth": "No safe option here",
+    "healthLink": "Pregnant or have a health condition?",
+    "nextBlock": "Start the next block",
+    "nextBlockHint": "Same choices. Your targets carry on from where you are.",
+    "changeChoices": "Change choices",
+    "blockWorkouts_one": "workout",
+    "blockWorkouts_other": "workouts",
+    "blockPlaces_one": "place",
+    "blockPlaces_other": "places",
+    "blockIndex": "Progrex Index"
   },
   "history": {
     "title": "History",
@@ -110,7 +120,9 @@
     "reset": "Erase everything and start over",
     "resetHint": "Deletes your workouts, plan, places and the exercises you created, and takes you back to the first screen. Language and appearance stay.",
     "resetConfirm": "Erase everything and start over? Your workouts, plan and places will be gone. To keep a copy, export your data first.",
-    "resetAction": "Erase everything"
+    "resetAction": "Erase everything",
+    "health": "Health",
+    "healthHint": "Pregnancy, diabetes, high blood pressure and other conditions."
   },
   "sync": {
     "title": "Sync",
@@ -190,7 +202,12 @@
     "target": "Target",
     "autoAdjusted": "Adjusted to your last set",
     "swap": "Swap",
-    "position": "{{n}} of {{total}}"
+    "position": "{{n}} of {{total}}",
+    "warmup": "Warm-up: {{steps}}",
+    "platesPerSide": "Each side: {{plates}} kg",
+    "platesApprox": "Each side: {{plates}} kg (as close as possible)",
+    "barOnly": "Just the bar",
+    "stopSigns": "Stop if you feel dizzy, chest pain or unusual breathlessness. See signs"
   },
   "addExercise": {
     "title": "Add exercise",
@@ -312,7 +329,9 @@
     "glute_bridge": "Glute bridge",
     "single_leg_glute_bridge": "Single-leg glute bridge",
     "dumbbell_hip_thrust": "Dumbbell hip thrust",
-    "barbell_hip_thrust": "Barbell hip thrust"
+    "barbell_hip_thrust": "Barbell hip thrust",
+    "good_morning": "Good morning",
+    "incline_plank": "Incline plank"
   },
   "howTo": {
     "open": "How to do it",
@@ -737,6 +756,16 @@
         "Upper back on a bench, bar on your hips.",
         "Lift your hips until your torso is level with the floor.",
         "Squeeze your glutes at the top; chin tucked."
+      ],
+      "good_morning": [
+        "Hands on your chest, feet hip-width apart.",
+        "Soft knees; push your hips back.",
+        "Flat back; squeeze your glutes to stand up."
+      ],
+      "incline_plank": [
+        "Hands on a bench, table or counter, under your shoulders.",
+        "Straight line from heels to head.",
+        "Breathe normally; don't hold your breath."
       ]
     }
   },
@@ -895,7 +924,8 @@
       "comeback": "Back after {{days}} days: today is about getting the rhythm back.",
       "long_break": "Back after {{days}} days: an easier re-entry with fewer sets.",
       "compressed": "Busy week: we merged {{count}} workouts into one so you don't fall behind.",
-      "early_deload": "Several exercises stalled: today you recover to come back stronger."
+      "early_deload": "Several exercises stalled: today you recover to come back stronger.",
+      "health": "Adapted for: {{stages}}. Only safe exercises, never to failure."
     },
     "left_out": "Left out today",
     "because_pain": "pain",
@@ -921,5 +951,83 @@
     "errorTitle": "Couldn't open your data",
     "errorBody": "Your workouts are still saved. Try again; if it keeps happening, restart the app.",
     "retry": "Try again"
+  },
+  "health": {
+    "eyebrow": "Health",
+    "title": "Train with care",
+    "intro": "Pick what applies. The app leaves out what isn't safe, never takes you to failure and always explains what changed.",
+    "conditions": {
+      "pregnancy": "Pregnancy",
+      "postpartum": "Postpartum",
+      "obesity": "Obesity",
+      "diabetes": "Diabetes",
+      "hypertension": "High blood pressure",
+      "heart_condition": "Heart condition",
+      "older_adult": "65 or older",
+      "osteoporosis": "Osteoporosis"
+    },
+    "pregnancyWeek": "Week of pregnancy",
+    "weeksSinceBirth": "Weeks since giving birth",
+    "stages": {
+      "pregnancy_1": "pregnancy (1st trimester)",
+      "pregnancy_2": "pregnancy (2nd trimester)",
+      "pregnancy_3": "pregnancy (3rd trimester)",
+      "postpartum_early": "postpartum (first 6 weeks)",
+      "postpartum": "postpartum",
+      "obesity": "obesity",
+      "diabetes": "diabetes",
+      "hypertension": "high blood pressure",
+      "heart_condition": "heart condition",
+      "older_adult": "65+",
+      "osteoporosis": "osteoporosis"
+    },
+    "today": "Today: {{stages}}",
+    "avoids": "Left out: {{list}}.",
+    "traits": {
+      "supine": "lying on your back",
+      "prone": "lying face down",
+      "floor": "floor exercises",
+      "inverted": "head below the heart",
+      "hanging": "hanging from a bar",
+      "ballistic": "explosive moves",
+      "balance": "balancing on one leg",
+      "spinal_flexion": "crunch-type moves",
+      "abdominal_load": "hard work for the belly",
+      "heavy_axial": "heavy loads on the spine"
+    },
+    "effort_one": "Effort: always finish with at least {{count}} rep in reserve.",
+    "effort_other": "Effort: always finish with at least {{count}} reps in reserve.",
+    "rest": "Rest: at least {{seconds}} s between sets.",
+    "fewerSets": "Volume: one set fewer per exercise.",
+    "clearanceTitle": "Before you start",
+    "clearance": "Talk to your doctor or midwife and check that strength training is fine for you. If they advise differently, follow them.",
+    "glucoseTitle": "Before each workout",
+    "glucose": "Check your blood sugar. Below 90 mg/dL, eat some carbs first. Above 250 mg/dL with ketones, skip today. Always keep sugar at hand.",
+    "stopTitle": {
+      "pregnancy": "Stop and call your doctor if",
+      "diabetes": "Stop and eat sugar if you feel",
+      "heart": "Stop right away if you feel"
+    },
+    "stopSigns": {
+      "pregnancy": [
+        "Vaginal bleeding or leaking fluid",
+        "Regular, painful contractions",
+        "Dizziness, fainting or a bad headache",
+        "Chest pain, or breathless before exercising",
+        "Pain or swelling in a calf"
+      ],
+      "diabetes": [
+        "Shaking, sweating or sudden hunger",
+        "Confusion, blurred vision or trouble speaking",
+        "An unusually fast heartbeat"
+      ],
+      "heart": [
+        "Pain, tightness or pressure in the chest",
+        "Unusual breathlessness",
+        "Dizziness or palpitations",
+        "Pain spreading to the arm, neck or jaw"
+      ]
+    },
+    "disclaimer": "Progrex adapts your training using public guidance (ACOG, ADA, ACSM), but it doesn't replace advice from a health professional. This data stays on your devices (and your own server, if you use sync)."
   }
 }

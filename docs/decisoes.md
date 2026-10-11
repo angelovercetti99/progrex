@@ -899,3 +899,63 @@ no telemóvel, download na web) e **Importar** junta-o ao que já tens. O fichei
 com Zod antes de se escrever o que quer que seja, e a importação nunca apaga nada nem
 substitui uma versão mais recente (a mesma regra da sincronização). Dados de exemplo ficam
 de fora. O idioma e a aparência não vão no ficheiro: são do dispositivo.
+
+## 49. Contas que a app faz por ti + fim de bloco num toque
+
+Pedido do utilizador depois de uma revisão do que falta. Mais uma ronda de conveniência (§42).
+
+| O quê | Como |
+|---|---|
+| **Ecrã sempre ligado** durante o treino | `expo-keep-awake` (`useKeepScreenOn`). Na web não, porque a Wake Lock API não existe em todo o lado e falha com ruído. |
+| **Aquecimento calculado** | No primeiro exercício pesado de cada zona (pernas, empurrar, puxar), uma linha discreta: "Aquecimento: 20 kg × 8 · 35 kg × 3". De 15 a 59 kg: 50% × 8, 75% × 3. A partir de 60 kg: 40% × 8, 60% × 5, 80% × 2. Arredonda para baixo ao passo do exercício e nunca fica abaixo da barra. Não se registam: é para fazer, não para preencher. |
+| **Discos por lado** | Nos exercícios com barra, debaixo do peso: "Por lado: 25 + 15 kg". Discos normais de ginásio e barra de 20 kg. Se não der certo, diz "o mais perto possível". |
+| **Fim de bloco** | Quando o plano acaba, aparece o resumo do bloco (treinos, sítios, Índice Progrex) e **"Começar o próximo bloco"**, com as mesmas escolhas. Um iniciante passa a intermédio depois de 3 blocos completos (~3–4 meses); "avançado" nunca se assume. "Mudar escolhas" abre o formulário, já preenchido com o último plano. |
+
+A lógica (aquecimento, discos, próximo bloco) está em `packages/shared` (`warmup.ts`,
+`plan/next.ts`) com testes. O "desfazer" ficou de fora: corrigir ou apagar uma série já são
+dois toques sem confirmação.
+
+## 50. Populações especiais (gravidez, pós-parto, obesidade, diabetes…)
+
+**O que é:** nas Definições → Saúde (e a partir do formulário do plano), uma lista de condições
+para marcar: gravidez, pós-parto, obesidade, diabetes, tensão alta, doença cardíaca, 65+ e
+osteoporose. O plano continua a ser o mesmo. Muda **que exercícios são seguros** e **até onde se
+puxa**.
+
+**Como funciona** (`packages/shared/src/health`, funções puras com testes):
+- Cada exercício do catálogo tem **características** (`traits`): deitado de costas, de barriga
+  para baixo, no chão, cabeça abaixo do coração, pendurado, explosivo, equilíbrio, flexão da
+  coluna, esforço forte na barriga, carga pesada na coluna.
+- Cada condição tem uma **regra**: que características evitar, RIR mínimo (nunca à falha),
+  descanso mínimo, uma série a menos, se deve falar com o médico antes e se há uma verificação
+  antes do treino (glicemia). Com várias condições, ganha sempre o valor mais rigoroso.
+- **Gravidez e pós-parto seguem o calendário sozinhos** (conveniência, §41). Só se pergunta a
+  semana de gravidez, com − e +, e a app guarda a data prevista do parto. O trimestre muda
+  sozinho. Depois da data prevista, passa a pós-parto (primeiras 6 semanas: muito leve e só com
+  luz verde médica; até ~6 meses: regresso gradual). Depois disso acaba, sem ninguém ter de
+  voltar às Definições.
+- O exercício escolhido para cada slot só vem dos seguros. O "Trocar" e a lista "Disponíveis
+  aqui" também filtram. Os exercícios personalizados não têm características conhecidas e
+  ficam ao critério do utilizador.
+- **Invariante testada:** para cada condição e para **todas juntas**, no hotel, em casa e no
+  ginásio, todos os movimentos principais têm uma variante segura. Para isso entraram dois
+  exercícios: **good morning** (dobradiça de anca sem material) e **prancha com mãos elevadas**
+  (core sem ir ao chão). E o empurrar vertical passa a recorrer ao horizontal quando não há
+  variante possível (as de peso corporal são todas de cabeça para baixo).
+- A explicação aparece onde a adaptação acontece: "Adaptado a: gravidez (2.º trimestre). Só
+  exercícios seguros, sem ir à falha." No treino há uma linha para os sinais para parar.
+
+**Onde se guarda:** no plano ativo (`plan.health`, que sincroniza, por isso todos os
+dispositivos seguem as mesmas regras) e numa preferência local (treinos sem plano e o próximo
+plano). Quando há plano, manda o plano.
+
+**Fontes e limites:** ACOG (gravidez/pós-parto), ADA (diabetes) e ACSM (hipertensão, doença
+cardíaca, idosos, osteoporose, obesidade). As regras são conservadoras de propósito, porque uma
+app não examina ninguém. Há sempre o aviso "não substitui aconselhamento médico", e para
+gravidez, pós-parto recente e doença cardíaca aparece "fala com o teu médico antes". As frases
+falam de adaptações seguras e nunca de tratamento (as lojas são exigentes com afirmações de
+saúde). Os dados de saúde são uma categoria especial no RGPD: ficam nos dispositivos e no
+servidor do próprio utilizador.
+
+**Ainda não:** retinopatia diabética (sem cargas máximas), diástase abdominal medida,
+asma, artroses específicas. Entram como novas regras na mesma tabela, sem mexer no motor.

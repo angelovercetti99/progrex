@@ -1,3 +1,4 @@
+import { activeHealth } from '../health';
 import { GOAL_CONFIG, type GoalConfig } from '../progression/config';
 import type { MovementPattern } from '../training';
 import type { Mesocycle, MesocycleRequest, Session, Slot, Week } from './schema';
@@ -20,6 +21,9 @@ const DELOAD_RIR = 4;
  * - Prioritised body areas (the body map): +1 set a week on their patterns, an
  *   isolation slot added where useful, and they are the last thing cut for time.
  * - Each session is trimmed to fit the minutes available.
+ * - Health conditions (§50): effort never closer to failure, and rest never
+ *   shorter, than the conditions allow. Which exercises are safe is decided
+ *   on the day (a pregnancy changes trimester during a block).
  */
 export function generateMesocycle(request: MesocycleRequest): Mesocycle {
   const config = GOAL_CONFIG[request.goal];
@@ -28,7 +32,9 @@ export function generateMesocycle(request: MesocycleRequest): Mesocycle {
     throw new Error(`No split for ${request.daysPerWeek} days`);
   }
 
-  const weeks = buildWeeks(request);
+  const health = activeHealth(request.health, request.startDate ?? new Date().toISOString().slice(0, 10));
+  const weeks = buildWeeks(request).map((week) => ({ ...week, rir: Math.max(week.rir, health.minRir) }));
+  const restSeconds = Math.max(config.restSeconds, health.minRestSeconds);
   const workWeeks = weeks.length - 1;
   const experienceDelta = request.experience === 'beginner' ? -1 : request.experience === 'advanced' ? 1 : 0;
   const baseMainSets = clamp(config.sets + experienceDelta, 2, 5);
@@ -86,7 +92,7 @@ export function generateMesocycle(request: MesocycleRequest): Mesocycle {
     return {
       key,
       focus: template.focus,
-      slots: fitToTime(slots, request.sessionMinutes, config.restSeconds),
+      slots: fitToTime(slots, request.sessionMinutes, restSeconds),
     };
   });
 
@@ -95,10 +101,11 @@ export function generateMesocycle(request: MesocycleRequest): Mesocycle {
     experience: request.experience,
     daysPerWeek: request.daysPerWeek,
     sessionMinutes: request.sessionMinutes,
-    restSeconds: config.restSeconds,
+    restSeconds,
     weeks,
     sessions,
     ...(priorityAreas.length ? { priorityAreas } : {}),
+    ...(request.health?.conditions.length ? { health: request.health } : {}),
   };
 }
 

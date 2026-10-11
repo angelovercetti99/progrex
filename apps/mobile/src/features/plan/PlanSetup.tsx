@@ -6,32 +6,37 @@ import {
   type BodyArea,
   type Experience,
   type Goal,
+  type Mesocycle,
 } from '@progrex/shared';
+import { router } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/ui/Button';
 import { Card, Divider } from '@/ui/Card';
 import { ListRow } from '@/ui/ListRow';
 import { SegmentedControl } from '@/ui/SegmentedControl';
 import { Text } from '@/ui/Text';
-import { space } from '@/ui/theme';
+import { space, touch } from '@/ui/theme';
 import { useTheme } from '@/ui/useTheme';
 
 import { BodyMap } from './BodyMap';
 import { createMesocycle } from './queries';
 
-/** "Create your plan": four choices and one button. */
-export function PlanSetup({ initialGoal }: { initialGoal: Goal }) {
+/**
+ * "Create your plan": four choices and one button. After a block, the choices
+ * start where the last plan left them (change only what's different).
+ */
+export function PlanSetup({ initialGoal, previous }: { initialGoal: Goal; previous?: Mesocycle }) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [goal, setGoal] = useState<Goal>(initialGoal);
-  const [days, setDays] = useState('3');
-  const [minutes, setMinutes] = useState('60');
-  const [experience, setExperience] = useState<Experience>('intermediate');
-  const [areas, setAreas] = useState<BodyArea[]>([]);
+  const [goal, setGoal] = useState<Goal>(previous?.goal ?? initialGoal);
+  const [days, setDays] = useState(String(previous?.daysPerWeek ?? 3));
+  const [minutes, setMinutes] = useState(String(previous?.sessionMinutes ?? 60));
+  const [experience, setExperience] = useState<Experience>(previous?.experience ?? 'intermediate');
+  const [areas, setAreas] = useState<BodyArea[]>(previous?.priorityAreas ?? []);
 
   async function create() {
     await createMesocycle({
@@ -120,6 +125,12 @@ export function PlanSetup({ initialGoal }: { initialGoal: Goal }) {
         <BodyMap value={areas} onChange={setAreas} />
       </View>
 
+      <Pressable accessibilityRole="link" onPress={() => router.push('/health')} style={styles.link}>
+        <Text variant="label" color="textMuted">
+          {t('plan.healthLink')}
+        </Text>
+      </Pressable>
+
       <Button label={t('plan.create')} onPress={create} />
     </View>
   );
@@ -135,5 +146,9 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: space.sm,
+  },
+  link: {
+    minHeight: touch.min,
+    justifyContent: 'center',
   },
 });

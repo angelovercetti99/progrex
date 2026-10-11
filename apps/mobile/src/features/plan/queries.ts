@@ -3,12 +3,15 @@ import {
   addDays,
   generateMesocycle,
   mergeSessions,
+  nextMesocycleRequest,
   planPosition,
+  progrexIndex,
   selectVariant,
   sessionScore,
   shouldDeloadEarly,
   stalledSessions,
   validateMesocycle,
+  type ActiveHealth,
   type AdaptedSession,
   type Experience,
   type Mesocycle,
@@ -17,7 +20,7 @@ import {
   type Slot,
   type TodayConditions,
 } from '@progrex/shared';
-import { and, desc, eq, isNotNull, isNull } from 'drizzle-orm';
+import { and, count, desc, eq, isNotNull, isNull } from 'drizzle-orm';
 
 import { db } from '@/db/client';
 import { notifyChanged } from '@/db/live';
@@ -32,6 +35,7 @@ import {
 } from '@/db/schema';
 import { insertStamps, newId, todayLocalDate, updateStamps } from '@/db/stamps';
 import { listExercises } from '@/features/exercises/queries';
+import { getActiveHealth, getHealthProfile, isExerciseAllowed } from '@/features/health/queries';
 import { loadExerciseSessions } from '@/features/progress/queries';
 import { addExerciseToWorkout, startWorkout } from '@/features/workouts/queries';
 import { setGoal } from '@/lib/preferences';
@@ -98,7 +102,13 @@ export async function getPlanState(): Promise<PlanState | undefined> {
 
 /** Generates, checks and saves a new plan. Any active plan is ended. */
 export async function createMesocycle(request: MesocycleRequest): Promise<string> {
-  const plan = generateMesocycle(request);
+  // Health conditions carry over by themselves (§50): nobody re-enters them.
+  const health = request.health ?? (await getHealthProfile());
+  const plan = generateMesocycle({
+    ...request,
+    health: health.conditions.length ? health : undefined,
+    startDate: request.startDate ?? todayLocalDate(),
+  });
   const problems = validateMesocycle(plan);
   if (problems.length > 0) {
     throw new Error(`Invalid plan: ${problems.join('; ')}`);
@@ -130,19 +140,62 @@ export async function endMesocycle(id: string, status: 'completed' | 'abandoned'
   notifyChanged('mesocycles');
 }
 
+/** The block that was just completed: how many sessions, places and how much progress. */
+export type BlockSummary = { workouts: number; places: number; index: number | null };
+
+export async function getBlockSummary(mesocycle: MesocycleRow): Promise<BlockSummary> {
+  const rows = await db
+    .select({ locationId: workouts.locationId })
+    .from(workouts)
+    .where(
+      and(eq(workouts.mesocycleId, mesocycle.id), isNotNull(workouts.finishedAt), isNull(workouts.deletedAt))
+    );
+  const sessions = await loadExerciseSessions(mesocycle.startDate);
+  return {
+    workouts: rows.length,
+    places: new Set(rows.map((row) => row.locationId)).size,
+    index: progrexIndex(sessions, mesocycle.startDate, todayLocalDate()),
+  };
+}
+
+/** The most recent plan, whatever its status: its choices pre-fill the next one. */
+export async function getLastPlan(): Promise<Mesocycle | undefined> {
+  const row = await db
+    .select({ plan: mesocycles.plan })
+    .from(mesocycles)
+    .where(isNull(mesocycles.deletedAt))
+    .orderBy(desc(mesocycles.createdAt))
+    .get();
+  return row?.plan;
+}
+
+/** One tap at the end of a block: close it and start the next with the same choices. */
+export async function startNextBlock(state: PlanState): Promise<string> {
+  await endMesocycle(state.mesocycle.id, 'completed');
+  const completed = await db
+    .select({ n: count() })
+    .from(mesocycles)
+    .where(and(eq(mesocycles.status, 'completed'), isNull(mesocycles.deletedAt)))
+    .get();
+  return createMesocycle(nextMesocycleRequest(state.mesocycle.plan, completed?.n ?? 1, todayLocalDate()));
+}
+
 export type SlotChoice = { slot: Slot; exercise: Exercise | null };
 
 /**
  * Picks an exercise for each slot, for the equipment at this place. Keeps the
  * variant last used here for the same pattern (so progress is comparable) and
- * never repeats an exercise within the session.
+ * never repeats an exercise within the session. With health conditions, only
+ * safe exercises are candidates (§50).
  */
 export async function chooseExercises(
   slots: Slot[],
   experience: Experience,
-  location: Location
+  location: Location,
+  health?: ActiveHealth
 ): Promise<SlotChoice[]> {
-  const catalog = await listExercises();
+  const all = await listExercises();
+  const catalog = health ? all.filter((exercise) => isExerciseAllowed(exercise, health)) : all;
   const lastUsedHere = await lastExercisePerPattern(location.id);
   const used = new Set<string>();
   // Beginners start with easier variants, advanced lifters with harder ones.
@@ -168,6 +221,7 @@ export function slotsForGroup(plan: Mesocycle, group: number[]): Slot[] {
 
 export type TodayPlan = {
   adapted: AdaptedSession;
+  health: ActiveHealth;
   earlyDeload: boolean;
   choices: SlotChoice[];
 };
@@ -183,18 +237,25 @@ export async function prepareToday(
 ): Promise<TodayPlan> {
   const { plan } = state.mesocycle;
   const week = state.next?.week ?? 0;
+  const health = await getActiveHealth();
   const adapted = adaptSession({
     slots: slotsForGroup(plan, state.group),
     plan,
     ...conditions,
     daysSinceLastWorkout: state.daysSinceLastWorkout,
+    health,
   });
   if (state.group.length > 1) adapted.reasons.unshift('compressed');
 
   const earlyDeload = !plan.weeks[week]?.deload && (await isStagnating());
   if (earlyDeload) adapted.reasons.push('early_deload');
 
-  return { adapted, earlyDeload, choices: await chooseExercises(adapted.slots, plan.experience, location) };
+  return {
+    adapted,
+    health,
+    earlyDeload,
+    choices: await chooseExercises(adapted.slots, plan.experience, location, health),
+  };
 }
 
 /** Starts today's session: creates the workout (with how it was adapted) and adds its exercises. */

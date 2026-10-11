@@ -179,6 +179,13 @@ export default function SettingsScreen() {
             title={t('settings.locations')}
             onPress={() => router.push('/locations')}
           />
+          <Divider />
+          <ListRow
+            leading={<IconBadge name={{ ios: 'heart', android: 'favorite', web: 'favorite' }} />}
+            title={t('settings.health')}
+            subtitle={t('settings.healthHint')}
+            onPress={() => router.push('/health')}
+          />
         </Card>
 
         <View style={styles.section}>
