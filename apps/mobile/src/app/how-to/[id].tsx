@@ -34,7 +34,10 @@ export default function HowToScreen() {
         {demo && (
           // Decorative for screen readers: the cues below say the same in words.
           <Card style={styles.demo}>
-            <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <View
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              style={styles.figure}>
               <ExerciseDemoView demo={demo} />
             </View>
           </Card>
@@ -65,6 +68,9 @@ const styles = StyleSheet.create({
   },
   demo: {
     paddingVertical: space.lg,
+  },
+  figure: {
+    height: 260,
   },
   cues: {
     gap: space.lg,

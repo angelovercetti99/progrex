@@ -5,6 +5,7 @@ import {
   type ExerciseDemo,
   type HeldProp,
   type Point,
+  type Pose,
   type SceneProp,
 } from './figure';
 
@@ -195,7 +196,7 @@ const kettlebellSwing: ExerciseDemo = {
     { hip: swingBottom, lean: 55, hands: pt(65, 69), feet: pt(64, ANKLE_Y) },
     { hip: hingeTop, lean: -4, hands: pt(90, 26), feet: pt(64, ANKLE_Y) },
   ],
-  props: [held('kettlebell')],
+  props: [held('kettlebell', 'hands', { hand: 'near' })],
   move: 0.7,
   hold: 0.15,
 };
@@ -233,11 +234,13 @@ const nordicCurl: ExerciseDemo = {
       hands: atShoulders(nordicLean(0), 0, 7, 10),
       feet: nordicAnkle,
       toes: -90,
+      // Lower as slowly as you can…
+      move: 2.8,
     },
-    { hip: nordicLean(55), lean: 55, hands: pt(108, 84), feet: nordicAnkle, toes: -90 },
+    // …catch yourself, and come back up quickly.
+    { hip: nordicLean(55), lean: 55, hands: pt(108, 84), feet: nordicAnkle, toes: -90, move: 0.8 },
   ],
   props: [held('pad', 'feet')],
-  move: 2,
 };
 
 // Lying face down on the machine, curling the heels up.
@@ -259,16 +262,30 @@ const legCurlMachine: ExerciseDemo = {
 
 const handsOnHips = (hip: Point, lean: number) => atShoulders(hip, lean, 4, 26);
 
+// A real step back: the foot lifts, then lands on its toes behind.
+const reverseLungeStep: Pose = {
+  hip: pt(60, 56),
+  lean: 2,
+  hands: handsOnHips(pt(60, 56), 2),
+  feet: [pt(62, ANKLE_Y), pt(44, 88)],
+  toes: [90, 30],
+  hold: 0,
+  move: 0.6,
+};
 const reverseLunge: ExerciseDemo = {
+  still: 2,
   poses: [
-    { hip: pt(62, 53.5), lean: 0, hands: handsOnHips(pt(62, 53.5), 0), feet: pt(62, ANKLE_Y) },
+    { hip: pt(62, 53.5), lean: 0, hands: handsOnHips(pt(62, 53.5), 0), feet: pt(62, ANKLE_Y), move: 0.5 },
+    reverseLungeStep,
     {
       hip: pt(48, 76),
       lean: 5,
       hands: handsOnHips(pt(48, 76), 5),
       feet: [pt(62, ANKLE_Y), pt(22, 93)],
       toes: [90, 20],
+      move: 0.7,
     },
+    { ...reverseLungeStep, move: 0.5 },
   ],
 };
 
@@ -302,16 +319,30 @@ const stepUp: ExerciseDemo = {
   props: [stepBox],
 };
 
+// A real step forward: the front foot lifts and lands, then the back knee drops.
+const walkingLungeStep: Pose = {
+  hip: pt(54, 56),
+  lean: 0,
+  hands: hanging(pt(54, 56), 0),
+  feet: [pt(68, 86), pt(50, ANKLE_Y)],
+  toes: [100, 90],
+  hold: 0,
+  move: 0.6,
+};
 const walkingLunge: ExerciseDemo = {
+  still: 2,
   poses: [
-    { hip: pt(50, 54), lean: 0, hands: hanging(pt(50, 54), 0), feet: pt(50, ANKLE_Y) },
+    { hip: pt(50, 54), lean: 0, hands: hanging(pt(50, 54), 0), feet: pt(50, ANKLE_Y), move: 0.5 },
+    walkingLungeStep,
     {
       hip: pt(62, 76),
       lean: 3,
       hands: hanging(pt(62, 76), 3),
       feet: [pt(82, ANKLE_Y), pt(42, 93)],
       toes: [90, 20],
+      move: 0.7,
     },
+    { ...walkingLungeStep, move: 0.5 },
   ],
   props: [held('dumbbell')],
 };
@@ -354,8 +385,8 @@ const dip: ExerciseDemo = {
 const pressStance = { hip: pt(60, 55), feet: [pt(70, ANKLE_Y), pt(48, ANKLE_Y)] as [Point, Point] };
 const bandChestPress: ExerciseDemo = {
   poses: [
-    { ...pressStance, lean: 5, hands: pt(74, 34) },
-    { ...pressStance, lean: 5, hands: pt(93, 30) },
+    { ...pressStance, lean: 5, hands: pt(65, 31) },
+    { ...pressStance, lean: 5, hands: pt(92, 30) },
   ],
   props: [line(pt(18, -5), pt(18, FLOOR_Y)), cable(pt(18, 32))],
 };
@@ -366,7 +397,8 @@ function lyingPress(shoulder: Point, ankle: Point, props: ExerciseDemo['props'])
   return {
     poses: [
       { ...body, hands: pt(shoulder.x + 2, shoulder.y - 30), feet: ankle },
-      { ...body, hands: pt(shoulder.x + 3, shoulder.y - 13), feet: ankle },
+      // Bottom: hands just above the chest, elbows down at the sides.
+      { ...body, hands: pt(shoulder.x + 5, shoulder.y - 8), feet: ankle },
     ],
     props,
   };
@@ -379,10 +411,11 @@ const seatHip = pt(50, 70);
 const seat = [box(30, 73, 32, 6), line(pt(46, 79), pt(46, FLOOR_Y)), line(pt(31, 28), pt(37, 73))];
 const machineChestPress: ExerciseDemo = {
   poses: [
-    { hip: seatHip, lean: -5, hands: pt(60, 41), feet: pt(78, ANKLE_Y) },
-    { hip: seatHip, lean: -5, hands: pt(77, 41), feet: pt(78, ANKLE_Y) },
+    // Hands by the chest, elbows back at chest height (not down, or it looks like a curl).
+    { hip: seatHip, lean: -5, hands: pt(50, 46), feet: pt(78, ANKLE_Y) },
+    { hip: seatHip, lean: -5, hands: pt(77, 45), feet: pt(78, ANKLE_Y) },
   ],
-  props: [...seat, held('pad', 'hands')],
+  props: [...seat, line(pt(100, 0), pt(100, FLOOR_Y)), held('pad', 'hands')],
 };
 
 // ---------- Vertical push ----------
@@ -394,6 +427,16 @@ const standingPress = (startHands: Point, topHands: Point): ExerciseDemo => ({
   ],
 });
 const overheadPress = standingPress(pt(66, 18), pt(63, -6));
+
+// One arm at a time: the other hangs relaxed.
+const restingHand = hanging(pt(62, 53.5), 0);
+const kettlebellPress: ExerciseDemo = {
+  poses: [
+    { hip: pt(62, 53.5), lean: 0, hands: [pt(66, 18), restingHand], feet: pt(62, ANKLE_Y) },
+    { hip: pt(62, 53.5), lean: 0, hands: [pt(63, -6), restingHand], feet: pt(62, ANKLE_Y) },
+  ],
+  props: [held('kettlebell', 'hands', { hand: 'near' })],
+};
 
 const machineShoulderPress: ExerciseDemo = {
   poses: [
@@ -482,7 +525,7 @@ const oneArmRow = (kind: 'dumbbell' | 'kettlebell'): ExerciseDemo => ({
       feet: [pt(58, ANKLE_Y), pt(40, ANKLE_Y)],
     },
   ],
-  props: [box(86, 77, 40), held(kind, 'hands', { oneSide: true })],
+  props: [box(86, 77, 40), held(kind, 'hands', { hand: 'near' })],
 });
 
 const seatedCableRow: ExerciseDemo = {
@@ -506,13 +549,12 @@ const barbellRow: ExerciseDemo = {
 
 const pullUpBar = pt(68, -14);
 const pullUpFrame = [bar(pullUpBar), line(pt(72, -14), pt(110, -14)), line(pt(110, -14), pt(110, FLOOR_Y))];
-const pullUp = (grip: Point, move = 1.1): ExerciseDemo => ({
+const pullUp = (grip: Point, speed: { up: number; down: number } = { up: 1.1, down: 1.1 }): ExerciseDemo => ({
   poses: [
-    { ...torso(pt(63, 16), pt(62, 46)), hands: grip, feet: pt(60, 90), toes: 20 },
-    { ...torso(pt(62, 4), pt(61, 34)), hands: grip, feet: pt(60, 78), toes: 20 },
+    { ...torso(pt(63, 16), pt(62, 46)), hands: grip, feet: pt(60, 90), toes: 20, move: speed.up },
+    { ...torso(pt(62, 4), pt(61, 34)), hands: grip, feet: pt(60, 78), toes: 20, move: speed.down },
   ],
   props: pullUpFrame,
-  move,
 });
 
 const bandPulldown: ExerciseDemo = {
@@ -592,7 +634,9 @@ const pallofPress: ExerciseDemo = {
     { hip: pt(62, 55), lean: 0, hands: pt(74, 34), feet: pt(62, ANKLE_Y) },
     { hip: pt(62, 55), lean: 0, hands: pt(92, 33), feet: pt(62, ANKLE_Y) },
   ],
-  props: [line(pt(18, -5), pt(18, FLOOR_Y)), cable(pt(18, 34))],
+  // The band comes from your side: the post stands beside you (drawn behind the body),
+  // so pressing out stretches it across, not towards or away from it.
+  props: [line(pt(70, -5), pt(70, FLOOR_Y)), cable(pt(70, 34))],
 };
 
 const cableCrunch: ExerciseDemo = {
@@ -634,7 +678,7 @@ const overheadExtension: ExerciseDemo = {
     { hip: pt(62, 53.5), lean: 0, hands: pt(63, -6), feet: pt(62, ANKLE_Y) },
     { hip: pt(62, 53.5), lean: 0, hands: pt(56, 12), feet: pt(62, ANKLE_Y) },
   ],
-  props: [held('dumbbell')],
+  props: [held('dumbbell', 'hands', { hand: 'near' })],
 };
 
 // Seen from the front: arms up to the sides, to shoulder height.
@@ -710,8 +754,8 @@ export const EXERCISE_DEMOS: Record<string, ExerciseDemo> = {
   bodyweight_squat: squat,
   assisted_pistol_squat: assistedPistol,
   pistol_squat: pistol,
-  goblet_squat: with_(goblet, held('dumbbell')),
-  kettlebell_goblet_squat: with_(goblet, held('kettlebell')),
+  goblet_squat: with_(goblet, held('dumbbell', 'hands', { hand: 'near' })),
+  kettlebell_goblet_squat: with_(goblet, held('kettlebell', 'hands', { hand: 'near' })),
   leg_press: legPress,
   back_squat: barbellSquat(false),
   front_squat: barbellSquat(true),
@@ -722,7 +766,8 @@ export const EXERCISE_DEMOS: Record<string, ExerciseDemo> = {
   nordic_curl: nordicCurl,
   band_good_morning: bandGoodMorning,
   dumbbell_rdl: with_(rdl, held('dumbbell')),
-  single_leg_dumbbell_rdl: with_(singleLegRdl, held('dumbbell')),
+  // The dumbbell goes in the hand opposite the standing leg.
+  single_leg_dumbbell_rdl: with_(singleLegRdl, held('dumbbell', 'hands', { hand: 'far' })),
   kettlebell_swing: kettlebellSwing,
   leg_curl_machine: legCurlMachine,
   barbell_rdl: with_(rdl, held('barbell')),
@@ -755,7 +800,7 @@ export const EXERCISE_DEMOS: Record<string, ExerciseDemo> = {
   band_overhead_press: with_(overheadPress, cable(pt(62, FLOOR_Y - 1))),
   dumbbell_shoulder_press: with_(overheadPress, held('dumbbell')),
   machine_shoulder_press: machineShoulderPress,
-  kettlebell_press: with_(overheadPress, held('kettlebell')),
+  kettlebell_press: kettlebellPress,
   barbell_overhead_press: with_(standingPress(pt(67, 22), pt(63, -6)), held('barbell')),
 
   // Horizontal pull
@@ -770,7 +815,8 @@ export const EXERCISE_DEMOS: Record<string, ExerciseDemo> = {
 
   // Vertical pull
   band_pulldown: bandPulldown,
-  negative_pull_up: pullUp(pullUpBar, 2.5),
+  // Up quickly (a jump or a step), down as slowly as possible.
+  negative_pull_up: pullUp(pullUpBar, { up: 0.5, down: 3 }),
   band_assisted_pull_up: with_(pullUp(pullUpBar), cable(pullUpBar, 'feet')),
   chin_up: pullUp(pt(66, -14)),
   pull_up: pullUp(pullUpBar),
@@ -802,7 +848,25 @@ export const EXERCISE_DEMOS: Record<string, ExerciseDemo> = {
   // Lateral delts
   band_lateral_raise: lateralRaise([cable(pt(70, FLOOR_Y - 1))]),
   dumbbell_lateral_raise: lateralRaise([held('dumbbell')]),
-  cable_lateral_raise: lateralRaise([cable(pt(118, FLOOR_Y - 4)), line(pt(122, 0), pt(122, FLOOR_Y))]),
+  // One arm: the pulley is on the right, the left arm pulls across the body.
+  cable_lateral_raise: {
+    view: 'front',
+    poses: [
+      {
+        hip: pt(70, 53.5),
+        lean: 0,
+        hands: [pt(66, 54), pt(81, 54)],
+        feet: [pt(65, ANKLE_Y), pt(75, ANKLE_Y)],
+      },
+      {
+        hip: pt(70, 53.5),
+        lean: 0,
+        hands: [pt(32, 27), pt(81, 54)],
+        feet: [pt(65, ANKLE_Y), pt(75, ANKLE_Y)],
+      },
+    ],
+    props: [cable(pt(118, FLOOR_Y - 4)), line(pt(122, 0), pt(122, FLOOR_Y))],
+  },
 
   // Calves
   calf_raise: calfRaise(null),

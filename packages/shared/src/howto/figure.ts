@@ -17,8 +17,11 @@ export type Point = { x: number; y: number };
 export type HeldProp = {
   kind: 'dumbbell' | 'kettlebell' | 'barbell' | 'pad';
   at: 'hands' | 'feet' | 'shoulders' | 'hips';
-  /** Only in the near hand (one-arm exercises). */
-  oneSide?: boolean;
+  /**
+   * Only in one hand (one-arm exercises): `near` or `far`. Without it, loaded
+   * equipment goes in both hands, except a barbell, which is drawn once.
+   */
+  hand?: 'near' | 'far';
   /** For `pad`: its direction in degrees (0 = vertical, 90 = horizontal). */
   angle?: number;
 };
@@ -47,9 +50,15 @@ export type Pose = {
   toes?: number | [number, number];
   /** Head tilt relative to the torso, in degrees (+ = chin down). */
   head?: number;
+  /** Seconds to pause on this pose (default: the demo's `hold`). */
+  hold?: number;
+  /** Seconds to move from this pose to the next (default: the demo's `move`). E.g. a slow lowering. */
+  move?: number;
 };
 
 export type ExerciseDemo = {
+  /** Which pose to show as a still picture (lists, thumbnails). Default: the second, the "hard" part. */
+  still?: number;
   /**
    * `side` (default): profile, facing right; index 0 = near limb, 1 = far limb.
    * `front`: facing the viewer, for sideways movements (lateral raises);
@@ -242,21 +251,91 @@ function ease(t: number): number {
   return (1 - Math.cos(Math.PI * t)) / 2;
 }
 
+/** Pause and move time of one pose (its own, or the demo's). */
+function timing(demo: ExerciseDemo, pose: Pose): { hold: number; move: number } {
+  return {
+    hold: pose.hold ?? demo.hold ?? DEFAULT_HOLD,
+    move: pose.move ?? demo.move ?? DEFAULT_MOVE,
+  };
+}
+
 /** How long one full loop of the demo takes, in seconds. */
 export function demoDuration(demo: ExerciseDemo): number {
-  return demo.poses.length * ((demo.move ?? DEFAULT_MOVE) + (demo.hold ?? DEFAULT_HOLD));
+  return demo.poses.reduce((total, pose) => {
+    const { hold, move } = timing(demo, pose);
+    return total + hold + move;
+  }, 0);
 }
 
 /** The pose at a moment in time (loops forever). */
 export function poseAt(demo: ExerciseDemo, seconds: number): Pose {
-  const move = demo.move ?? DEFAULT_MOVE;
-  const hold = demo.hold ?? DEFAULT_HOLD;
-  const step = move + hold;
-  const time = ((seconds % demoDuration(demo)) + demoDuration(demo)) % demoDuration(demo);
-  const index = Math.floor(time / step);
-  const within = time - index * step;
-  const from = demo.poses[index];
-  const to = demo.poses[(index + 1) % demo.poses.length];
-  if (within < hold) return from;
-  return blendPoses(from, to, ease((within - hold) / move));
+  const total = demoDuration(demo);
+  let time = ((seconds % total) + total) % total;
+  for (let index = 0; index < demo.poses.length; index++) {
+    const from = demo.poses[index];
+    const { hold, move } = timing(demo, from);
+    if (time < hold) return from;
+    if (time < hold + move) {
+      const to = demo.poses[(index + 1) % demo.poses.length];
+      return blendPoses(from, to, ease((time - hold) / move));
+    }
+    time -= hold + move;
+  }
+  return demo.poses[0];
+}
+
+export type Box = { x: number; y: number; width: number; height: number };
+
+/**
+ * The smallest box that holds the whole demo (every frame, plus scenery),
+ * with a little margin: lets the picture fill its space instead of leaving
+ * empty room above a figure lying on the floor.
+ * With `pose`, just that one still pose (thumbnails): long poles and cables
+ * are left out so the figure stays big.
+ */
+export function demoBounds(demo: ExerciseDemo, margin = 8, pose?: Pose): Box {
+  const xs: number[] = [];
+  const ys: number[] = [];
+  const add = (p: Point, r = 0) => {
+    xs.push(p.x - r, p.x + r);
+    ys.push(p.y - r, p.y + r);
+  };
+  const total = demoDuration(demo);
+  const figures: Figure[] = [];
+  if (pose) figures.push(solvePose(pose, demo.view));
+  else for (let t = 0; t <= total; t += 0.1) figures.push(solvePose(poseAt(demo, t), demo.view));
+  for (const f of figures) {
+    add(f.head, BODY.headRadius);
+    for (const p of [f.shoulder, f.hip, ...f.elbows, ...f.hands, ...f.knees, ...f.ankles, ...f.toes])
+      add(p, 2);
+    // Room for what's held (a barbell plate is the biggest).
+    for (const prop of demo.props ?? []) {
+      if (prop.kind === 'barbell' || prop.kind === 'dumbbell' || prop.kind === 'kettlebell')
+        add(f.hands[0], 9);
+    }
+  }
+  for (const prop of demo.props ?? []) {
+    if (prop.kind === 'box') {
+      add({ x: prop.x, y: prop.y });
+      add({ x: prop.x + prop.w, y: prop.y + prop.h });
+    } else if (pose) {
+      continue;
+    } else if (prop.kind === 'line' || prop.kind === 'cable') {
+      add(prop.from);
+      if (prop.kind === 'line') add(prop.to);
+    } else if (prop.kind === 'bar') {
+      add(prop.at, 3);
+    }
+  }
+  ys.push(FLOOR_Y);
+  const minX = Math.max(VIEW.x, Math.min(...xs) - margin);
+  const maxX = Math.min(VIEW.x + VIEW.width, Math.max(...xs) + margin);
+  const minY = Math.max(VIEW.y, Math.min(...ys) - margin);
+  const maxY = Math.min(VIEW.y + VIEW.height, Math.max(...ys) + margin / 2);
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+}
+
+/** The still picture of a demo (see `still`). */
+export function stillPose(demo: ExerciseDemo): Pose {
+  return demo.poses[demo.still ?? 1] ?? demo.poses[0];
 }

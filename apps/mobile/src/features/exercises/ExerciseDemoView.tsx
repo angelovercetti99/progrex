@@ -1,14 +1,16 @@
 import {
   BODY,
+  demoBounds,
   FLOOR_Y,
   poseAt,
   solvePose,
-  VIEW,
+  stillPose,
+  type Box,
   type ExerciseDemo,
   type Figure,
   type Point,
 } from '@progrex/shared';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 import Svg, { Circle, Line, Polyline, Rect } from 'react-native-svg';
@@ -48,26 +50,53 @@ function useSeconds(running: boolean): number {
   return seconds;
 }
 
-/** A looping stick-figure demo. With "reduce motion" on, the key poses side by side. */
-export function ExerciseDemoView({ demo }: { demo: ExerciseDemo }) {
+/**
+ * A looping stick-figure demo, framed to fit the exercise. It fills its
+ * parent, so the parent sets the size.
+ * - `still`: just the key position, no animation (thumbnails in lists).
+ * - "Reduce motion" on: the start and the key position side by side.
+ */
+export function ExerciseDemoView({ demo, still = false }: { demo: ExerciseDemo; still?: boolean }) {
   const reduceMotion = useReducedMotion();
-  const seconds = useSeconds(!reduceMotion);
+  const seconds = useSeconds(!reduceMotion && !still);
+  const box = useMemo(() => (still ? demoBounds(demo, 4, stillPose(demo)) : demoBounds(demo)), [demo, still]);
 
+  if (still) {
+    // Small pictures need a bolder line to read.
+    return (
+      <FigureDrawing
+        demo={demo}
+        box={box}
+        figure={solvePose(stillPose(demo), demo.view)}
+        stroke={STROKE * 1.4}
+      />
+    );
+  }
   if (reduceMotion) {
     return (
       <View style={styles.row}>
-        {demo.poses.map((pose, index) => (
+        {[demo.poses[0], stillPose(demo)].map((pose, index) => (
           <View key={index} style={styles.flex}>
-            <FigureDrawing demo={demo} figure={solvePose(pose, demo.view)} />
+            <FigureDrawing demo={demo} box={box} figure={solvePose(pose, demo.view)} />
           </View>
         ))}
       </View>
     );
   }
-  return <FigureDrawing demo={demo} figure={solvePose(poseAt(demo, seconds), demo.view)} />;
+  return <FigureDrawing demo={demo} box={box} figure={solvePose(poseAt(demo, seconds), demo.view)} />;
 }
 
-function FigureDrawing({ demo, figure }: { demo: ExerciseDemo; figure: Figure }) {
+function FigureDrawing({
+  demo,
+  box,
+  figure,
+  stroke = STROKE,
+}: {
+  demo: ExerciseDemo;
+  box: Box;
+  figure: Figure;
+  stroke?: number;
+}) {
   const theme = useTheme();
   const front = demo.view === 'front';
   const props = demo.props ?? [];
@@ -79,7 +108,7 @@ function FigureDrawing({ demo, figure }: { demo: ExerciseDemo; figure: Figure })
       fill="none"
       stroke={theme.text}
       strokeOpacity={opacity}
-      strokeWidth={STROKE}
+      strokeWidth={stroke}
       strokeLinecap="round"
       strokeLinejoin="round"
     />
@@ -91,14 +120,11 @@ function FigureDrawing({ demo, figure }: { demo: ExerciseDemo; figure: Figure })
   };
 
   return (
-    <Svg
-      width="100%"
-      viewBox={`${VIEW.x} ${VIEW.y} ${VIEW.width} ${VIEW.height}`}
-      style={{ aspectRatio: VIEW.width / VIEW.height }}>
+    <Svg width="100%" height="100%" viewBox={`${box.x} ${box.y} ${box.width} ${box.height}`}>
       <Line
-        x1={VIEW.x}
+        x1={box.x}
         y1={FLOOR_Y}
-        x2={VIEW.x + VIEW.width}
+        x2={box.x + box.width}
         y2={FLOOR_Y}
         stroke={theme.border}
         strokeWidth={1.5}
@@ -166,7 +192,7 @@ function FigureDrawing({ demo, figure }: { demo: ExerciseDemo; figure: Figure })
         r={BODY.headRadius}
         fill="none"
         stroke={theme.text}
-        strokeWidth={STROKE}
+        strokeWidth={stroke}
       />
       {limb([figure.hips[0], figure.knees[0], figure.ankles[0], figure.toes[0]])}
       {limb([figure.shoulders[0], figure.elbows[0], figure.hands[0]])}
@@ -209,12 +235,14 @@ function FigureDrawing({ demo, figure }: { demo: ExerciseDemo; figure: Figure })
                 ? [{ at: figure.ankles[0], opacity: 1 }]
                 : prop.kind === 'barbell'
                   ? [{ at: midHands, opacity: 1 }]
-                  : prop.oneSide
+                  : prop.hand === 'near'
                     ? [{ at: figure.hands[0], opacity: 1 }]
-                    : [
-                        { at: figure.hands[1], opacity: farOpacity },
-                        { at: figure.hands[0], opacity: 1 },
-                      ];
+                    : prop.hand === 'far'
+                      ? [{ at: figure.hands[1], opacity: farOpacity }]
+                      : [
+                          { at: figure.hands[1], opacity: farOpacity },
+                          { at: figure.hands[0], opacity: 1 },
+                        ];
         return places.map(({ at, opacity }, side) => (
           <Circle
             key={`${index}-${side}`}
@@ -236,6 +264,7 @@ function FigureDrawing({ demo, figure }: { demo: ExerciseDemo; figure: Figure })
 
 const styles = StyleSheet.create({
   row: {
+    flex: 1,
     flexDirection: 'row',
   },
   flex: {

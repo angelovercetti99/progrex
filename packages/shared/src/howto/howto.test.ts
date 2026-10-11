@@ -4,6 +4,7 @@ import { CATALOG } from '../catalog';
 import { EXERCISE_DEMOS, exerciseDemo } from './demos';
 import {
   BODY,
+  demoBounds,
   demoDuration,
   distance,
   FLOOR_Y,
@@ -102,6 +103,25 @@ describe('exercise demos', () => {
   });
 });
 
+describe('demo framing', () => {
+  it('fits every demo in a box inside the picture, floor included', () => {
+    for (const [key, demo] of Object.entries(EXERCISE_DEMOS)) {
+      const box = demoBounds(demo);
+      expect(box.x, key).toBeGreaterThanOrEqual(VIEW.x);
+      expect(box.y, key).toBeGreaterThanOrEqual(VIEW.y);
+      expect(box.x + box.width, key).toBeLessThanOrEqual(VIEW.x + VIEW.width);
+      expect(box.y + box.height, key).toBeGreaterThanOrEqual(FLOOR_Y);
+      for (const figure of frames(key)) {
+        expect(figure.head.y - BODY.headRadius, key).toBeGreaterThanOrEqual(box.y);
+      }
+    }
+  });
+
+  it('crops away the empty sky above a figure lying down', () => {
+    expect(demoBounds(EXERCISE_DEMOS.glute_bridge).height).toBeLessThan(VIEW.height / 2);
+  });
+});
+
 describe('figure', () => {
   it('bends knees forward and elbows backward, like a real body', () => {
     const figure = solvePose({
@@ -118,6 +138,20 @@ describe('figure', () => {
     const { end } = solveLimb({ x: 0, y: 0 }, { x: 0, y: 100 }, 16, 15, 1);
     expect(end.y).toBeCloseTo(31, 1);
     expect(end.x).toBeCloseTo(0, 1);
+  });
+
+  it('lets a pose move at its own speed (negatives: up fast, down slowly)', () => {
+    const [bottom, top] = EXERCISE_DEMOS.negative_pull_up.poses;
+    expect(top.move).toBeGreaterThan(bottom.move ?? 0);
+    const demo = {
+      poses: [
+        { ...bottom, hold: 0, move: 1 },
+        { ...top, hold: 0, move: 3 },
+      ],
+    };
+    expect(demoDuration(demo)).toBe(4);
+    // Halfway through the slow lowering, the figure is halfway down.
+    expect(poseAt(demo, 2.5).hip.y).toBeCloseTo((bottom.hip.y + top.hip.y) / 2, 5);
   });
 
   it('loops: starts and ends on the first pose, pausing on each one', () => {
