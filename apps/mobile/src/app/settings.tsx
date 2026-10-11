@@ -10,7 +10,9 @@ import { getConnection } from '@/db/client';
 import { useLiveQuery } from '@/db/live';
 import { pickBackupFile, saveBackupFile } from '@/features/backup/backupFile';
 import { exportBackup, restoreBackup } from '@/features/backup/queries';
+import { resetAllData } from '@/features/reset/queries';
 import { resolveLanguage } from '@/i18n';
+import { confirm } from '@/lib/confirm';
 import {
   DEFAULT_GOAL,
   getGoal,
@@ -100,6 +102,13 @@ export default function SettingsScreen() {
       : storage.state === 'ok'
         ? t('settings.storageOk', { version: storage.version })
         : t('settings.storageError', { message: storage.message });
+
+  async function startOver() {
+    if (await confirm(t('settings.resetConfirm'), t('settings.resetAction'), t('common.cancel'))) {
+      await resetAllData();
+      router.replace('/');
+    }
+  }
 
   return (
     <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.scroll}>
@@ -203,6 +212,25 @@ export default function SettingsScreen() {
           </Card>
           <Text variant="caption" color="textMuted">
             {backupMessage ?? t('settings.backupHint')}
+          </Text>
+        </View>
+
+        {/* Start over: everything goes, back to "Where do you train?". */}
+        <View style={styles.section}>
+          <Card>
+            <ListRow
+              leading={
+                <IconBadge
+                  name={{ ios: 'arrow.counterclockwise', android: 'restart_alt', web: 'restart_alt' }}
+                />
+              }
+              title={t('settings.reset')}
+              onPress={startOver}
+              showChevron={false}
+            />
+          </Card>
+          <Text variant="caption" color="textMuted">
+            {t('settings.resetHint')}
           </Text>
         </View>
 

@@ -106,7 +106,11 @@
     "backupImported_one": "Cópia importada: {{count}} treino novo.",
     "backupImported_other": "Cópia importada: {{count}} treinos novos.",
     "backupInvalid": "Este ficheiro não é uma cópia da Progrex (ou é de uma versão mais recente da app).",
-    "backupFailed": "Não foi possível concluir. Tenta outra vez."
+    "backupFailed": "Não foi possível concluir. Tenta outra vez.",
+    "reset": "Apagar tudo e começar do zero",
+    "resetHint": "Apaga os treinos, o plano, os espaços e os exercícios que criaste, e volta ao primeiro ecrã. O idioma e a aparência ficam.",
+    "resetConfirm": "Apagar tudo e começar do zero? Os teus treinos, o plano e os espaços desaparecem. Se quiseres guardar uma cópia, exporta primeiro os teus dados.",
+    "resetAction": "Apagar tudo"
   },
   "common": {
     "save": "Guardar",

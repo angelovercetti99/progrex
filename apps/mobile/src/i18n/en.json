@@ -106,7 +106,11 @@
     "backupImported_one": "Backup imported: {{count}} new workout.",
     "backupImported_other": "Backup imported: {{count}} new workouts.",
     "backupInvalid": "This file isn't a Progrex backup (or it's from a newer version of the app).",
-    "backupFailed": "Couldn't finish. Please try again."
+    "backupFailed": "Couldn't finish. Please try again.",
+    "reset": "Erase everything and start over",
+    "resetHint": "Deletes your workouts, plan, places and the exercises you created, and takes you back to the first screen. Language and appearance stay.",
+    "resetConfirm": "Erase everything and start over? Your workouts, plan and places will be gone. To keep a copy, export your data first.",
+    "resetAction": "Erase everything"
   },
   "common": {
     "save": "Save",
