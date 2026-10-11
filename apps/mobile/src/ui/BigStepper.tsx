@@ -87,7 +87,7 @@ export function BigStepper({ label, value, onChange, step = 1, min = 0, max = 99
               style={[
                 typography.display,
                 styles.input,
-                { color: theme.text, fontFamily: fontFamilyFor('600'), fontWeight: undefined },
+                { color: theme.text, fontFamily: fontFamilyFor('700', 'display'), fontWeight: undefined },
               ]}
             />
           )}

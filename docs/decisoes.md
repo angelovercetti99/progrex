@@ -797,9 +797,10 @@ desempenho do SQLite nativo e o comportamento real do teclado no iPhone.
 ## 44. Demonstração dos exercícios: boneco animado + 3 dicas
 
 Mudar de sítio leva muitas vezes a uma variante que nunca fizeste (remada debaixo da mesa no
-hotel, búlgaro numa cadeira). Por isso, cada exercício de base tem um ecrã **"Como se faz"**
-(ícone ⓘ no cartão do exercício, durante o treino): uma animação curta em loop e três
-dicas curtas.
+hotel, búlgaro numa cadeira). Por isso, durante o treino, o cartão do exercício que estás a
+fazer mostra uma **animação curta em loop** (sempre à vista, pedido do utilizador). Tocar nela
+abre o ecrã **"Como se faz"**, com a animação em grande e três dicas curtas. Os outros
+cartões só têm um ícone ⓘ, para não haver várias animações ao mesmo tempo.
 
 **Porquê um boneco desenhado em código, e não vídeos ou GIFs:**
 - funciona offline e quase não aumenta o tamanho da app (vídeos de 84 exercícios seriam
@@ -823,3 +824,39 @@ Os exercícios personalizados não têm demo nem dicas, e o ícone não aparece.
 
 **Acessibilidade:** com "reduzir movimento" ligado, mostram-se as poses lado a lado em vez
 da animação. Para leitores de ecrã, a animação é decorativa e as dicas dizem o mesmo.
+
+## 45. Design mais rico, sempre monocromático
+
+O utilizador achou a app "muito básica". Escolheu manter o monocromático (§ Design) e dar-lhe
+mais personalidade, ao estilo Apple Fitness / Nike Training, em todos os ecrãs.
+
+- **Hierarquia por tipografia:** dois estilos novos em `theme.ts`: `hero` (40 pt, o assunto do
+  ecrã: "Superior", "Semana 1 de 5") e `eyebrow` (12 pt, maiúsculas, espaçado: a data, "ESTA
+  SEMANA", "1 DE 6").
+- **Números em destaque:** `StatRow` (exercícios · séries · minutos) no Hoje e no treino em curso.
+- **Profundidade:** os cartões têm uma sombra muito suave no modo claro (`elevation`); no escuro
+  a superfície mais clara já os destaca. Cantos maiores (`radius.lg`).
+- **O boneco como imagem da marca:** `ExerciseThumb` mostra cada exercício parado na pose
+  principal (Hoje, treino em curso, cartões do treino, lista de exercícios). As demos são
+  enquadradas à medida (`demoBounds`), sem espaço vazio por cima de quem está deitado.
+- **Plano:** gráfico de barras com o esforço de cada semana (tocar numa semana mostra os seus
+  treinos) e treinos com a letra num círculo (cheio com ✓ quando feito, contornado quando é o
+  próximo).
+- **Ícones** em quadrados suaves (`IconBadge`) no início das linhas (espaço, cópia de segurança).
+
+## 46. Letra: Archivo larga nos títulos e números, Inter no texto
+
+A Inter sozinha deixava a app "muito básica" (pedido do utilizador). Comparámos quatro opções
+no ecrã Hoje (Inter, Archivo larga, Barlow Condensed e Manrope) e o utilizador escolheu a
+**Archivo larga**.
+
+- **Archivo larga** (peso 700/800, largura 118) no que se lê de relance: `display` (números
+  das séries), `hero`, `title`, `stat`, botões e o título do cabeçalho. Dá força, ao estilo Nike
+  Training.
+- **Inter** no texto corrido (nomes de exercícios, frases, legendas): é mais fácil de ler.
+- **Porque é que há ficheiros de letra no repositório:** o React Native não consegue mudar o
+  eixo de largura de uma letra variável, e o pacote `@expo-google-fonts/archivo` só traz a
+  largura normal. Por isso cortámos dois ficheiros fixos a partir da letra variável oficial
+  (`apps/mobile/assets/fonts/`, licença OFL; o comando está no README dessa pasta).
+- O `Text` escolhe a letra pela variante (`DISPLAY_VARIANTS` em `theme.ts`); `face="display"`
+  força a Archivo onde não há variante própria (os botões).

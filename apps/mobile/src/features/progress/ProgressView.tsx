@@ -60,7 +60,7 @@ export function ProgressView({ data }: { data: ProgressOverview }) {
       {/* 1. The Progrex Index */}
       <Card style={styles.card}>
         <View style={styles.row}>
-          <Text variant="caption" color="textMuted" style={styles.flex}>
+          <Text variant="eyebrow" color="textMuted" style={styles.flex}>
             {t('progress.index', { weeks: PROGRESS_WEEKS })}
           </Text>
           <Pressable hitSlop={12} onPress={() => setHowOpen((open) => !open)}>

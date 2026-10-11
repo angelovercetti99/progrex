@@ -9,6 +9,7 @@ import { useEquipmentSummary } from '@/features/locations/useEquipmentSummary';
 import { QuickStart } from '@/features/onboarding/QuickStart';
 import { NextSession } from '@/features/plan/NextSession';
 import { getPlanState } from '@/features/plan/queries';
+import { ActiveWorkout } from '@/features/workouts/ActiveWorkout';
 import { getActiveWorkout, hasFinishedWorkout, startWorkout } from '@/features/workouts/queries';
 import { getQuickStartSkipped } from '@/lib/preferences';
 import { Button } from '@/ui/Button';
@@ -45,20 +46,9 @@ export default function TodayScreen() {
 
   // 1. A workout is already in progress: one thing to do, continue it.
   if (active.data) {
-    const workout = active.data;
     return (
       <Screen title={t('today.title')} header={<Logo size={30} />}>
-        <View style={styles.center}>
-          <Text variant="heading" align="center">
-            {t('today.inProgress')}
-          </Text>
-          <Text color="textMuted" align="center">
-            {t('today.exerciseCount', { count: workout.exerciseCount })}
-          </Text>
-          <View style={styles.actions}>
-            <Button label={t('today.continue')} onPress={() => router.push(`/workout/${workout.id}`)} />
-          </View>
-        </View>
+        <ActiveWorkout workoutId={active.data.id} />
       </Screen>
     );
   }

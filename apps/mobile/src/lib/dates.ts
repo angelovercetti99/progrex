@@ -8,3 +8,12 @@ export function formatShortDate(isoDate: string, language: string): string {
     month: 'short',
   }).format(new Date(year, month - 1, day));
 }
+
+/** "sábado, 10 de outubro" / "Saturday 10 October": today, for screen headers. */
+export function formatToday(language: string): string {
+  return new Intl.DateTimeFormat(language === 'pt' ? 'pt-PT' : 'en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date());
+}

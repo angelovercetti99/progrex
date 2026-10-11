@@ -1,7 +1,7 @@
 import { Text as RNText, StyleSheet, type TextProps as RNTextProps } from 'react-native';
 
-import { fontFamilyFor } from './fonts';
-import { typography, type ColorName, type TypographyVariant } from './theme';
+import { fontFamilyFor, type FontFace } from './fonts';
+import { DISPLAY_VARIANTS, typography, type ColorName, type TypographyVariant } from './theme';
 import { useTheme } from './useTheme';
 
 type TextProps = RNTextProps & {
@@ -10,6 +10,8 @@ type TextProps = RNTextProps & {
   /** Fixed-width digits, so numbers don't "jump" when they change (12 → 11). */
   numeric?: boolean;
   align?: 'left' | 'center' | 'right';
+  /** Force a face: `display` = wide Archivo (titles, numbers), `text` = Inter. Default: by variant. */
+  face?: FontFace;
 };
 
 export function Text({
@@ -17,6 +19,7 @@ export function Text({
   color = 'text',
   numeric = false,
   align,
+  face,
   style,
   ...props
 }: TextProps) {
@@ -29,5 +32,6 @@ export function Text({
   ]);
   // Swap the weight for the matching Inter file (see fonts.ts).
   const { fontWeight, ...rest } = flat;
-  return <RNText style={[rest, { fontFamily: fontFamilyFor(fontWeight) }]} {...props} />;
+  const resolvedFace = face ?? (DISPLAY_VARIANTS.includes(variant) ? 'display' : 'text');
+  return <RNText style={[rest, { fontFamily: fontFamilyFor(fontWeight, resolvedFace) }]} {...props} />;
 }

@@ -1,4 +1,4 @@
-import { BODY_AREAS, type BodyArea, type TodayConditions } from '@progrex/shared';
+import { BODY_AREAS, intensityForRir, type BodyArea, type TodayConditions } from '@progrex/shared';
 import { router } from 'expo-router';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,17 +7,21 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { useLiveQuery } from '@/db/live';
 import type { Location } from '@/db/schema';
+import { ExerciseThumb } from '@/features/exercises/ExerciseThumb';
 import { useExerciseName } from '@/features/exercises/useExerciseName';
 import { getActiveTravel } from '@/features/locations/queries';
 import { TravelBanner } from '@/features/locations/TravelBanner';
 import { useEquipmentSummary } from '@/features/locations/useEquipmentSummary';
 import { startWorkout } from '@/features/workouts/queries';
+import { formatToday } from '@/lib/dates';
 import { Button } from '@/ui/Button';
 import { Card, Divider } from '@/ui/Card';
+import { IconBadge } from '@/ui/IconBadge';
 import { TargetBar } from '@/ui/charts/TargetBar';
 import { ListRow } from '@/ui/ListRow';
 import { ProgressBar } from '@/ui/ProgressBar';
 import { SegmentedControl } from '@/ui/SegmentedControl';
+import { StatRow } from '@/ui/StatRow';
 import { Text } from '@/ui/Text';
 import { radius, space, touch } from '@/ui/theme';
 import { useSingleFlight } from '@/ui/useSingleFlight';
@@ -45,7 +49,7 @@ const QUICK_MINUTES = ['20', '30', '45'] as const;
  * A normal day needs nothing: tap Start. The three chips are optional.
  */
 export function NextSession({ state, next, location }: NextSessionProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = useTheme();
   const exerciseName = useExerciseName();
   const summarize = useEquipmentSummary();
@@ -88,6 +92,10 @@ export function NextSession({ state, next, location }: NextSessionProps) {
       today?.adapted.slots ?? [],
     ]
   ).data;
+
+  const week = plan.weeks[next.week];
+  const chosen = (today?.choices ?? []).filter((choice) => choice.exercise);
+  const totalSets = chosen.reduce((sum, choice) => sum + (choice.slot.setsPerWeek[next.week] ?? 0), 0);
 
   const setsOf = (list: SlotChoice[]) =>
     list
@@ -134,19 +142,45 @@ export function NextSession({ state, next, location }: NextSessionProps) {
     <View style={styles.container}>
       {travel && <TravelBanner travel={travel} />}
 
-      <View style={styles.heading}>
-        <Text variant="heading">{t('plan.nextSession', { week: next.week + 1, key: keys })}</Text>
-        <Text color="textMuted">
-          {t(`focus.${session.focus}`)}
-          {plan.weeks[next.week].deload ? ` · ${t('plan.weekDeload', { n: next.week + 1 })}` : ''}
+      {/* What today is, at a glance: the day, the session, and its size. */}
+      <View style={styles.hero}>
+        <Text variant="eyebrow" color="textMuted">
+          {formatToday(i18n.language)}
         </Text>
-        <View style={styles.progress}>
-          <ProgressBar value={state.done.length / (plan.weeks.length * plan.sessions.length)} />
-        </View>
+        <Text variant="hero">{t(`focus.${session.focus}`)}</Text>
+        <Text color="textMuted">
+          {t('plan.nextSession', { week: next.week + 1, key: keys })} ·{' '}
+          {week.deload
+            ? t('today.recovery')
+            : t('today.effort', { level: t(`effort.intensity.${intensityForRir(week.rir)}`) })}
+        </Text>
+      </View>
+
+      {today && (
+        <StatRow
+          items={[
+            { value: String(chosen.length), label: t('today.statExercises', { count: chosen.length }) },
+            { value: String(totalSets), label: t('today.statSets', { count: totalSets }) },
+            { value: String(minutes ?? plan.sessionMinutes), label: t('today.statMinutes') },
+          ]}
+        />
+      )}
+
+      <View style={styles.progress}>
+        <ProgressBar value={state.done.length / (plan.weeks.length * plan.sessions.length)} />
+        <Text variant="caption" color="textMuted">
+          {t('plan.sessionsDone', {
+            done: state.done.length,
+            total: plan.weeks.length * plan.sessions.length,
+          })}
+        </Text>
       </View>
 
       <Card>
         <ListRow
+          leading={
+            <IconBadge name={{ ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' }} />
+          }
           title={location.name}
           subtitle={summarize(location.equipment)}
           onPress={() => router.push('/select-location')}
@@ -227,6 +261,9 @@ export function NextSession({ state, next, location }: NextSessionProps) {
         </Card>
       )}
 
+      <Text variant="eyebrow" color="textMuted" style={styles.sectionTitle}>
+        {t('today.exercises')}
+      </Text>
       <Card>
         {(today?.choices ?? []).map(({ slot, exercise }, index) => {
           const usual = home ? homeExercise(slot.id) : undefined;
@@ -234,10 +271,22 @@ export function NextSession({ state, next, location }: NextSessionProps) {
           return (
             <Fragment key={slot.id}>
               {index > 0 && <Divider />}
-              <View style={styles.exerciseRow}>
+              <Pressable
+                accessibilityRole={exercise?.nameKey ? 'button' : undefined}
+                disabled={!exercise?.nameKey}
+                onPress={() =>
+                  exercise && router.push({ pathname: '/how-to/[id]', params: { id: exercise.id } })
+                }
+                style={({ pressed }) => [styles.exerciseRow, pressed && styles.pressed]}>
+                <ExerciseThumb exercise={exercise ?? null} />
                 <View style={styles.exerciseName}>
-                  <Text color={exercise ? 'text' : 'textMuted'}>
+                  <Text variant="label" color={exercise ? 'text' : 'textMuted'}>
                     {exercise ? exerciseName(exercise) : t(`patterns.${slot.pattern}`)}
+                  </Text>
+                  <Text variant="caption" color="textMuted" numeric>
+                    {exercise
+                      ? `${t('today.setsReps', { sets: slot.setsPerWeek[next.week], min: slot.repMin, max: slot.repMax })}`
+                      : t('plan.skipped')}
                   </Text>
                   {changed && (
                     <Text variant="caption" color="textMuted">
@@ -245,12 +294,7 @@ export function NextSession({ state, next, location }: NextSessionProps) {
                     </Text>
                   )}
                 </View>
-                <Text variant="caption" color="textMuted" numeric>
-                  {exercise
-                    ? `${slot.setsPerWeek[next.week]} × ${slot.repMin}–${slot.repMax}`
-                    : t('plan.skipped')}
-                </Text>
-              </View>
+              </Pressable>
             </Fragment>
           );
         })}
@@ -296,11 +340,19 @@ const styles = StyleSheet.create({
   container: {
     gap: space.lg,
   },
-  heading: {
-    gap: 2,
+  hero: {
+    gap: space.xs,
+    marginTop: space.sm,
   },
   progress: {
-    marginTop: space.md,
+    gap: space.sm,
+  },
+  sectionTitle: {
+    marginTop: space.sm,
+    marginBottom: -space.sm,
+  },
+  pressed: {
+    opacity: 0.6,
   },
   chips: {
     flexDirection: 'row',
@@ -332,8 +384,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.md,
-    minHeight: touch.min,
-    paddingVertical: space.sm,
+    minHeight: touch.primary,
+    paddingVertical: space.md,
   },
   exerciseName: {
     flex: 1,

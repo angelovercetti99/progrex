@@ -11,6 +11,7 @@ import { finishWorkout, getWorkoutDetail } from '@/features/workouts/queries';
 import { RestTimer } from '@/features/workouts/RestTimer';
 import { DEFAULT_GOAL, getGoal } from '@/lib/preferences';
 import { Button } from '@/ui/Button';
+import { ProgressBar } from '@/ui/ProgressBar';
 import { Text } from '@/ui/Text';
 import { maxContentWidth, space } from '@/ui/theme';
 import { useTheme } from '@/ui/useTheme';
@@ -58,6 +59,13 @@ export default function WorkoutScreen() {
     previousActive.current = { id: activeId, sets: activeSets };
   }, [activeId, activeSets, activeDone, firstOpen]);
 
+  // How far through today's workout you are, in sets.
+  const setsDone = items.reduce((sum, item) => sum + item.sets.length, 0);
+  const setsPlanned = items.reduce(
+    (sum, item) => sum + Math.max(item.target?.sets.length ?? 0, item.sets.length),
+    0
+  );
+
   const lastCompletedAt =
     items
       .flatMap((item) => item.sets.map((set) => set.completedAt))
@@ -99,14 +107,20 @@ export default function WorkoutScreen() {
         automaticallyAdjustKeyboardInsets>
         <View style={styles.column}>
           <View style={styles.topBar}>
-            <Text color="textMuted" style={styles.place}>
-              {workout?.planWeek !== null ? (workout?.location?.name ?? '') : ''}
+            <Text variant="eyebrow" color="textMuted" style={styles.place} numeric>
+              {[
+                workout?.planWeek !== null ? workout?.location?.name : null,
+                setsPlanned ? t('today.setsOf', { done: setsDone, total: setsPlanned }) : null,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </Text>
             <RestTimer
               since={lastCompletedAt}
               targetSeconds={items.find((item) => item.id === activeId)?.target?.restSeconds ?? null}
             />
           </View>
+          {setsPlanned > 0 && <ProgressBar value={setsDone / setsPlanned} />}
 
           {detail.status === 'ready' && items.length === 0 && (
             <Text color="textMuted" align="center" style={styles.empty}>
@@ -114,9 +128,10 @@ export default function WorkoutScreen() {
             </Text>
           )}
 
-          {items.map((item) => (
+          {items.map((item, index) => (
             <ExerciseCard
               key={item.id}
+              position={{ n: index + 1, total: items.length }}
               workoutId={id}
               item={item}
               goal={goal}

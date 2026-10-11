@@ -26,6 +26,7 @@ import {
 } from '@/lib/preferences';
 import { Card, Divider } from '@/ui/Card';
 import { CheckRow } from '@/ui/CheckRow';
+import { IconBadge } from '@/ui/IconBadge';
 import { ListRow } from '@/ui/ListRow';
 import { Logo } from '@/ui/Logo';
 import { SegmentedControl } from '@/ui/SegmentedControl';
@@ -45,7 +46,6 @@ export default function SettingsScreen() {
   const goal = useLiveQuery(getGoal, ['preferences'], []).data ?? DEFAULT_GOAL;
   const showRir = useLiveQuery(getShowRir, ['preferences'], []).data ?? false;
   const themePreference = useLiveQuery(getThemePreference, ['preferences'], []).data ?? 'system';
-
   const [backupMessage, setBackupMessage] = useState<string | null>(null);
 
   const exportData = useSingleFlight(async () => {
@@ -105,7 +105,7 @@ export default function SettingsScreen() {
     <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.scroll}>
       <View style={styles.column}>
         <View style={styles.section}>
-          <Text variant="label" color="textMuted">
+          <Text variant="eyebrow" color="textMuted">
             {t('settings.language')}
           </Text>
           <SegmentedControl
@@ -120,7 +120,7 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text variant="label" color="textMuted">
+          <Text variant="eyebrow" color="textMuted">
             {t('settings.appearance')}
           </Text>
           <SegmentedControl<ThemePreference>
@@ -135,7 +135,7 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text variant="label" color="textMuted">
+          <Text variant="eyebrow" color="textMuted">
             {t('settings.goal')}
           </Text>
           <Card>
@@ -162,7 +162,13 @@ export default function SettingsScreen() {
         </View>
 
         <Card>
-          <ListRow title={t('settings.locations')} onPress={() => router.push('/locations')} />
+          <ListRow
+            leading={
+              <IconBadge name={{ ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' }} />
+            }
+            title={t('settings.locations')}
+            onPress={() => router.push('/locations')}
+          />
         </Card>
 
         <View style={styles.section}>
@@ -175,13 +181,25 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text variant="label" color="textMuted">
+          <Text variant="eyebrow" color="textMuted">
             {t('settings.backup')}
           </Text>
           <Card>
-            <ListRow title={t('settings.backupExport')} onPress={exportData} showChevron={false} />
+            <ListRow
+              leading={<IconBadge name={{ ios: 'square.and.arrow.up', android: 'upload', web: 'upload' }} />}
+              title={t('settings.backupExport')}
+              onPress={exportData}
+              showChevron={false}
+            />
             <Divider />
-            <ListRow title={t('settings.backupImport')} onPress={importData} showChevron={false} />
+            <ListRow
+              leading={
+                <IconBadge name={{ ios: 'square.and.arrow.down', android: 'download', web: 'download' }} />
+              }
+              title={t('settings.backupImport')}
+              onPress={importData}
+              showChevron={false}
+            />
           </Card>
           <Text variant="caption" color="textMuted">
             {backupMessage ?? t('settings.backupHint')}

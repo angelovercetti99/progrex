@@ -1,4 +1,4 @@
-import { effortForRir, type Goal } from '@progrex/shared';
+import { effortForRir, exerciseDemo, type Goal } from '@progrex/shared';
 import * as Haptics from 'expo-haptics';
 import { SymbolView } from 'expo-symbols';
 import { router } from 'expo-router';
@@ -9,6 +9,8 @@ import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated'
 
 import { useLiveQuery } from '@/db/live';
 import type { Exercise, WorkoutSet } from '@/db/schema';
+import { ExerciseDemoView } from '@/features/exercises/ExerciseDemoView';
+import { ExerciseThumb } from '@/features/exercises/ExerciseThumb';
 import { useExerciseName } from '@/features/exercises/useExerciseName';
 import { useTargetMessage } from '@/features/progression/useTargetMessage';
 import { confirm } from '@/lib/confirm';
@@ -45,16 +47,28 @@ type ExerciseCardProps = {
   harder: Exercise | null;
   /** Only the active card shows the set logger. */
   active: boolean;
+  /** "2 of 6": where this exercise is in today's workout. */
+  position: { n: number; total: number };
   onActivate: () => void;
 };
 
-export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate }: ExerciseCardProps) {
+export function ExerciseCard({
+  workoutId,
+  item,
+  goal,
+  harder,
+  active,
+  position,
+  onActivate,
+}: ExerciseCardProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const exerciseName = useExerciseName();
   const targetMessage = useTargetMessage();
   const kg = t('common.kg');
   const usesWeight = item.exercise.loadType === 'external';
+  // Built-in exercises have a demo; custom ones don't.
+  const demo = exerciseDemo(item.exercise.nameKey);
   const target = item.target;
   // Beginners see effort in words; people who know RIR can turn the numbers on.
   const showRir = useLiveQuery(getShowRir, ['preferences'], []).data ?? false;
@@ -141,6 +155,10 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
     stopEditing();
   }
 
+  function openHowTo() {
+    router.push({ pathname: '/how-to/[id]', params: { id: item.exerciseId } });
+  }
+
   async function removeExercise() {
     const message = `${t('workout.removeExercise')}?`;
     if (await confirm(message, t('common.delete'), t('common.cancel'))) {
@@ -172,7 +190,11 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
   return (
     <Card style={styles.card}>
       <View style={styles.headerRow}>
+        {!active && <ExerciseThumb exercise={item.exercise} size={44} />}
         <Pressable onPress={onActivate} disabled={active} style={styles.header}>
+          <Text variant="eyebrow" color="textMuted" numeric>
+            {t('workout.position', position)}
+          </Text>
           <Text variant="heading">{exerciseName(item.exercise)}</Text>
           {lastSummary ? (
             <Text variant="caption" color="textMuted">
@@ -180,13 +202,13 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
             </Text>
           ) : null}
         </Pressable>
-        {/* Built-in exercises have a demo; custom ones don't. */}
-        {item.exercise.nameKey && (
+        {/* The active card shows the demo itself; the others just a shortcut to it. */}
+        {demo && !active && (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t('howTo.open')}
             hitSlop={8}
-            onPress={() => router.push({ pathname: '/how-to/[id]', params: { id: item.exerciseId } })}
+            onPress={openHowTo}
             style={styles.howTo}>
             <SymbolView
               name={{ ios: 'info.circle', android: 'info', web: 'info' }}
@@ -196,6 +218,19 @@ export function ExerciseCard({ workoutId, item, goal, harder, active, onActivate
           </Pressable>
         )}
       </View>
+
+      {active && demo && (
+        // How the exercise is done, always in view while you do it. Tap for the cues.
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('howTo.open')}
+          onPress={openHowTo}
+          style={[styles.demo, { backgroundColor: theme.surfaceMuted }]}>
+          <View style={styles.demoFigure}>
+            <ExerciseDemoView demo={demo} />
+          </View>
+        </Pressable>
+      )}
 
       {target && (
         <View style={[styles.target, { borderColor: theme.accent }]}>
@@ -346,8 +381,8 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: space.sm,
+    alignItems: 'center',
+    gap: space.md,
   },
   header: {
     flex: 1,
@@ -360,6 +395,15 @@ const styles = StyleSheet.create({
     marginRight: -space.md,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  demo: {
+    alignItems: 'center',
+    borderRadius: radius.sm,
+    paddingVertical: space.xs,
+  },
+  demoFigure: {
+    width: '100%',
+    height: 150,
   },
   target: {
     borderLeftWidth: 3,

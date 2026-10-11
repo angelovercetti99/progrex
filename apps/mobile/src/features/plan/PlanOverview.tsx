@@ -2,7 +2,7 @@ import { SymbolView } from 'expo-symbols';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { intensityForRir } from '@progrex/shared';
 
@@ -14,14 +14,14 @@ import { Card, Divider } from '@/ui/Card';
 import { ListRow } from '@/ui/ListRow';
 import { ProgressBar } from '@/ui/ProgressBar';
 import { Text } from '@/ui/Text';
-import { space, touch } from '@/ui/theme';
+import { radius, space } from '@/ui/theme';
 import { useTheme } from '@/ui/useTheme';
 
 import { endMesocycle, sessionKey, type PlanState } from './queries';
 
 /**
- * The block at a glance: overall progress, the current week open, the others
- * folded into one line each (tap to open).
+ * The block at a glance: where you are, how hard each week is (a small bar
+ * chart; tap a week to see its sessions), and that week's sessions.
  */
 export function PlanOverview({ state }: { state: PlanState }) {
   const { t } = useTranslation();
@@ -33,16 +33,7 @@ export function PlanOverview({ state }: { state: PlanState }) {
   const total = plan.weeks.length * plan.sessions.length;
 
   const showRir = useLiveQuery(getShowRir, ['preferences'], []).data ?? false;
-  const [open, setOpen] = useState<Set<number>>(() => new Set([currentWeek]));
-
-  function toggle(week: number) {
-    setOpen((current) => {
-      const next = new Set(current);
-      if (next.has(week)) next.delete(week);
-      else next.add(week);
-      return next;
-    });
-  }
+  const [selected, setSelected] = useState(currentWeek);
 
   async function newPlan() {
     if (complete) {
@@ -52,135 +43,231 @@ export function PlanOverview({ state }: { state: PlanState }) {
     }
   }
 
-  function weekTitle(index: number): string {
+  function weekEffort(index: number): string {
     const week = plan.weeks[index];
-    if (week.deload) return t('plan.weekDeload', { n: index + 1 });
+    if (week.deload) return t('plan.recovery');
     return showRir
-      ? t('plan.weekRir', { n: index + 1, rir: week.rir })
-      : t('plan.weekEffort', { n: index + 1, level: t(`effort.intensity.${intensityForRir(week.rir)}`) });
+      ? t('plan.rir', { rir: week.rir })
+      : t('plan.effort', { level: t(`effort.intensity.${intensityForRir(week.rir)}`) });
   }
+
+  /** Bar height: the closer to failure, the taller. Recovery is the lowest. */
+  function barHeight(index: number): number {
+    const week = plan.weeks[index];
+    if (week.deload) return 0.22;
+    return 0.4 + (0.6 * (4 - Math.min(4, week.rir))) / 4;
+  }
+
+  const weekDone = (index: number) =>
+    plan.sessions.every((_, session) => done.has(sessionKey({ week: index, session })));
 
   return (
     <View style={styles.container}>
-      {/* Overall progress */}
-      <View style={styles.progress}>
-        <Text variant="heading">
+      <View style={styles.hero}>
+        <Text variant="eyebrow" color="textMuted">
+          {t(`goals.${plan.goal}`)} ·{' '}
+          {t('plan.daysMinutes', { days: plan.daysPerWeek, minutes: plan.sessionMinutes })}
+        </Text>
+        <Text variant="hero">
           {complete
             ? t('plan.completeTitle')
             : t('plan.weekOf', { n: currentWeek + 1, total: plan.weeks.length })}
         </Text>
+        {plan.priorityAreas?.length ? (
+          <Text color="textMuted">
+            {t('plan.focusSummary', {
+              areas: plan.priorityAreas.map((area) => t(`areas.${area}`)).join(', '),
+            })}
+          </Text>
+        ) : null}
+      </View>
+
+      <View style={styles.progress}>
         <ProgressBar value={done.size / total} />
         <Text variant="caption" color="textMuted">
-          {t('plan.sessionsDone', { done: done.size, total })} ·{' '}
-          {t('plan.summary', {
-            goal: t(`goals.${plan.goal}`),
-            days: plan.daysPerWeek,
-            minutes: plan.sessionMinutes,
-          })}
-          {plan.priorityAreas?.length
-            ? ` · ${t('plan.focusSummary', {
-                areas: plan.priorityAreas.map((area) => t(`areas.${area}`)).join(', '),
-              })}`
-            : ''}
+          {t('plan.sessionsDone', { done: done.size, total })}
         </Text>
       </View>
 
       {complete && <Button label={t('plan.newPlan')} onPress={newPlan} />}
 
-      <Card>
-        {plan.weeks.map((week, weekIndex) => {
-          const weekDone = plan.sessions.every((_, session) =>
-            done.has(sessionKey({ week: weekIndex, session }))
-          );
-          const isOpen = open.has(weekIndex);
-          return (
-            <Fragment key={weekIndex}>
-              {weekIndex > 0 && <Divider />}
+      {/* Effort per week: a bar per week, tap to see that week. */}
+      <Card style={styles.chartCard}>
+        <View style={styles.chartHeader}>
+          <Text variant="label">{t('plan.effortTitle')}</Text>
+          <Text variant="caption" color="textMuted">
+            {weekEffort(selected)}
+          </Text>
+        </View>
+        <View style={styles.chart}>
+          {plan.weeks.map((week, index) => {
+            const isSelected = index === selected;
+            const isCurrent = index === currentWeek && !complete;
+            return (
               <Pressable
+                key={index}
                 accessibilityRole="button"
-                accessibilityState={{ expanded: isOpen }}
-                onPress={() => toggle(weekIndex)}
-                style={styles.weekRow}>
+                accessibilityState={{ selected: isSelected }}
+                accessibilityLabel={`${t('plan.week', { n: index + 1 })}, ${weekEffort(index)}`}
+                onPress={() => setSelected(index)}
+                style={styles.barColumn}>
+                <View style={styles.barTrack}>
+                  <View
+                    style={[
+                      styles.bar,
+                      {
+                        height: `${barHeight(index) * 100}%`,
+                        backgroundColor: isSelected ? theme.accent : theme.surfaceMuted,
+                        borderColor: isCurrent && !isSelected ? theme.accent : 'transparent',
+                      },
+                    ]}>
+                    {weekDone(index) && (
+                      <SymbolView
+                        name={{ ios: 'checkmark', android: 'check', web: 'check' }}
+                        tintColor={isSelected ? theme.onAccent : theme.textMuted}
+                        size={14}
+                      />
+                    )}
+                  </View>
+                </View>
                 <Text
-                  variant={weekIndex === currentWeek ? 'label' : 'body'}
-                  color={weekDone ? 'textMuted' : 'text'}
-                  style={styles.weekTitle}>
-                  {weekTitle(weekIndex)}
+                  variant="caption"
+                  color={isSelected ? 'text' : 'textMuted'}
+                  style={isSelected ? styles.barLabelSelected : undefined}
+                  numeric>
+                  {week.deload ? 'R' : `S${index + 1}`}
                 </Text>
-                {weekDone && <DoneIcon color={theme.textMuted} />}
-                <SymbolView
-                  name={{
-                    ios: isOpen ? 'chevron.up' : 'chevron.down',
-                    android: isOpen ? 'expand_less' : 'expand_more',
-                    web: isOpen ? 'expand_less' : 'expand_more',
-                  }}
-                  tintColor={theme.textMuted}
-                  size={16}
-                />
               </Pressable>
-
-              {isOpen && (
-                <Animated.View entering={FadeIn.duration(200)} layout={LinearTransition.duration(200)}>
-                  {plan.sessions.map((session, sessionIndex) => {
-                    const ref = { week: weekIndex, session: sessionIndex };
-                    const isDone = done.has(sessionKey(ref));
-                    const isNext = state.next?.week === weekIndex && state.next.session === sessionIndex;
-                    return (
-                      <View key={session.key} style={styles.session}>
-                        <ListRow
-                          title={`${t('plan.session', { key: session.key })} · ${t(`focus.${session.focus}`)}`}
-                          subtitle={session.slots.map((slot) => t(`patterns.${slot.pattern}`)).join(', ')}
-                          right={
-                            isDone ? (
-                              <DoneIcon color={theme.text} />
-                            ) : isNext ? (
-                              <Text variant="label">{t('plan.next')}</Text>
-                            ) : null
-                          }
-                        />
-                      </View>
-                    );
-                  })}
-                </Animated.View>
-              )}
-            </Fragment>
-          );
-        })}
+            );
+          })}
+        </View>
       </Card>
+
+      <Text variant="eyebrow" color="textMuted" style={styles.sectionTitle}>
+        {selected === currentWeek && !complete ? t('plan.thisWeek') : t('plan.week', { n: selected + 1 })}
+      </Text>
+      <Animated.View key={selected} entering={FadeIn.duration(200)}>
+        <Card>
+          {plan.sessions.map((session, sessionIndex) => {
+            const ref = { week: selected, session: sessionIndex };
+            const isDone = done.has(sessionKey(ref));
+            const isNext = state.next?.week === selected && state.next.session === sessionIndex;
+            return (
+              <Fragment key={session.key}>
+                {sessionIndex > 0 && <Divider />}
+                <ListRow
+                  leading={<SessionBadge letter={session.key} done={isDone} next={isNext} />}
+                  title={t(`focus.${session.focus}`)}
+                  subtitle={session.slots.map((slot) => t(`patterns.${slot.pattern}`)).join(', ')}
+                  right={
+                    isNext ? (
+                      <View style={[styles.nextPill, { backgroundColor: theme.accent }]}>
+                        <Text variant="caption" color="onAccent" style={styles.nextText}>
+                          {t('plan.next')}
+                        </Text>
+                      </View>
+                    ) : null
+                  }
+                />
+              </Fragment>
+            );
+          })}
+        </Card>
+      </Animated.View>
 
       {!complete && <Button variant="secondary" label={t('plan.newPlan')} onPress={newPlan} />}
     </View>
   );
 }
 
-function DoneIcon({ color }: { color: string }) {
+/** The session letter in a circle: filled with a ✓ when done, outlined when it's next. */
+function SessionBadge({ letter, done, next }: { letter: string; done: boolean; next: boolean }) {
+  const theme = useTheme();
   return (
-    <SymbolView
-      name={{ ios: 'checkmark.circle.fill', android: 'check_circle', web: 'check_circle' }}
-      tintColor={color}
-      size={20}
-    />
+    <View
+      style={[
+        styles.badge,
+        {
+          backgroundColor: done ? theme.accent : theme.surfaceMuted,
+          borderColor: next ? theme.accent : 'transparent',
+        },
+      ]}>
+      {done ? (
+        <SymbolView
+          name={{ ios: 'checkmark', android: 'check', web: 'check' }}
+          tintColor={theme.onAccent}
+          size={16}
+        />
+      ) : (
+        <Text variant="label">{letter}</Text>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    gap: space.xl,
+    gap: space.lg,
     paddingBottom: space.xl,
+  },
+  hero: {
+    gap: space.xs,
   },
   progress: {
     gap: space.sm,
   },
-  weekRow: {
+  chartCard: {
+    paddingVertical: space.lg,
+    gap: space.lg,
+  },
+  chartHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+  },
+  chart: {
+    flexDirection: 'row',
+    gap: space.sm,
+  },
+  barColumn: {
+    flex: 1,
     alignItems: 'center',
     gap: space.sm,
-    minHeight: touch.primary,
   },
-  weekTitle: {
-    flex: 1,
+  barTrack: {
+    height: 88,
+    width: '100%',
+    justifyContent: 'flex-end',
   },
-  session: {
-    paddingLeft: space.md,
+  bar: {
+    width: '100%',
+    borderRadius: radius.sm,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: space.xs,
+  },
+  barLabelSelected: {
+    fontWeight: '700',
+  },
+  sectionTitle: {
+    marginTop: space.sm,
+    marginBottom: -space.sm,
+  },
+  badge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nextPill: {
+    paddingHorizontal: space.md,
+    paddingVertical: space.xs,
+    borderRadius: radius.pill,
+  },
+  nextText: {
+    fontWeight: '600',
   },
 });

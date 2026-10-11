@@ -50,7 +50,7 @@ function AppNavigator() {
           screenOptions={{
             headerShadowVisible: false,
             headerBackButtonDisplayMode: 'minimal',
-            headerTitleStyle: { fontFamily: fontFamilyFor('600') },
+            headerTitleStyle: { fontFamily: fontFamilyFor('700', 'display'), fontSize: 17 },
             contentStyle: { backgroundColor: palette.background },
           }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

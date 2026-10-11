@@ -16,7 +16,20 @@
     "inProgress": "Workout in progress",
     "exerciseCount_one": "{{count}} exercise",
     "exerciseCount_other": "{{count}} exercises",
-    "continue": "Continue workout"
+    "continue": "Continue workout",
+    "statExercises_one": "exercise",
+    "statExercises_other": "exercises",
+    "statSets_one": "set",
+    "statSets_other": "sets",
+    "statMinutes": "minutes",
+    "exercises": "Today's exercises",
+    "effort": "{{level}} effort",
+    "recovery": "recovery week",
+    "setsReps": "{{sets}} sets × {{min}}–{{max}} reps",
+    "keepGoing": "Pick up where you left off",
+    "setsOf": "{{done}} of {{total}} sets",
+    "setsCount_one": "{{count}} set",
+    "setsCount_other": "{{count}} sets"
   },
   "plan": {
     "title": "Plan",
@@ -52,7 +65,13 @@
     "front": "Front",
     "back": "Back",
     "areasMax": "Up to {{max}} areas. Tap a chosen one to remove it.",
-    "focusSummary": "Focus: {{areas}}"
+    "focusSummary": "Focus: {{areas}}",
+    "recovery": "Recovery",
+    "rir": "RIR {{rir}}",
+    "effort": "{{level}} effort",
+    "effortTitle": "Effort by week",
+    "thisWeek": "This week",
+    "daysMinutes": "{{days}} days · {{minutes}} min"
   },
   "history": {
     "title": "History",
@@ -137,7 +156,8 @@
     "repsLabel": "Reps",
     "target": "Target",
     "autoAdjusted": "Adjusted to your last set",
-    "swap": "Swap"
+    "swap": "Swap",
+    "position": "{{n}} of {{total}}"
   },
   "addExercise": {
     "title": "Add exercise",

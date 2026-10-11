@@ -16,7 +16,20 @@
     "inProgress": "Treino em curso",
     "exerciseCount_one": "{{count}} exercício",
     "exerciseCount_other": "{{count}} exercícios",
-    "continue": "Continuar treino"
+    "continue": "Continuar treino",
+    "statExercises_one": "exercício",
+    "statExercises_other": "exercícios",
+    "statSets_one": "série",
+    "statSets_other": "séries",
+    "statMinutes": "minutos",
+    "exercises": "Exercícios de hoje",
+    "effort": "esforço {{level}}",
+    "recovery": "semana de recuperação",
+    "setsReps": "{{sets}} séries × {{min}}–{{max}} reps",
+    "keepGoing": "Continua onde ficaste",
+    "setsOf": "{{done}} de {{total}} séries",
+    "setsCount_one": "{{count}} série",
+    "setsCount_other": "{{count}} séries"
   },
   "plan": {
     "title": "Plano",
@@ -52,7 +65,13 @@
     "front": "Frente",
     "back": "Costas",
     "areasMax": "Máximo de {{max}} zonas. Toca numa escolhida para a retirar.",
-    "focusSummary": "Foco: {{areas}}"
+    "focusSummary": "Foco: {{areas}}",
+    "recovery": "Recuperação",
+    "rir": "RIR {{rir}}",
+    "effort": "Esforço {{level}}",
+    "effortTitle": "Esforço por semana",
+    "thisWeek": "Esta semana",
+    "daysMinutes": "{{days}} dias · {{minutes}} min"
   },
   "history": {
     "title": "Histórico",
@@ -137,7 +156,8 @@
     "repsLabel": "Repetições",
     "target": "Alvo",
     "autoAdjusted": "Ajustado à série anterior",
-    "swap": "Trocar"
+    "swap": "Trocar",
+    "position": "{{n}} de {{total}}"
   },
   "addExercise": {
     "title": "Adicionar exercício",

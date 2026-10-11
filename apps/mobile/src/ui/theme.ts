@@ -55,7 +55,17 @@ export const radius = {
   sm: 8,
   md: 14,
   lg: 20,
+  xl: 28,
   pill: 999,
+} as const;
+
+/**
+ * Depth for cards. In light mode a soft shadow lifts white cards off the grey
+ * background; in dark mode the lighter surface already does that.
+ */
+export const elevation = {
+  light: '0px 1px 2px rgba(0, 0, 0, 0.04), 0px 8px 24px rgba(0, 0, 0, 0.06)',
+  dark: 'none',
 } as const;
 
 /** Minimum touch sizes. Used in the gym with sweaty hands, so err on big. */
@@ -68,13 +78,28 @@ export const touch = {
 export const maxContentWidth = 560;
 
 export const typography = {
-  // Big numbers: weight, reps, timer. Semibold like Apple Fitness, not heavy.
-  display: { fontSize: 64, lineHeight: 70, fontWeight: '600', letterSpacing: -2.5 },
-  title: { fontSize: 34, lineHeight: 41, fontWeight: '700', letterSpacing: -1 },
+  // Big numbers: weight, reps, timer. Wide and heavy (Archivo).
+  display: { fontSize: 60, lineHeight: 66, fontWeight: '700', letterSpacing: -2 },
+  // The one thing a screen is about (today's session, this week).
+  hero: { fontSize: 38, lineHeight: 42, fontWeight: '800', letterSpacing: -1.2 },
+  title: { fontSize: 32, lineHeight: 38, fontWeight: '800', letterSpacing: -1 },
   heading: { fontSize: 20, lineHeight: 26, fontWeight: '600', letterSpacing: -0.4 },
+  // A number in a summary row (exercises · sets · minutes).
+  stat: { fontSize: 28, lineHeight: 32, fontWeight: '800', letterSpacing: -0.8 },
   body: { fontSize: 17, lineHeight: 24, fontWeight: '400', letterSpacing: -0.2 },
   label: { fontSize: 15, lineHeight: 20, fontWeight: '600', letterSpacing: -0.1 },
   caption: { fontSize: 13, lineHeight: 18, fontWeight: '400' },
+  // Small label above a title or a group: "SÁBADO, 10 OUT", "ESTA SEMANA".
+  eyebrow: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '600',
+    letterSpacing: 0.9,
+    textTransform: 'uppercase',
+  },
 } satisfies Record<string, TextStyle>;
 
 export type TypographyVariant = keyof typeof typography;
+
+/** Variants drawn in the wide display face (Archivo); the rest use Inter. */
+export const DISPLAY_VARIANTS: readonly TypographyVariant[] = ['display', 'hero', 'title', 'stat'];

@@ -9,6 +9,8 @@ import { useTheme } from './useTheme';
 type ListRowProps = {
   title: string;
   subtitle?: string;
+  /** Shown before the title (an icon or a thumbnail). */
+  leading?: ReactNode;
   /** Shown on the right, before the chevron. */
   value?: string;
   right?: ReactNode;
@@ -18,7 +20,15 @@ type ListRowProps = {
 };
 
 /** A tappable row: title (+ subtitle) on the left, value and › on the right. */
-export function ListRow({ title, subtitle, value, right, onPress, showChevron = true }: ListRowProps) {
+export function ListRow({
+  title,
+  subtitle,
+  leading,
+  value,
+  right,
+  onPress,
+  showChevron = true,
+}: ListRowProps) {
   const theme = useTheme();
   return (
     <Pressable
@@ -26,6 +36,7 @@ export function ListRow({ title, subtitle, value, right, onPress, showChevron = 
       disabled={!onPress}
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+      {leading}
       <View style={styles.texts}>
         <Text>{title}</Text>
         {subtitle ? (

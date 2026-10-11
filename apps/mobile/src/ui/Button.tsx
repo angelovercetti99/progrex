@@ -38,7 +38,7 @@ export function Button({ label, onPress, variant = 'primary', disabled = false }
         pressed && styles.pressed,
         disabled && styles.disabled,
       ]}>
-      <Text variant="label" color={isPrimary ? 'onAccent' : 'text'} style={styles.label}>
+      <Text variant="label" face="display" color={isPrimary ? 'onAccent' : 'text'} style={styles.label}>
         {label}
       </Text>
     </Pressable>
@@ -54,7 +54,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   label: {
-    fontSize: 17,
+    fontWeight: '700',
+    fontSize: 16,
+    letterSpacing: -0.2,
   },
   pressed: {
     opacity: 0.85,

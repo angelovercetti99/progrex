@@ -7,6 +7,7 @@ import { SectionList, StyleSheet, View } from 'react-native';
 import { useLiveQuery } from '@/db/live';
 import type { Exercise } from '@/db/schema';
 import { listExercises } from '@/features/exercises/queries';
+import { ExerciseThumb } from '@/features/exercises/ExerciseThumb';
 import { useExerciseName } from '@/features/exercises/useExerciseName';
 import { addExerciseToWorkout, getWorkoutDetail, swapExercise } from '@/features/workouts/queries';
 import { ListRow } from '@/ui/ListRow';
@@ -104,7 +105,12 @@ export default function AddExerciseScreen() {
         )}
         renderItem={({ item }) => (
           <View style={[styles.item, { backgroundColor: theme.surface }]}>
-            <ListRow title={exerciseName(item)} subtitle={equipmentLabel(item)} onPress={() => add(item)} />
+            <ListRow
+              leading={<ExerciseThumb exercise={item} size={44} />}
+              title={exerciseName(item)}
+              subtitle={equipmentLabel(item)}
+              onPress={() => add(item)}
+            />
           </View>
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
